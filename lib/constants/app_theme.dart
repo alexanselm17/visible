@@ -64,26 +64,26 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: pureWhite,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: darkBlue),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: accentOrange, width: 2),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: darkBlue.withOpacity(0.5)),
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: Color(0xFFEEEEEE),
-      thickness: 1,
-    ),
+    // inputDecorationTheme: InputDecorationTheme(
+    //   filled: true,
+    //   fillColor: pureWhite,
+    //   border: OutlineInputBorder(
+    //     borderRadius: BorderRadius.circular(12),
+    //     borderSide: const BorderSide(color: darkBlue),
+    //   ),
+    //   focusedBorder: OutlineInputBorder(
+    //     borderRadius: BorderRadius.circular(12),
+    //     borderSide: const BorderSide(color: accentOrange, width: 2),
+    //   ),
+    //   enabledBorder: OutlineInputBorder(
+    //     borderRadius: BorderRadius.circular(12),
+    //     borderSide: BorderSide(color: darkBlue.withOpacity(0.5)),
+    //   ),
+    // ),
+    // dividerTheme: const DividerThemeData(
+    //   color: Color(0xFFEEEEEE),
+    //   thickness: 1,
+    // ),
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
