@@ -1,0 +1,70 @@
+name: visible
+description: "A new Flutter project."
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.3 <4.0.0"
+
+dependencies:
+  cached_network_image: ^3.3.1
+  cupertino_icons: ^1.0.6
+  dio: ^5.8.0+1
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.4
+  fl_chart: ^0.66.2
+  flutter:
+    sdk: flutter
+  flutter_animate: ^4.5.2
+  flutter_launcher_icons: ^0.9.2
+  flutter_local_notifications: ^18.0.1
+  get: ^4.7.2
+  get_it: ^8.0.3
+  image_picker: ^1.1.2
+  intl: ^0.20.2
+  logger: ^2.5.0
+  percent_indicator: ^4.2.5
+  permission_handler: ^11.3.1
+  share_plus: ^10.1.4
+  shared_preferences: ^2.3.3
+  gallery_saver: ^2.3.2
+  path_provider: ^2.1.1
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  fonts:
+    - family: TT Hoves Pro Trial
+      fonts:
+        - asset: assets/fonts/TT Hoves Pro Trial Black.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Bold.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Light.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Medium.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Regular.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Thin.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial ExtraBold.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial ExtraLight.ttf
+        - asset: assets/fonts/TT Hoves Pro Trial Hairline.ttf
+
+    - family: Leotaro
+      fonts:
+        - asset: assets/fonts/Leotaro-Free.otf
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.jpeg"
+  adaptive_icon_foreground: "assets/images/logo_foreground.png"
+  adaptive_icon_background: "#FFFFFF"
+  min_sdk_android: 21
+  remove_alpha_ios: true
