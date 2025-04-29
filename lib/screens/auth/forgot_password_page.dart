@@ -23,14 +23,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   void _sendResetLink() {
-    // Here you would implement the actual password reset logic
-    // For now, we'll just simulate a successful email send
     if (_emailController.text.isNotEmpty) {
       setState(() {
         _isEmailSent = true;
       });
 
-      // Optional: Add a timer to automatically navigate back after showing success message
       Future.delayed(const Duration(seconds: 3), () {
         Get.back();
       });

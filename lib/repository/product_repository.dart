@@ -34,10 +34,10 @@ class ProductRepository {
     }
   }
 
-  Future<Response?> getProducts() async {
+  Future<Response?> getProducts({required String userId}) async {
     try {
-      final Response? response =
-          await dioClient.getHTTP("${ApiEndpoints.baseUrl}/get_product_advert");
+      final Response? response = await dioClient.getHTTP(
+          "${ApiEndpoints.baseUrl}/campaign/get_product_advert?user_id=$userId");
 
       return response;
     } on DioException catch (e) {
@@ -50,7 +50,7 @@ class ProductRepository {
 
   Future<Response?> uploadProductScreenShot({
     required File imageFile,
-    required int productId,
+    required String productId,
   }) async {
     try {
       final formData = FormData.fromMap({

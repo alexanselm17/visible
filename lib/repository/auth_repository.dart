@@ -14,11 +14,11 @@ class AuthRepository {
     required String phone,
     required int nationalId,
     required String email,
-    required String cardNumber,
+    required String occupation,
     required String password,
     required String cpassword,
-    required String companyId,
-    required String petroStationId,
+    required String location,
+    required String gender,
   }) async {
     try {
       var body = {
@@ -27,11 +27,11 @@ class AuthRepository {
         "phone": phone,
         "email": email,
         "national_id": nationalId,
-        "card_number": cardNumber,
         "password": password,
+        "occupation": occupation,
+        "location": location,
         "password_confirmation": cpassword,
-        "company_id": companyId,
-        "visible_id": petroStationId,
+        "gender": gender
       };
       Logger().d(body);
       final Response? response =

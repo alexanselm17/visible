@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/auth/forgot_password_page.dart';
 import 'package:visible/screens/auth/sign_up_page.dart';
-import 'package:visible/screens/user/main_screen.dart' as user;
-import 'package:visible/screens/admin/main_screen.dart' as admin;
+import 'package:visible/widgets/input_widgets.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,10 +18,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _obscurePassword = true;
   bool _rememberMe = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
 
   @override
   void dispose() {
@@ -34,13 +35,15 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.pureWhite,
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Header with gradient and logo
+            Container(
               width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.4,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -126,236 +129,124 @@ class _LoginPageState extends State<LoginPage> {
                 begin: const Offset(3, 3),
                 end: const Offset(1, 1),
                 duration: 400.ms),
-          ),
 
-          // Email field with animation
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.pureWhite,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              ),
-              child: TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  hintText: 'Email',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-            ),
-          ).animate(delay: 300.ms).fadeIn(duration: 600.ms).slideX(
-              begin: 0.2, end: 0, duration: 600.ms, curve: Curves.easeOutQuad),
-
-          const SizedBox(height: 16),
-
-          // Password field with animation
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.pureWhite,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              ),
-              child: TextField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  StandardFormField(
+                    label: 'Email',
+                    hintText: 'Enter your email address',
+                    controller: _emailController,
+                    prefixIconData: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    animationDelay: const Duration(milliseconds: 300),
                   ),
-                ),
-              ),
-            ),
-          ).animate(delay: 400.ms).fadeIn(duration: 600.ms).slideX(
-              begin: 0.2, end: 0, duration: 600.ms, curve: Curves.easeOutQuad),
 
-          const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-          // Remember me checkbox and Forgot password
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Remember me checkbox
-                Row(
-                  children: [
-                    SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: Checkbox(
-                        value: _rememberMe,
-                        activeColor: AppColors.accentOrange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                  PasswordFormField(
+                    label: 'Password',
+                    hintText: 'Enter your password',
+                    controller: _passwordController,
+                    textInputAction: TextInputAction.done,
+                    animationDelay: const Duration(milliseconds: 400),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Padding(
+                    padding: const EdgeInsets.all(0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Checkbox(
+                                value: _rememberMe,
+                                activeColor: AppColors.accentOrange,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    _rememberMe = value ?? false;
+                                  });
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Remember me',
+                              style: TextStyle(
+                                fontFamily: 'TT Hoves Pro Trial',
+                                fontSize: 14,
+                                color: AppColors.primaryBlack,
+                              ),
+                            ),
+                          ],
                         ),
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _rememberMe = value ?? false;
-                          });
-                        },
-                      ),
+
+                        // Forgot password link
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(const ForgotPasswordPage());
+                            debugPrint('Forgot password tapped');
+                          },
+                          child: const Text(
+                            'Forgot password?',
+                            style: TextStyle(
+                              fontFamily: 'TT Hoves Pro Trial',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.accentOrange,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Remember me',
-                      style: TextStyle(
-                        fontFamily: 'TT Hoves Pro Trial',
-                        fontSize: 14,
-                        color: AppColors.primaryBlack,
-                      ),
-                    ),
-                  ],
-                ),
+                  )
+                      .animate(delay: const Duration(milliseconds: 450))
+                      .fadeIn(duration: 600.ms)
+                      .moveY(
+                          begin: 10,
+                          end: 0,
+                          duration: 400.ms,
+                          curve: Curves.easeOut),
 
-                // Forgot password link
-                GestureDetector(
-                  onTap: () {
-                    Get.to(const ForgotPasswordPage());
-                    debugPrint('Forgot password tapped');
-                  },
-                  child: const Text(
-                    'Forgot password?',
-                    style: TextStyle(
-                      fontFamily: 'TT Hoves Pro Trial',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.accentOrange,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ).animate(delay: 450.ms).fadeIn(duration: 600.ms).moveY(
-              begin: 10, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                  const SizedBox(height: 40),
 
-          const SizedBox(height: 28),
+                  // Sign In Button with animation
+                  FormActionButton(
+                    text: 'Sign In',
+                    onPressed: () {
+                      authenticationController.handleSignIn(
+                          userName: _emailController.text,
+                          password: _passwordController.text);
+                    },
+                    animationDelay: const Duration(milliseconds: 500),
+                  ),
 
-          // Sign In Button with animation
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.to(const user.MainScreen());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentOrange,
-                  foregroundColor: AppColors.pureWhite,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Sign In',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          ).animate(delay: 500.ms).fadeIn(duration: 600.ms).scale(
-              begin: const Offset(0.95, 0.95),
-              end: const Offset(1, 1),
-              duration: 600.ms,
-              curve: Curves.easeOut),
-          const SizedBox(height: 10),
+                  const SizedBox(height: 30),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.to(const admin.MainScreen());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.darkBlue,
-                  foregroundColor: AppColors.pureWhite,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Sign In',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          ).animate(delay: 500.ms).fadeIn(duration: 600.ms).scale(
-              begin: const Offset(0.95, 0.95),
-              end: const Offset(1, 1),
-              duration: 600.ms,
-              curve: Curves.easeOut),
-
-          const SizedBox(height: 20),
-
-          // Don't have an account? Sign up
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: const TextStyle(
-                fontFamily: 'TT Hoves Pro Trial',
-                color: AppColors.primaryBlack,
-                fontSize: 14,
-              ),
-              children: [
-                const TextSpan(text: "Don't have an account? "),
-                TextSpan(
-                  text: 'Sign up',
-                  style: const TextStyle(
-                    color: AppColors.accentOrange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
+                  // Don't have an account? Sign up
+                  AuthLinkText(
+                    leadText: "Don't have an account?",
+                    linkText: 'Sign up',
+                    onTap: () {
                       Get.to(const SignUpPage());
                     },
-                ),
-              ],
+                    animationDelay: const Duration(milliseconds: 600),
+                  ),
+                ],
+              ),
             ),
-          ).animate(delay: 600.ms).fadeIn(duration: 600.ms).moveY(
-              begin: 10, end: 0, duration: 400.ms, curve: Curves.easeOut),
-
-          const SizedBox(height: 50),
-        ],
+          ],
+        ),
       ),
     );
   }

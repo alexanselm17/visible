@@ -2,8 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:visible/common/toast.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/auth/login_page.dart';
+import 'package:visible/widgets/custom_input_decoration.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -21,20 +24,25 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
   final _nameController = TextEditingController();
+  final _userNameController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _locationController = TextEditingController();
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
 
   // Form field validation statuses
   bool _nameValid = true;
+  bool _userNameValid = true;
+
   bool _emailValid = true;
   final bool _passwordValid = true;
   final bool _confirmPasswordValid = true;
 
-  // Demographic information
   String? _selectedGender;
-  String? _isEmployed;
   String? _selectedOccupation;
 
   // Page controller for multi-step form
@@ -42,26 +50,32 @@ class _SignUpPageState extends State<SignUpPage> {
   int _currentPage = 0;
   final int _totalPages = 3;
 
-  // Helper validation methods
   bool _validateEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  bool _validatePassword(String password) {
-    return password.length >= 8;
+  _validateAndSubmit() {
+    setState(() {
+      _nameValid = _nameController.text.trim().isNotEmpty;
+      _userNameValid = _userNameController.text.trim().isNotEmpty;
+
+      _emailValid = _validateEmail(_emailController.text.trim());
+    });
+
+    if (!_nameValid && !_userNameValid && !_emailValid) {
+      return CommonUtils.showErrorToast(
+          'Name and Email are missing or invalid.');
+    } else if (!_nameValid) {
+      return CommonUtils.showErrorToast('Name is required.');
+    } else if (!_emailValid) {
+      return CommonUtils.showErrorToast('Enter a valid Email address.');
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
   }
-
-  // bool _validateForm() {
-  //   setState(() {
-  //     _nameValid = _nameController.text.trim().isNotEmpty;
-  //     _emailValid = _validateEmail(_emailController.text.trim());
-  //     _passwordValid = _validatePassword(_passwordController.text);
-  //     _confirmPasswordValid =
-  //         _passwordController.text == _confirmPasswordController.text;
-  //   });
-
-  //   return _nameValid && _emailValid && _passwordValid && _confirmPasswordValid;
-  // }
 
   @override
   void dispose() {
@@ -235,7 +249,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     // Multi-step form
                     SizedBox(
                       height: _currentPage == 0
-                          ? MediaQuery.of(context).size.height * 0.7
+                          ? MediaQuery.of(context).size.height * 0.95
                           : _currentPage == 1
                               ? MediaQuery.of(context).size.height * 0.65
                               : MediaQuery.of(context).size.height * 0.85,
@@ -328,6 +342,60 @@ class _SignUpPageState extends State<SignUpPage> {
               begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutQuad),
 
           const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'User Name',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.pureWhite,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: !_nameValid ? Colors.red : Colors.grey.shade300,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _userNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your user name',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    prefixIcon:
+                        const Icon(Icons.person_outline, color: Colors.grey),
+                  ),
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                ),
+              ),
+            ],
+          ).animate(delay: 200.ms).fadeIn(duration: 400.ms).slideX(
+              begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutQuad),
+
+          const SizedBox(height: 16),
+
+          KenyaPhoneFormField(
+            label: "Phone Number",
+            controller: _phoneNumberController,
+            helperText: "",
+          ),
 
           // Email field with animation
           Column(
@@ -384,7 +452,7 @@ class _SignUpPageState extends State<SignUpPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Location (Optional)',
+                'Location',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -435,21 +503,7 @@ class _SignUpPageState extends State<SignUpPage> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  if (_nameController.text.trim().isNotEmpty &&
-                      _validateEmail(_emailController.text.trim())) {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                  } else {
-                    setState(() {
-                      _nameValid = _nameController.text.trim().isNotEmpty;
-                      _emailValid =
-                          _validateEmail(_emailController.text.trim());
-                    });
-                  }
-                },
+                onPressed: () => _validateAndSubmit(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accentOrange,
                   foregroundColor: AppColors.pureWhite,
@@ -1086,6 +1140,17 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           );
                         }
+                        authenticationController.handleSignUp(
+                          gender: _selectedGender!,
+                          fullname: _nameController.text,
+                          username: _userNameController.text,
+                          phone: _phoneNumberController.text,
+                          password: _passwordController.text,
+                          cpassword: _confirmPasswordController.text,
+                          email: _emailController.text,
+                          occupation: _selectedOccupation!,
+                          location: _locationController.text,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.accentOrange,
@@ -1140,40 +1205,6 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ).animate(delay: 600.ms).fadeIn(duration: 400.ms),
         ],
-      ),
-    );
-  }
-
-  // Helper widget for selection buttons (Yes/No)
-  Widget _buildSelectionButton({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.accentOrange : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? AppColors.accentOrange : Colors.grey.shade300,
-              width: 1,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : Colors.grey.shade700,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -12,20 +12,26 @@ String productModelToJson(ProductModel data) => json.encode(data.toJson());
 class ProductModel {
   String? message;
   Data? data;
+  Pagination? pagination;
 
   ProductModel({
     this.message,
     this.data,
+    this.pagination,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
         message: json["message"],
         data: json["data"] == null ? null : Data.fromJson(json["data"]),
+        pagination: json["pagination"] == null
+            ? null
+            : Pagination.fromJson(json["pagination"]),
       );
 
   Map<String, dynamic> toJson() => {
         "message": message,
         "data": data?.toJson(),
+        "pagination": pagination?.toJson(),
       };
 }
 
@@ -102,13 +108,16 @@ class Data {
 }
 
 class Datum {
-  int? id;
+  String? id;
   String? category;
   DateTime? createdAt;
   DateTime? updatedAt;
   String? imagePath;
   String? imageUrl;
   String? downloadUrl;
+  String? userScreenshot;
+  String? screenshotUrl;
+  String? screenshotId;
 
   Datum({
     this.id,
@@ -118,6 +127,9 @@ class Datum {
     this.imagePath,
     this.imageUrl,
     this.downloadUrl,
+    this.userScreenshot,
+    this.screenshotUrl,
+    this.screenshotId,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -132,6 +144,9 @@ class Datum {
         imagePath: json["image_path"],
         imageUrl: json["image_url"],
         downloadUrl: json["download_url"],
+        userScreenshot: json["user_screenshot"],
+        screenshotUrl: json["screenshot_url"],
+        screenshotId: json["screenshot_id"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -142,6 +157,9 @@ class Datum {
         "image_path": imagePath,
         "image_url": imageUrl,
         "download_url": downloadUrl,
+        "user_screenshot": userScreenshot,
+        "screenshot_url": screenshotUrl,
+        "screenshot_id": screenshotId,
       };
 }
 
@@ -166,5 +184,41 @@ class Link {
         "url": url,
         "label": label,
         "active": active,
+      };
+}
+
+class Pagination {
+  int? total;
+  int? perPage;
+  int? currentPage;
+  int? lastPage;
+  int? from;
+  int? to;
+
+  Pagination({
+    this.total,
+    this.perPage,
+    this.currentPage,
+    this.lastPage,
+    this.from,
+    this.to,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) => Pagination(
+        total: json["total"],
+        perPage: json["per_page"],
+        currentPage: json["current_page"],
+        lastPage: json["last_page"],
+        from: json["from"],
+        to: json["to"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "total": total,
+        "per_page": perPage,
+        "current_page": currentPage,
+        "last_page": lastPage,
+        "from": from,
+        "to": to,
       };
 }

@@ -10,6 +10,7 @@ import 'package:visible/model/product_model.dart';
 import 'package:visible/repository/product_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:visible/shared_preferences/user_pref.dart';
 
 class ProductController extends GetxController {
   final ProductRepository _productRepository = ProductRepository();
@@ -49,7 +50,9 @@ class ProductController extends GetxController {
   Future<void> fetchProducts() async {
     try {
       isLoading.value = true;
-      final response = await _productRepository.getProducts();
+      final String userId = await UserPreferences().getUserId();
+
+      final response = await _productRepository.getProducts(userId: userId);
       isLoading.value = false;
 
       if (response != null && response.statusCode == 200) {
@@ -64,7 +67,7 @@ class ProductController extends GetxController {
 
   Future<void> uploadProductScreenShot({
     required File imageFile,
-    required int productId,
+    required String productId,
   }) async {
     try {
       isUploading(true);

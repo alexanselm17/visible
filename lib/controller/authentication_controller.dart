@@ -1,336 +1,227 @@
-// import 'package:dio/dio.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:logger/logger.dart';
-// import 'package:visible/common/toast.dart';
-// import 'package:visible/models/auth/sign_in_model.dart' as login;
-// import 'package:visible/models/auth/sign_up_model.dart';
-// import 'package:visible/models/users/home_page_user_details.dart' as homePage;
-// import 'package:visible/models/users/home_page_user_details.dart';
-// import 'package:visible/repositories/auth_repository.dart';
-// import 'package:visible/repository/auth_repository.dart';
-// import 'package:visible/screens/auth/login_screen.dart';
-// import 'package:visible/screens/employees/user_controller.dart';
-// import 'package:visible/screens/navigation_page.dart';
-// import 'package:visible/services/network/dio_exception.dart';
-// import 'package:visible/services/shared_preferences/user_pref.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:visible/shared_preferences/user_pref.dart';
+import 'dart:math';
 
-// class AuthenticationController extends GetxController {
-//   final AuthRepository authRepository = AuthRepository();
-//   UsersController usersController = Get.put(UsersController());
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:visible/common/toast.dart';
+import 'package:visible/constants/roles_constants.dart';
+import 'package:visible/model/auth/sign_in_model.dart';
+import 'package:visible/repository/auth_repository.dart';
 
-//   final signUpFormKey = GlobalKey<FormState>();
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visible/screens/auth/login_page.dart';
+import 'package:visible/service/network/dio_exception.dart';
+import 'package:visible/shared_preferences/user_pref.dart';
 
-//   final fullNameController = TextEditingController();
-//   final userNameController = TextEditingController();
-//   final phoneController = TextEditingController();
-//   final nationalIdController = TextEditingController();
-//   final emailController = TextEditingController();
-//   final cardNumberController = TextEditingController();
-//   final passwordController = TextEditingController();
-//   final confirmPasswordController = TextEditingController();
+import 'package:visible/screens/user/main_screen.dart' as user;
+import 'package:visible/screens/admin/main_screen.dart' as admin;
 
-//   final usernameController = TextEditingController();
-//   final loginPasswordController = TextEditingController();
+class AuthenticationController extends GetxController {
+  final AuthRepository authRepository = AuthRepository();
+  final fullNameController = TextEditingController();
+  final userNameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final nationalIdController = TextEditingController();
+  final emailController = TextEditingController();
+  final cardNumberController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-//   final isLoading = false.obs;
-//   final pVisible = false.obs;
-//   get passVisible => pVisible;
+  final usernameController = TextEditingController();
+  final loginPasswordController = TextEditingController();
 
-//   final isLoggingIn = false.obs;
-//   final passwordVisible = false.obs;
+  final isLoading = false.obs;
 
-//   Rx<homePage.Data> currentUserDetails = homePage.Data().obs;
-//   Rx<login.Data> currentUserLoginDetails = login.Data().obs;
+  final isLoggingIn = false.obs;
+  final passwordVisible = false.obs;
 
-//   @override
-//   void onInit() {
-//     // getUserDetails();
-//     super.onInit();
-//   }
+  @override
+  void onInit() {
+    // getUserDetails();
+    super.onInit();
+  }
 
-//   void togglePasswordVisibility() {
-//     pVisible.value = !pVisible.value;
-//   }
+  Future<void> handleSignUp({
+    required String fullname,
+    required String username,
+    required String phone,
+    required String password,
+    required String cpassword,
+    required String email,
+    required String occupation,
+    required String location,
+    required String gender,
+  }) async {
+    try {
+      isLoading.value = true;
 
-//   Future<void> handleSignUp() async {
-//     try {
-//       isLoading.value = true;
+      final random = Random();
+      final generatedNationalId = 10000000 + random.nextInt(90000000);
 
-//       final res = await authRepository.userSignUp(
-//         fullname: fullNameController.text,
-//         username: userNameController.text,
-//         phone: phoneController.text,
-//         nationalId: int.parse(nationalIdController.text.trim()),
-//         password: passwordController.text,
-//         cpassword: confirmPasswordController.text,
-//         email: emailController.text,
-//         cardNumber: cardNumberController.text,
-//         companyId: '',
-//         petroStationId: '',
-//       );
+      final res = await authRepository.userSignUp(
+          fullname: fullname,
+          username: username,
+          phone: "+254${phone.replaceAll(' ', '')}",
+          nationalId: generatedNationalId,
+          password: password,
+          cpassword: cpassword,
+          email: email,
+          occupation: occupation,
+          location: location,
+          gender: gender);
 
-//       isLoading.value = false;
+      isLoading.value = false;
 
-//       if (res!.statusCode == 200) {
-//         final data = SignUpModel.fromJson(res.data);
-//         CommonUtils.showToast(data.message!);
-//         Get.offUntil(
-//             MaterialPageRoute(builder: (_) => LoginScreen()), (route) => false);
-//         isLoading.value = true;
-//         userNameController.clear();
-//         passwordController.clear();
-//         fullNameController.clear();
-//         phoneController.clear();
-//         emailController.clear();
-//         nationalIdController.clear();
-//         cardNumberController.clear();
-//         confirmPasswordController.clear();
-//       }
-//       if (res.statusCode == 422) {
-//         return CommonUtils.showErrorToast(res.data['message']);
-//       } else {
-//         return CommonUtils.showErrorToast(res.data['message']);
-//       }
-//     } catch (e) {
-//       isLoading.value = false;
-//     }
-//   }
+      if (res!.statusCode == 200) {
+        Get.offUntil(
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+          (route) => false,
+        );
 
-//   Future<void> addEmployee() async {
-//     try {
-//       isLoading.value = true;
+        isLoading.value = true;
+      } else {
+        return CommonUtils.showErrorToast(res.data['message']);
+      }
+    } catch (e) {
+      isLoading.value = false;
+      CommonUtils.showErrorToast("Sign-up failed. Please try again.");
+    }
+  }
 
-//       final String companyId = await UserPreferences().getUserCompanyId();
-//       final String visibleStationId =
-//           await UserPreferences().getUserStationId();
+  Future<void> handleSignIn({
+    required String userName,
+    required String password,
+  }) async {
+    try {
+      isLoggingIn.value = true;
 
-//       final res = await authRepository.userSignUp(
-//         fullname: fullNameController.text.trim(),
-//         username: userNameController.text.trim(),
-//         phone: "+254${phoneController.text.replaceAll(' ', '')}",
-//         nationalId: int.parse(nationalIdController.text.trim()),
-//         password: passwordController.text,
-//         cpassword: confirmPasswordController.text,
-//         email: emailController.text.trim(),
-//         cardNumber: cardNumberController.text.trim(),
-//         companyId: companyId,
-//         petroStationId: visibleStationId,
-//       );
-//       isLoading.value = false;
+      final userSignInResponse = await authRepository.userSign(
+        username: userName,
+        password: password,
+      );
 
-//       if (res?.statusCode == 200) {
-//         final data = SignUpModel.fromJson(res!.data);
-//         await usersController.getAllUsers();
-//         _clearFormFields();
-//         CommonUtils.showToast(data.message ?? 'Employee added successfully');
-//         Get.back(closeOverlays: true);
-//       } else {
-//         CommonUtils.showErrorToast(
-//             res?.data['message'] ?? 'Failed to add employee');
-//       }
-//     } catch (e) {
-//       CommonUtils.showErrorToast('Error: ${e.toString()}');
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
+      isLoggingIn.value = false;
+      Logger().i(userSignInResponse!.data);
 
-//   void _clearFormFields() {
-//     userNameController.clear();
-//     passwordController.clear();
-//     fullNameController.clear();
-//     phoneController.clear();
-//     emailController.clear();
-//     nationalIdController.clear();
-//     cardNumberController.clear();
-//     confirmPasswordController.clear();
-//   }
+      if (userSignInResponse.statusCode == 200) {
+        final data = SignInModel.fromJson(userSignInResponse.data);
+        await UserPreferences().storeToken(data.token!);
+        await UserPreferences().storeUserId(data.data!.id!);
+        await UserPreferences().storeRoleId(data.data!.role!.id!);
+        await UserPreferences().storeUserSlug(data.data!.role!.slug!);
+        isLoggingIn.value = false;
+        Get.offUntil(
+          MaterialPageRoute(
+              builder: (_) => data.data!.role!.slug == RoleConstants.ADMIN
+                  ? const admin.MainScreen()
+                  : const user.MainScreen()),
+          (route) => false,
+        );
+      } else {
+        CommonUtils.showErrorToast(userSignInResponse.data['message']);
+        usernameController.text = "";
+        passwordController.text = "";
+      }
+      isLoggingIn.value = false;
+    } catch (e) {
+      usernameController.text = "";
+      passwordController.text = "";
+      isLoggingIn.value = false;
+      CommonUtils.showErrorToast(e.toString());
+    }
+  }
 
-//   void toggleLoginPasswordVisibility() {
-//     passwordVisible.value = !passwordVisible.value;
-//   }
+  Future logOut() async {
+    try {
+      String id = await UserPreferences().getUserId();
 
-//   Future<void> handleSignIn() async {
-//     try {
-//       isLoggingIn.value = true;
+      final response = await authRepository.logoutUserApi(userId: id);
+      if (response!.statusCode == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        CommonUtils.showToast('Logged out sucessfully');
+        Get.offAll(const LoginPage());
+      }
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
 
-//       final userSignInResponse = await authRepository.userSign(
-//         username: usernameController.text,
-//         password: passwordController.text,
-//       );
+  Future<void> getUserDetails() async {
+    isLoading.value = true;
 
-//       isLoggingIn.value = false;
+    String userId = await UserPreferences().getUserId();
+    String roleId = await UserPreferences().getUserRoleId();
+    String companyId = await UserPreferences().getUserCompanyId();
+    String visibleStationId = await UserPreferences().getUserStationId();
 
-//       Logger().i(userSignInResponse!.data);
+    var response = await authRepository.getUserHomeDetails(
+      roleId: roleId,
+      userId: userId,
+      companyId: companyId,
+      visibleStationId: visibleStationId,
+    );
+    isLoading.value = false;
+    Logger().f(response!.realUri);
 
-//       if (userSignInResponse.statusCode == 200) {
-//         final data = login.LoginResponse.fromJson(userSignInResponse.data);
-//         currentUserLoginDetails.value = data.data!;
-//         update();
-//         await UserPreferences().storeToken(data.token!);
-//         await UserPreferences()
-//             .storeUserId(currentUserLoginDetails.value.id!.toString());
-//         await UserPreferences()
-//             .storeRoleId(currentUserLoginDetails.value.role!.id!.toString());
-//         await UserPreferences()
-//             .storeUserSlug(currentUserLoginDetails.value.role!.slug!);
-//         await UserPreferences().storeCompanyId(
-//             currentUserLoginDetails.value.company!.id!.toString());
-//         currentUserLoginDetails.value.visibleStation != null
-//             ? {
-//                 await UserPreferences().storeStationId(currentUserLoginDetails
-//                     .value.visibleStation!.id!
-//                     .toString()),
-//               }
-//             : null;
-//         isLoggingIn.value = false;
-//         usernameController.clear();
-//         passwordController.clear();
+    Logger().i(response.data);
 
-//         Get.off(const NavigationPage());
-//       } else {
-//         CommonUtils.showErrorToast(userSignInResponse.data['message']);
-//         usernameController.text = "";
-//         passwordController.text = "";
-//       }
-//       isLoggingIn.value = false;
-//     } catch (e) {
-//       usernameController.text = "";
-//       passwordController.text = "";
-//       isLoggingIn.value = false;
-//       CommonUtils.showErrorToast(e.toString());
-//     }
-//   }
+    if (response.statusCode == 200) {
+      // final userDetail = homePage.HomePageUserDetails.fromJson(response.data!);
+      // currentUserDetails.value = userDetail.data!;
+      // await UserPreferences.saveUserData(
+      //   name: currentUserDetails.value.visibleStation!.first.name!,
+      //   email: currentUserDetails.value.visibleStation!.first.email!,
+      //   phone: currentUserDetails.value.visibleStation!.first.phone!,
+      // );
+      // currentUserDetails.refresh();
+    } else {
+      CommonUtils.showErrorToast(response.data['message']);
+    }
+    // } finally {}
+  }
 
-//   Future logOut() async {
-//     try {
-//       String id = await UserPreferences().getUserId();
+  Future<void> resetPassword({
+    required String username,
+    required String phone,
+    required String nationalId,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      isLoggingIn.value = true;
+      final formattedPhone = phone
+              .replaceAll(RegExp(r'\s+'), '')
+              .startsWith('+254')
+          ? phone.replaceAll(RegExp(r'\s+'), '')
+          : '+254${phone.replaceAll(RegExp(r'\s+'), '').replaceFirst(RegExp(r'^0'), '')}';
 
-//       final response = await authRepository.logoutUserApi(userId: id);
-//       if (response!.statusCode == 200) {
-//         SharedPreferences prefs = await SharedPreferences.getInstance();
-//         await prefs.clear();
-//         CommonUtils.showToast('Logged out sucessfully');
-//         Get.offAll(LoginScreen());
-//       }
-//     } on DioException catch (e) {
-//       final errorMessage = DioExceptions.fromDioError(e).toString();
-//       throw errorMessage;
-//     }
-//   }
+      final userSignInResponse = await authRepository.resetPassword(
+        username: username,
+        password: password,
+        phone: formattedPhone,
+        nationalId: nationalId,
+        passwordConfirmation: passwordConfirmation,
+      );
 
-//   Future<void> getUserDetails() async {
-//     isLoading.value = true;
+      isLoggingIn.value = false;
 
-//     String userId = await UserPreferences().getUserId();
-//     String roleId = await UserPreferences().getUserRoleId();
-//     String companyId = await UserPreferences().getUserCompanyId();
-//     String visibleStationId = await UserPreferences().getUserStationId();
+      Logger().f(userSignInResponse!.data);
 
-//     var response = await authRepository.getUserHomeDetails(
-//       roleId: roleId,
-//       userId: userId,
-//       companyId: companyId,
-//       visibleStationId: visibleStationId,
-//     );
-//     isLoading.value = false;
-//     Logger().f(response!.realUri);
-
-//     Logger().i(response.data);
-
-//     if (response.statusCode == 200) {
-//       final userDetail = homePage.HomePageUserDetails.fromJson(response.data!);
-//       currentUserDetails.value = userDetail.data!;
-//       await UserPreferences.saveUserData(
-//         name: currentUserDetails.value.visibleStation!.first.name!,
-//         email: currentUserDetails.value.visibleStation!.first.email!,
-//         phone: currentUserDetails.value.visibleStation!.first.phone!,
-//       );
-//       currentUserDetails.refresh();
-//     } else {
-//       CommonUtils.showErrorToast(response.data['message']);
-//     }
-//     // } finally {}
-//   }
-
-//   Future<void> resetPassword({
-//     required String username,
-//     required String phone,
-//     required String nationalId,
-//     required String password,
-//     required String passwordConfirmation,
-//   }) async {
-//     try {
-//       isLoggingIn.value = true;
-//       final formattedPhone = phone
-//               .replaceAll(RegExp(r'\s+'), '') // Remove spaces
-//               .startsWith('+254')
-//           ? phone.replaceAll(
-//               RegExp(r'\s+'), '') // Remove spaces again for consistency
-//           : '+254${phone.replaceAll(RegExp(r'\s+'), '').replaceFirst(RegExp(r'^0'), '')}';
-
-//       final userSignInResponse = await authRepository.resetPassword(
-//         username: username,
-//         password: password,
-//         phone: formattedPhone,
-//         nationalId: nationalId,
-//         passwordConfirmation: passwordConfirmation,
-//       );
-
-//       isLoggingIn.value = false;
-
-//       Logger().f(userSignInResponse!.data);
-
-//       if (userSignInResponse.data['ok'] == true) {
-//         CommonUtils.showToast(userSignInResponse.data['message']);
-//         Get.off(LoginScreen());
-//       } else {
-//         CommonUtils.showErrorToast(userSignInResponse.data['message']);
-//       }
-//       isLoggingIn.value = false;
-//     } catch (e) {
-//       usernameController.text = "";
-//       passwordController.text = "";
-//       isLoggingIn.value = false;
-//       CommonUtils.showErrorToast(e.toString());
-//     }
-//   }
-
-//   Future<void> createvisibleStation({
-//     required String name,
-//     required String type,
-//   }) async {
-//     try {
-//       isLoggingIn.value = true;
-//       String companyId = await UserPreferences().getUserCompanyId();
-
-//       final userSignInResponse = await authRepository.createvisibleStation(
-//         name: name.toUpperCase(),
-//         type: type,
-//         companyId: companyId,
-//       );
-
-//       isLoggingIn.value = false;
-
-//       if (userSignInResponse!.statusCode == 200) {
-//         Get.back();
-//         currentUserDetails.value.visibleStation!.add(
-//           visibleStation(name: name, type: type),
-//         );
-//         currentUserDetails.refresh();
-//         return CommonUtils.showToast(userSignInResponse.data['message']);
-//       } else {
-//         CommonUtils.showErrorToast(userSignInResponse.data['message']);
-//       }
-//       isLoggingIn.value = false;
-//     } catch (e) {
-//       usernameController.text = "";
-//       passwordController.text = "";
-//       isLoggingIn.value = false;
-//       CommonUtils.showErrorToast(e.toString());
-//     }
-//   }
-// }
+      if (userSignInResponse.data['ok'] == true) {
+        CommonUtils.showToast(userSignInResponse.data['message']);
+        Get.off(const LoginPage());
+      } else {
+        CommonUtils.showErrorToast(userSignInResponse.data['message']);
+      }
+      isLoggingIn.value = false;
+    } catch (e) {
+      usernameController.text = "";
+      passwordController.text = "";
+      isLoggingIn.value = false;
+      CommonUtils.showErrorToast(e.toString());
+    }
+  }
+}
