@@ -7,8 +7,10 @@ import 'package:visible/controller/product_controller.dart';
 
 class AdminProductEditPage extends StatefulWidget {
   final Map<String, dynamic>? product;
+  final String CampaignId;
 
-  const AdminProductEditPage({super.key, this.product});
+  const AdminProductEditPage(
+      {super.key, this.product, required this.CampaignId});
 
   static const routeName = '/admin/products/edit';
 
@@ -238,24 +240,6 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
             ),
             const SizedBox(height: 16),
 
-            // Reward Field
-            TextField(
-              controller: _rewardController,
-              decoration: InputDecoration(
-                labelText: 'Reward',
-                hintText: 'e.g. Ksh 50 Cashback',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
             const SizedBox(height: 32),
             Obx(
               () => productController.isLoading.value
@@ -268,7 +252,10 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                       child: ElevatedButton(
                         onPressed: () async {
                           await productController.uploadProductAdvert(
-                              imageFile: _selectedImage!, category: "category");
+                              campaignId: widget.CampaignId,
+                              imageFile: _selectedImage!,
+                              category: "category",
+                              name: _nameController.text);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accentOrange,

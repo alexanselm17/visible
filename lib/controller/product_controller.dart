@@ -15,29 +15,73 @@ import 'package:visible/shared_preferences/user_pref.dart';
 class ProductController extends GetxController {
   final ProductRepository _productRepository = ProductRepository();
 
+  var campaignProducts = <Map<String, dynamic>>[].obs;
+
+  @override
+  void onInit() {
+    campaignProducts.assignAll(dummyProducts);
+    super.onInit();
+  }
+
   RxBool isLoading = false.obs;
   RxString uploadStatus = ''.obs;
   RxList<Datum> productsList = <Datum>[].obs;
   RxBool isDownloading = false.obs;
   RxBool isUploading = false.obs;
 
+  final List<Map<String, dynamic>> dummyProducts = [
+    {
+      "id": 1,
+      "name": "OMO Detergent 1kg",
+      "category": "Cleaning",
+      "image": "", // Leave empty or use a test file path
+      "reward": 25,
+    },
+    {
+      "id": 2,
+      "name": "Sunlight Soap",
+      "category": "Toiletries",
+      "image": "", // Placeholder or local image path
+      "reward": 10,
+    },
+    {
+      "id": 3,
+      "name": "Jik Bleach",
+      "category": "Cleaning",
+      "image": "",
+      "reward": 15,
+    },
+    {
+      "id": 4,
+      "name": "Harpic Toilet Cleaner",
+      "category": "Cleaning",
+      "image": "",
+      "reward": 20,
+    },
+  ];
+
   Future<void> uploadProductAdvert({
     required File imageFile,
     required String category,
+    required String campaignId,
+    required String name,
   }) async {
     try {
       isLoading(true);
       uploadStatus('Uploading...');
 
       final response = await _productRepository.uploadProductAdvert(
+        campaignId: campaignId,
         imageFile: imageFile,
         category: category,
+        name: name,
       );
 
       if (response != null && response.statusCode == 200) {
         Logger().i(response.data);
         uploadStatus('Upload successful');
-        CommonUtils.showToast('Product advert uploaded successfully');
+        Get.back();
+        return CommonUtils.showToast('Product advert uploaded successfully');
       }
     } catch (e) {
       uploadStatus('Upload failed');
@@ -54,8 +98,11 @@ class ProductController extends GetxController {
 
       final response = await _productRepository.getProducts(userId: userId);
       isLoading.value = false;
+      productsList.clear();
+      productsList.refresh();
+      Logger().i(response!.data);
 
-      if (response != null && response.statusCode == 200) {
+      if (response.statusCode == 200) {
         var product = ProductModel.fromJson(response.data);
         productsList.addAll(product.data!.data!);
       }
@@ -70,19 +117,17 @@ class ProductController extends GetxController {
     required String productId,
   }) async {
     try {
-      isUploading(true);
+      isUploading.value = true;
+      final String userId = await UserPreferences().getUserId();
 
       final response = await _productRepository.uploadProductScreenShot(
-        imageFile: imageFile,
-        productId: productId,
-      );
-      isUploading(false);
+          imageFile: imageFile, productId: productId, userId: userId);
+      isUploading.value = false;
       Logger().i(response!.statusCode);
 
       if (response.statusCode == 200) {
         Logger().i(response.data);
-        uploadStatus('Upload successful');
-        CommonUtils.showToast('Product screenshot uploaded successfully');
+        CommonUtils.showToast(response.data['message']);
       } else {
         CommonUtils.showErrorToast('Failed !, Please try again later .');
       }

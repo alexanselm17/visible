@@ -275,41 +275,41 @@ class _ProductsPageState extends State<ProductsPage> {
                                     ),
                                   ),
 
-                                  // Verification badge
-                                  // if (product['isVerified'])
-                                  //   Positioned(
-                                  //     top: 8,
-                                  //     right: 8,
-                                  //     child: Container(
-                                  //       padding: const EdgeInsets.symmetric(
-                                  //         horizontal: 8,
-                                  //         vertical: 4,
-                                  //       ),
-                                  //       decoration: BoxDecoration(
-                                  //         color: Colors.green,
-                                  //         borderRadius: BorderRadius.circular(12),
-                                  //       ),
-                                  //       child: const Row(
-                                  //         mainAxisSize: MainAxisSize.min,
-                                  //         children: [
-                                  //           Icon(
-                                  //             Icons.check_circle,
-                                  //             color: Colors.white,
-                                  //             size: 12,
-                                  //           ),
-                                  //           SizedBox(width: 4),
-                                  //           Text(
-                                  //             'Verified',
-                                  //             style: TextStyle(
-                                  //               color: Colors.white,
-                                  //               fontSize: 10,
-                                  //               fontWeight: FontWeight.bold,
-                                  //             ),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //   ),
+                                  if (product.screenshotUrl != null)
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Colors.white,
+                                              size: 12,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'Verified',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -332,7 +332,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
-                                    'Reward: }',
+                                    'Reward: Ksh 20',
                                     style: TextStyle(
                                       color: AppColors.accentOrange,
                                       fontSize: 12,
@@ -340,32 +340,34 @@ class _ProductsPageState extends State<ProductsPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  // SizedBox(
-                                  //   width: double.infinity,
-                                  //   child: ElevatedButton(
-                                  //     onPressed: () {},
-                                  //     // _shareToWhatsAppStatus(product),
-                                  //     style: ElevatedButton.styleFrom(
-                                  //       backgroundColor: AppColors.accentOrange,
-                                  //       foregroundColor: AppColors.pureWhite,
-                                  //       disabledBackgroundColor: Colors.grey,
-                                  //       elevation: 0,
-                                  //       padding: const EdgeInsets.symmetric(
-                                  //           vertical: 8),
-                                  //       shape: RoundedRectangleBorder(
-                                  //         borderRadius:
-                                  //             BorderRadius.circular(8),
-                                  //       ),
-                                  //     ),
-                                  //     child: const Text(
-                                  //       // product['isVerified']
-                                  //       //     ? 'Shared'
-                                  //       // :
-                                  //       'Share Now',
-                                  //       style: TextStyle(fontSize: 12),
-                                  //     ),
-                                  //   ),
-                                  // ),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {},
+                                      // _shareToWhatsAppStatus(product),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            product.screenshotUrl != null
+                                                ? Colors.grey
+                                                : AppColors.accentOrange,
+                                        foregroundColor: AppColors.pureWhite,
+                                        disabledBackgroundColor: Colors.grey,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        product.screenshotUrl != null
+                                            ? 'Shared'
+                                            : 'Share Now',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

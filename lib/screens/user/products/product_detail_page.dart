@@ -22,15 +22,11 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedScreenshot;
-  bool _isVerified = false;
   ProductController productController = Get.put(ProductController());
 
   @override
   void initState() {
     super.initState();
-    _isVerified =
-        // widget.product['isVerified'] ??
-        false;
   }
 
   Future<void> _pickScreenshot() async {
@@ -106,7 +102,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                   ),
                   // Verification badge
-                  if (_isVerified)
+                  if (widget.product.screenshotUrl != null)
                     Positioned(
                       top: 16,
                       right: 16,
@@ -329,7 +325,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   ),
                                 ),
                               ),
-                              if (_isVerified)
+                              if (widget.product.screenshotId != null)
                                 const Icon(
                                   Icons.check_circle,
                                   color: Colors.green,
@@ -347,7 +343,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          if (_selectedScreenshot != null && !_isVerified)
+                          if (_selectedScreenshot != null &&
+                              widget.product.screenshotId == null)
                             Container(
                               width: double.infinity,
                               height: 150,
@@ -360,7 +357,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 ),
                               ),
                             ),
-                          if (!_isVerified)
+                          if (widget.product.screenshotId == null)
                             Row(
                               children: [
                                 Expanded(
@@ -381,40 +378,45 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: productController
-                                                .isUploading.value ||
-                                            _selectedScreenshot == null
-                                        ? null
-                                        : () async => await productController
-                                            .uploadProductScreenShot(
-                                                imageFile: _selectedScreenshot!,
-                                                productId: widget.product.id!),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.accentOrange,
-                                      foregroundColor: AppColors.pureWhite,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                Obx(
+                                  () => Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: productController
+                                                  .isUploading.value ||
+                                              _selectedScreenshot == null
+                                          ? null
+                                          : () async => await productController
+                                              .uploadProductScreenShot(
+                                                  imageFile:
+                                                      _selectedScreenshot!,
+                                                  productId:
+                                                      widget.product.id!),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.accentOrange,
+                                        foregroundColor: AppColors.pureWhite,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
                                       ),
-                                    ),
-                                    icon: productController.isUploading.value
-                                        ? const SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: CircularProgressIndicator(
-                                              color: Colors.white,
-                                              strokeWidth: 2,
-                                            ),
-                                          )
-                                        : const Icon(Icons.upload),
-                                    label: Text(
-                                      productController.isUploading.value
-                                          ? 'Uploading...'
-                                          : 'Verify',
+                                      icon: productController.isUploading.value
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(Icons.upload),
+                                      label: Text(
+                                        productController.isUploading.value
+                                            ? 'Uploading...'
+                                            : 'Verify',
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -53,7 +53,9 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
   // Navigate to create new product page
   void _navigateToCreateProduct() async {
-    final result = await Get.to(() => const AdminProductEditPage());
+    final result = await Get.to(() => const AdminProductEditPage(
+          CampaignId: '',
+        ));
 
     // If we got a result back, add the new product
     if (result != null) {
@@ -78,7 +80,10 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
 
   // Navigate to edit product page
   void _navigateToEditProduct(Map<String, dynamic> product) async {
-    final result = await Get.to(() => AdminProductEditPage(product: product));
+    final result = await Get.to(() => AdminProductEditPage(
+          product: product,
+          CampaignId: '',
+        ));
 
     // If we got a result back, update the product
     if (result != null) {

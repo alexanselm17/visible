@@ -71,6 +71,12 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                 _buildNavItem(
                   icon: Icons.shopping_bag_outlined,
                   activeIcon: Icons.shopping_bag,
+                  label: 'Campaign',
+                  selectedItemColor: selectedItemColor,
+                ),
+                _buildNavItem(
+                  icon: Icons.shopping_bag_outlined,
+                  activeIcon: Icons.shopping_bag,
                   label: 'Products',
                   selectedItemColor: selectedItemColor,
                 ),

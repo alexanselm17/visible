@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/app_constants.dart';
 import 'package:visible/service/network/dio_client.dart';
@@ -11,6 +12,8 @@ class ProductRepository {
   Future<Response?> uploadProductAdvert({
     required File imageFile,
     required String category,
+    required String campaignId,
+    required String name,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -19,11 +22,14 @@ class ProductRepository {
           filename: imageFile.path.split('/').last,
         ),
         "category": category,
+        "name": name,
+        "selling_price": 10
       });
 
       final Response? response = await dioClient.postHTTP(
-          "${ApiEndpoints.baseUrl}/upload_product_advert", formData);
-
+          "${ApiEndpoints.baseUrl}/campaign/upload_product_advert/$campaignId",
+          formData);
+      Logger().i(response!.data);
       return response;
     } on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();
@@ -51,6 +57,7 @@ class ProductRepository {
   Future<Response?> uploadProductScreenShot({
     required File imageFile,
     required String productId,
+    required String userId,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -58,10 +65,13 @@ class ProductRepository {
           imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
+        "user_id": userId,
       });
 
       final Response? response = await dioClient.postHTTP(
-          "${ApiEndpoints.baseUrl}/upload_screenshot/$productId", formData);
+          "${ApiEndpoints.baseUrl}/campaign/upload_screenshot/$productId",
+          formData);
+      Logger().i(response!.data);
 
       return response;
     } on DioException catch (e) {
