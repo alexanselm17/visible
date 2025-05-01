@@ -33,43 +33,43 @@ class _ProductsPageState extends State<ProductsPage> {
     'Home'
   ];
 
-  // Future _shareToWhatsAppStatus(Datum product) async {
-  //   try {
-  //     Get.dialog(
-  //       const Center(
-  //         child: CircularProgressIndicator(
-  //           color: AppColors.accentOrange,
-  //         ),
-  //       ),
-  //       barrierDismissible: false,
-  //     );
+  Future _shareToWhatsAppStatus(Datum product) async {
+    try {
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(
+            color: AppColors.accentOrange,
+          ),
+        ),
+        barrierDismissible: false,
+      );
 
-  //     final imageFile =
-  //         await productController.downloadImage(product.imageUrl!);
+      final imageFile =
+          await productController.downloadImage(product.downloadUrl!);
 
-  //     if (imageFile == null) {
-  //       throw Exception("Image couldn't be downloaded");
-  //     }
+      if (imageFile == null) {
+        throw Exception("Image couldn't be downloaded");
+      }
 
-  //    await Share.shareXFiles(
-  //       [XFile(imageFile.path)],
-  //       text:
-  //           'Check out this product: ${product.category}\n${product.createdAt!}\n\nShared via Visible App',
-  //       sharePositionOrigin: Rect.zero,
-  //     );
+      await Share.shareXFiles(
+        [XFile(imageFile.path)],
+        text:
+            'Check out this product: ${product.category}\n${product.createdAt!}\n\nShared via Visible App',
+        sharePositionOrigin: Rect.zero,
+      );
 
-  //     _showVerificationDialog(product);
-  //   } catch (e) {
-  //     Get.back();
-  //     Get.snackbar(
-  //       'Error',
-  //       'Failed to share product. Please try again.',
-  //       backgroundColor: Colors.red,
-  //       colorText: Colors.white,
-  //       snackPosition: SnackPosition.BOTTOM,
-  //     );
-  //   }
-  // }
+      _showVerificationDialog(product);
+    } catch (e) {
+      Get.back();
+      Get.snackbar(
+        'Error',
+        'Failed to share product. Please try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
   void _showVerificationDialog(Datum product) {
     Get.dialog(
@@ -343,8 +343,8 @@ class _ProductsPageState extends State<ProductsPage> {
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton(
-                                      onPressed: () {},
-                                      // _shareToWhatsAppStatus(product),
+                                      onPressed: () =>
+                                          _shareToWhatsAppStatus(product),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             product.screenshotUrl != null
