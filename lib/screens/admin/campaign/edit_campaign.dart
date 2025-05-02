@@ -124,41 +124,6 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
     }
   }
 
-  void _showDeleteConfirmation() {
-    // Get.defaultDialog(
-    //   title: 'Delete Campaign',
-    //   titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-    //   middleText:
-    //       'Are you sure you want to delete this campaign? This action cannot be undone.',
-    //   textConfirm: 'Delete',
-    //   textCancel: 'Cancel',
-    //   confirmTextColor: Colors.white,
-    //   buttonColor: Colors.red,
-    //   cancelTextColor: Colors.grey[700],
-    //   onConfirm: () {
-    //     Get.back(); // Close dialog
-    // campaignController.deleteCampaign(widget.campaign['id']).then((_) {
-    //   Get.back(); // Go back to campaigns list
-    //   Get.snackbar(
-    //     'Success',
-    //     'Campaign deleted successfully',
-    //     backgroundColor: Colors.green,
-    //     colorText: Colors.white,
-    //     snackPosition: SnackPosition.BOTTOM,
-    //   );
-    //     }).catchError((error) {
-    //       Get.snackbar(
-    //         'Error',
-    //         'Failed to delete campaign: $error',
-    //         backgroundColor: Colors.red,
-    //         colorText: Colors.white,
-    //         snackPosition: SnackPosition.BOTTOM,
-    //       );
-    //     });
-    //   },
-    // );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,12 +145,6 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
           icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: _showDeleteConfirmation,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

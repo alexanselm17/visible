@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/controller/authentication_controller.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -14,6 +15,8 @@ class AdminDashboardPage extends StatefulWidget {
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
   final List<String> _timeFilters = [
     'Today',
     'This Week',
@@ -119,25 +122,27 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         backgroundColor: AppColors.pureWhite,
         elevation: 0,
         centerTitle: false,
-        leadingWidth: 180, // enough space for avatar + name
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 16.0),
+        leadingWidth: 180,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
           child: Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 18,
                 backgroundImage: AssetImage(
                   'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
                 ),
               ),
-              SizedBox(width: 8),
-              Text(
-                'Admin',
-                style: TextStyle(
-                  fontFamily: 'TT Hoves Pro Trial',
-                  color: AppColors.primaryBlack,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+              const SizedBox(width: 8),
+              Obx(
+                () => Text(
+                  authenticationController.currentUser.value.username!,
+                  style: const TextStyle(
+                    fontFamily: 'TT Hoves Pro Trial',
+                    color: AppColors.primaryBlack,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ],

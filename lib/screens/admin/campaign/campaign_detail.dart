@@ -94,7 +94,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
         onPressed: () {
           Get.to(
               () => AdminProductEditPage(
-                    CampaignId: widget.campaign.id!,
+                    campaignId: widget.campaign.id!,
                   ),
               arguments: {"campaignId": widget.campaign.id});
         },
@@ -439,7 +439,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                 onPressed: () {
                   Get.to(
                     () => AdminProductEditPage(
-                      CampaignId: widget.campaign.id!,
+                      campaignId: widget.campaign.id!,
                     ),
                   );
                 },
@@ -509,7 +509,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             onPressed: () {
               Get.to(
                 () => AdminProductEditPage(
-                  CampaignId: widget.campaign.id!,
+                  campaignId: widget.campaign.id!,
                 ),
               );
             },
@@ -549,7 +549,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
     return InkWell(
       onTap: () {
         Get.to(() => AdminProductEditPage(
-            product: product, CampaignId: widget.campaign.id!));
+            product: product, campaignId: widget.campaign.id!));
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -601,32 +601,6 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.category!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  // if (product['reward'] != null)
-                  //   Container(
-                  //     padding: const EdgeInsets.symmetric(
-                  //         horizontal: 8, vertical: 2),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.orange[50],
-                  //       borderRadius: BorderRadius.circular(4),
-                  //     ),
-                  //     child: Text(
-                  //       'Reward: KSh ${product['reward']}',
-                  //       style: TextStyle(
-                  //         fontSize: 12,
-                  //         fontWeight: FontWeight.w500,
-                  //         color: Colors.orange[800],
-                  //       ),
-                  //     ),
-                  //   ),
                 ],
               ),
             ),

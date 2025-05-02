@@ -5,15 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/campaign/campaign_product.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AdminProductEditPage extends StatefulWidget {
   final Datum? product;
-  final String CampaignId;
+  final String campaignId;
 
   const AdminProductEditPage(
-      {super.key, required this.CampaignId, this.product});
-
-  static const routeName = '/admin/products/edit';
+      {super.key, required this.campaignId, this.product});
 
   @override
   State<AdminProductEditPage> createState() => _AdminProductEditPageState();
@@ -21,11 +20,11 @@ class AdminProductEditPage extends StatefulWidget {
 
 class _AdminProductEditPageState extends State<AdminProductEditPage> {
   final ImagePicker _picker = ImagePicker();
-  File? _selectedImage;
+  File? _selectedImageFile;
+  String? _existingImageUrl;
+  bool _imageChanged = false;
 
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _rewardController = TextEditingController();
   bool get isEditing => widget.product != null;
   ProductController productController = Get.put(ProductController());
 
@@ -35,23 +34,15 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
 
     if (isEditing) {
       _nameController.text = widget.product!.name!;
-      _descriptionController.text = widget.product!.category!;
-
-      // if (widget.product!.imageUrl != null) {
-      //   try {
-      //     _selectedImage = File(widget.product['image']);
-      //   } catch (e) {
-      //     _selectedImage = null;
-      //   }
-      // }
+      if (widget.product!.imageUrl != null) {
+        _existingImageUrl = widget.product!.imageUrl;
+      }
     }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _descriptionController.dispose();
-    _rewardController.dispose();
     super.dispose();
   }
 
@@ -60,7 +51,8 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImageFile = File(image.path);
+          _imageChanged = true;
         });
       }
     } catch (e) {
@@ -70,6 +62,96 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Widget _buildImagePreview() {
+    if (_selectedImageFile != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.file(
+          _selectedImageFile!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 200,
+        ),
+      );
+    } else if (isEditing && _existingImageUrl != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: CachedNetworkImage(
+          imageUrl: _existingImageUrl!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 200,
+          placeholder: (context, url) => const Center(
+            child: CircularProgressIndicator(color: AppColors.accentOrange),
+          ),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        ),
+      );
+    }
+    // Default placeholder
+    else {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.add_photo_alternate, size: 60, color: Colors.grey),
+          SizedBox(height: 12),
+          Text(
+            'Tap to select product image',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      );
+    }
+  }
+
+  void _handleSubmit() async {
+    if (_nameController.text.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter a product name',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (isEditing) {
+      // if (_imageChanged && _selectedImageFile != null) {
+      //   await productController.updateProductAdvert(
+      //     productId: widget.product!.id!,
+      //     campaignId: widget.campaignId,
+      //     imageFile: _selectedImageFile,
+      //     name: _nameController.text,
+      //   );
+      // } else {
+      //   await productController.updateProductAdvert(
+      //     productId: widget.product!.id!,
+      //     campaignId: widget.campaignId,
+      //     name: _nameController.text,
+      //   );
+      // }
+    } else {
+      // Handle create scenario
+      if (_selectedImageFile == null) {
+        Get.snackbar(
+          'Error',
+          'Please select a product image',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      await productController.uploadProductAdvert(
+        campaignId: widget.campaignId,
+        imageFile: _selectedImageFile!,
+        name: _nameController.text,
       );
     }
   }
@@ -120,26 +202,7 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.grey),
                 ),
-                child: _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          _selectedImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_photo_alternate,
-                              size: 60, color: Colors.grey),
-                          SizedBox(height: 12),
-                          Text(
-                            'Tap to select product image',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                child: _buildImagePreview(),
               ),
             ),
             const SizedBox(height: 24),
@@ -173,30 +236,8 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Product Description
-            TextField(
-              controller: _descriptionController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                hintText: 'Enter product description',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
             const SizedBox(height: 32),
+
             Obx(
               () => productController.isLoading.value
                   ? const Center(
@@ -206,12 +247,7 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () async {
-                          await productController.uploadProductAdvert(
-                              campaignId: widget.CampaignId,
-                              imageFile: _selectedImage!,
-                              name: _nameController.text);
-                        },
+                        onPressed: _handleSubmit,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accentOrange,
                           foregroundColor: Colors.white,

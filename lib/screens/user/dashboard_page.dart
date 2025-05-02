@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/controller/authentication_controller.dart';
 
 class UserDashboardPage extends StatefulWidget {
   const UserDashboardPage({super.key});
@@ -13,6 +14,8 @@ class UserDashboardPage extends StatefulWidget {
 }
 
 class _UserDashboardPageState extends State<UserDashboardPage> {
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
   bool _isLoading = false;
 
   // Mock data for user dashboard
@@ -159,24 +162,26 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         elevation: 0,
         centerTitle: false,
         leadingWidth: 180, // enough space for avatar + name
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 16.0),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
           child: Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 18,
                 backgroundImage: AssetImage(
                   'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
                 ),
               ),
-              SizedBox(width: 8),
-              Text(
-                'John Doe',
-                style: TextStyle(
-                  fontFamily: 'TT Hoves Pro Trial',
-                  color: AppColors.primaryBlack,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
+              const SizedBox(width: 8),
+              Obx(
+                () => Text(
+                  authenticationController.currentUser.value.username!,
+                  style: const TextStyle(
+                    fontFamily: 'TT Hoves Pro Trial',
+                    color: AppColors.primaryBlack,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ],
