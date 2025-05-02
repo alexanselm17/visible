@@ -4,13 +4,14 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
+import 'package:visible/model/campaign/campaign_product.dart';
 
 class AdminProductEditPage extends StatefulWidget {
-  final Map<String, dynamic>? product;
+  final Datum? product;
   final String CampaignId;
 
   const AdminProductEditPage(
-      {super.key, this.product, required this.CampaignId});
+      {super.key, required this.CampaignId, this.product});
 
   static const routeName = '/admin/products/edit';
 
@@ -21,17 +22,7 @@ class AdminProductEditPage extends StatefulWidget {
 class _AdminProductEditPageState extends State<AdminProductEditPage> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
-  final List<String> _categories = [
-    'All',
-    'Trending',
-    'New',
-    'Fashion',
-    'Electronics',
-    'Home'
-  ];
-  String _selectedCategory = 'All';
 
-  // Controllers for form fields
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _rewardController = TextEditingController();
@@ -43,18 +34,16 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
     super.initState();
 
     if (isEditing) {
-      _nameController.text = widget.product!['name'];
-      _descriptionController.text = widget.product!['description'];
-      _rewardController.text = widget.product!['reward'];
-      _selectedCategory = widget.product!['category'] ?? 'All';
+      _nameController.text = widget.product!.name!;
+      _descriptionController.text = widget.product!.category!;
 
-      if (widget.product!['image'].startsWith('/')) {
-        try {
-          _selectedImage = File(widget.product!['image']);
-        } catch (e) {
-          _selectedImage = null;
-        }
-      }
+      // if (widget.product!.imageUrl != null) {
+      //   try {
+      //     _selectedImage = File(widget.product['image']);
+      //   } catch (e) {
+      //     _selectedImage = null;
+      //   }
+      // }
     }
   }
 
@@ -112,7 +101,6 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image Selector
             const Text(
               'Product Image',
               style: TextStyle(
@@ -208,38 +196,6 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
             ),
             const SizedBox(height: 16),
 
-            // Category Dropdown
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  decoration: const InputDecoration(
-                    labelText: 'Category',
-                    border: InputBorder.none,
-                  ),
-                  items: _categories.map((category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedCategory = value;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
             const SizedBox(height: 32),
             Obx(
               () => productController.isLoading.value
@@ -254,7 +210,6 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                           await productController.uploadProductAdvert(
                               campaignId: widget.CampaignId,
                               imageFile: _selectedImage!,
-                              category: "category",
                               name: _nameController.text);
                         },
                         style: ElevatedButton.styleFrom(

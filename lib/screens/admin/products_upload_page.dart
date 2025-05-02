@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/model/campaign/campaign_product.dart';
 import 'package:visible/screens/admin/add_new_product.dart';
 
 class AdminProductsPage extends StatefulWidget {
@@ -75,30 +76,6 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
-    }
-  }
-
-  // Navigate to edit product page
-  void _navigateToEditProduct(Map<String, dynamic> product) async {
-    final result = await Get.to(() => AdminProductEditPage(
-          product: product,
-          CampaignId: '',
-        ));
-
-    // If we got a result back, update the product
-    if (result != null) {
-      final index = _products.indexWhere((p) => p['id'] == result['id']);
-      if (index != -1) {
-        _products[index] = result;
-
-        Get.snackbar(
-          'Success',
-          'Product updated successfully',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
     }
   }
 
@@ -198,7 +175,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                           margin: const EdgeInsets.only(bottom: 16),
                           elevation: 2,
                           child: InkWell(
-                            onTap: () => _navigateToEditProduct(product),
+                            onTap: () {},
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Row(
@@ -276,8 +253,7 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                                       IconButton(
                                         icon: const Icon(Icons.edit,
                                             color: Colors.blue),
-                                        onPressed: () =>
-                                            _navigateToEditProduct(product),
+                                        onPressed: () {},
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.delete,

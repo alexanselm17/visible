@@ -23,6 +23,23 @@ class CampaignRepository {
     }
   }
 
+  Future<Response?> fetchProductsInCampaign(
+      {required String campaignId}) async {
+    try {
+      final Response? response = await dioClient
+          .getHTTP('${ApiEndpoints.baseUrl}/campaign/advert/$campaignId');
+      Logger().i(response);
+
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      CommonUtils.showErrorToast(e.toString());
+      rethrow;
+    }
+  }
+
   Future<Response?> createCampaign({
     required String name,
     required int capitalInvested,

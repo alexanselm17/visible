@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/campaign_controller.dart';
 import 'package:visible/controller/product_controller.dart';
+import 'package:visible/model/campaign/campaign_product.dart' as prod;
 import 'package:visible/model/campaign/campaign_model.dart';
 import 'package:visible/screens/admin/add_new_product.dart';
 import 'package:visible/screens/admin/campaign/edit_campaign.dart';
@@ -28,7 +29,14 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
   @override
   void initState() {
     super.initState();
-    // productController.fetchCampaignProducts(widget.campaign['id']);
+    init();
+  }
+
+  init() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await campaignController.fetchCampaignProducts(
+          campaignId: widget.campaign.id!, isRefresh: true);
+    });
   }
 
   bool get isActive {
@@ -449,7 +457,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
           ),
           const SizedBox(height: 12),
           Obx(
-            () => productController.isLoading.value
+            () => campaignController.isLoading.value
                 ? const Center(
                     child: Padding(
                       padding: EdgeInsets.all(32.0),
@@ -457,7 +465,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                           color: AppColors.accentOrange),
                     ),
                   )
-                : productController.campaignProducts.isEmpty
+                : campaignController.productsInCampaign.isEmpty
                     ? _buildEmptyProductsState()
                     : _buildProductsGrid(),
           ),
@@ -529,15 +537,15 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
-      itemCount: productController.campaignProducts.length,
+      itemCount: campaignController.productsInCampaign.length,
       itemBuilder: (context, index) {
-        final product = productController.campaignProducts[index];
+        prod.Datum product = campaignController.productsInCampaign[index];
         return _buildProductCard(product);
       },
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _buildProductCard(prod.Datum product) {
     return InkWell(
       onTap: () {
         Get.to(() => AdminProductEditPage(
@@ -567,11 +575,10 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                     top: Radius.circular(12),
                   ),
                   image: DecorationImage(
-                    image:
-                        product['image'] != null && product['image'].isNotEmpty
-                            ? FileImage(File(product['image']))
-                            : const AssetImage('assets/images/placeholder.png')
-                                as ImageProvider,
+                    image: product.imageUrl != null
+                        ? NetworkImage(product.imageUrl!)
+                        : const AssetImage('assets/images/placeholder.png')
+                            as ImageProvider,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -585,7 +592,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product['name'] ?? 'Unnamed Product',
+                    product.name ?? 'Unnamed Product',
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -596,30 +603,30 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    product['category'] ?? 'No Category',
+                    product.category!,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 6),
-                  if (product['reward'] != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'Reward: KSh ${product['reward']}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.orange[800],
-                        ),
-                      ),
-                    ),
+                  // if (product['reward'] != null)
+                  //   Container(
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 8, vertical: 2),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.orange[50],
+                  //       borderRadius: BorderRadius.circular(4),
+                  //     ),
+                  //     child: Text(
+                  //       'Reward: KSh ${product['reward']}',
+                  //       style: TextStyle(
+                  //         fontSize: 12,
+                  //         fontWeight: FontWeight.w500,
+                  //         color: Colors.orange[800],
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
             ),

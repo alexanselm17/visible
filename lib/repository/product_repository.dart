@@ -11,7 +11,6 @@ class ProductRepository {
 
   Future<Response?> uploadProductAdvert({
     required File imageFile,
-    required String category,
     required String campaignId,
     required String name,
   }) async {
@@ -21,9 +20,7 @@ class ProductRepository {
           imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
-        "category": category,
         "name": name,
-        "selling_price": 10
       });
 
       final Response? response = await dioClient.postHTTP(

@@ -62,7 +62,6 @@ class ProductController extends GetxController {
 
   Future<void> uploadProductAdvert({
     required File imageFile,
-    required String category,
     required String campaignId,
     required String name,
   }) async {
@@ -73,7 +72,6 @@ class ProductController extends GetxController {
       final response = await _productRepository.uploadProductAdvert(
         campaignId: campaignId,
         imageFile: imageFile,
-        category: category,
         name: name,
       );
 
