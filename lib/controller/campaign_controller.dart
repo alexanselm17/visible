@@ -43,7 +43,6 @@ class CampaignController extends GetxController {
     }
   }
 
-  // Fetch paginated products in a campaign
   Future<void> fetchCampaignProducts(
       {bool isRefresh = false, required String campaignId}) async {
     try {

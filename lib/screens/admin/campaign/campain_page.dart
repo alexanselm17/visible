@@ -5,6 +5,7 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/campaign_controller.dart';
 import 'package:visible/screens/admin/campaign/campaign_detail.dart';
 import 'package:visible/screens/admin/campaign/create_campaign.dart';
+import 'package:visible/widgets/loading_indicator.dart';
 
 class AdminCampaignPage extends StatefulWidget {
   const AdminCampaignPage({super.key});
@@ -69,8 +70,13 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
       ),
       body: Obx(
         () => campaignController.isLoading.value
-            ? const Center(
-                child: CircularProgressIndicator(color: AppColors.accentOrange),
+            ? const Expanded(
+                child: Center(
+                  child: AnimatedLoadingIndicator(
+                    isLoading: true,
+                    loadingText: "Loading campaigns...",
+                  ),
+                ),
               )
             : campaignController.campaigns.isEmpty
                 ? _buildEmptyState()

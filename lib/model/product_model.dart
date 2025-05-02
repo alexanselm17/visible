@@ -110,6 +110,8 @@ class Data {
 class Datum {
   String? id;
   String? category;
+  String? name;
+
   DateTime? createdAt;
   DateTime? updatedAt;
   String? imagePath;
@@ -130,6 +132,7 @@ class Datum {
     this.userScreenshot,
     this.screenshotUrl,
     this.screenshotId,
+    this.name,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -142,6 +145,7 @@ class Datum {
             ? null
             : DateTime.parse(json["updated_at"]),
         imagePath: json["image_path"],
+        name: json['name'],
         imageUrl: json["image_url"],
         downloadUrl: json["download_url"],
         userScreenshot: json["user_screenshot"],

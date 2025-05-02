@@ -112,7 +112,6 @@ class AuthenticationController extends GetxController {
   }) async {
     try {
       isLoggingIn.value = true;
-      isLoading.refresh();
 
       final userSignInResponse = await authRepository.userSign(
         username: userName,
@@ -120,7 +119,6 @@ class AuthenticationController extends GetxController {
       );
 
       isLoggingIn.value = false;
-      isLoading.refresh();
 
       Logger().i(userSignInResponse!.data);
 

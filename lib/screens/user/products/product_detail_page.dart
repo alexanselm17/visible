@@ -53,9 +53,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share, color: AppColors.primaryBlack),
-            onPressed: () {
-              // Implement share functionality
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -101,7 +99,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                     ),
                   ),
-                  // Verification badge
                   if (widget.product.screenshotUrl != null)
                     Positioned(
                       top: 16,
@@ -136,7 +133,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                     ),
-                  // Product name overlay
                   Positioned(
                     bottom: 16,
                     left: 16,
@@ -153,71 +149,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                 ],
               ).animate().fadeIn(duration: 400.ms),
-
-              // Product info section
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Reward info
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentOrange.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.card_giftcard,
-                            color: AppColors.accentOrange,
-                            size: 18,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Reward: ',
-                            style: TextStyle(
-                              color: AppColors.accentOrange,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-
-                    const SizedBox(height: 16),
-
-                    // Description
-                    const Text(
-                      'Description',
-                      style: TextStyle(
-                        fontFamily: 'Leotaro',
-                        color: AppColors.primaryBlack,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
-
-                    const SizedBox(height: 8),
-
-                    const Text(
-                      "widget.product['description']",
-                      style: TextStyle(
-                        fontFamily: 'TT Hoves Pro Trial',
-                        color: Colors.black87,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-
                     const SizedBox(height: 24),
-
-                    // Download section
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(

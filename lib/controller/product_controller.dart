@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:visible/common/toast.dart';
+import 'package:visible/controller/campaign_controller.dart';
 import 'package:visible/model/product_model.dart';
 import 'package:visible/repository/product_repository.dart';
 import 'package:http/http.dart' as http;
@@ -16,49 +17,13 @@ class ProductController extends GetxController {
   final ProductRepository _productRepository = ProductRepository();
 
   var campaignProducts = <Map<String, dynamic>>[].obs;
-
-  @override
-  void onInit() {
-    campaignProducts.assignAll(dummyProducts);
-    super.onInit();
-  }
+  CampaignController campaignController = Get.put(CampaignController());
 
   RxBool isLoading = false.obs;
   RxString uploadStatus = ''.obs;
   RxList<Datum> productsList = <Datum>[].obs;
   RxBool isDownloading = false.obs;
   RxBool isUploading = false.obs;
-
-  final List<Map<String, dynamic>> dummyProducts = [
-    {
-      "id": 1,
-      "name": "OMO Detergent 1kg",
-      "category": "Cleaning",
-      "image": "", // Leave empty or use a test file path
-      "reward": 25,
-    },
-    {
-      "id": 2,
-      "name": "Sunlight Soap",
-      "category": "Toiletries",
-      "image": "", // Placeholder or local image path
-      "reward": 10,
-    },
-    {
-      "id": 3,
-      "name": "Jik Bleach",
-      "category": "Cleaning",
-      "image": "",
-      "reward": 15,
-    },
-    {
-      "id": 4,
-      "name": "Harpic Toilet Cleaner",
-      "category": "Cleaning",
-      "image": "",
-      "reward": 20,
-    },
-  ];
 
   Future<void> uploadProductAdvert({
     required File imageFile,
@@ -76,8 +41,9 @@ class ProductController extends GetxController {
       );
 
       if (response != null && response.statusCode == 200) {
-        Logger().i(response.data);
-        uploadStatus('Upload successful');
+        await campaignController.fetchCampaignProducts(
+            campaignId: campaignId, isRefresh: true);
+
         Get.back();
         return CommonUtils.showToast('Product advert uploaded successfully');
       }
@@ -138,8 +104,10 @@ class ProductController extends GetxController {
   }
 
   Future downloadImage(String imageUrl) async {
+    isDownloading.value = true;
     final hasPermission = await _requestPermission();
     if (!hasPermission) {
+      isDownloading.value = false;
       Get.snackbar(
         'Permission Denied',
         'Storage or photo permission is required to download images',
@@ -159,6 +127,7 @@ class ProductController extends GetxController {
         await file.writeAsBytes(response.bodyBytes);
 
         final saved = await GallerySaver.saveImage(file.path);
+        isDownloading.value = false;
 
         if (saved == true) {
           Get.snackbar(

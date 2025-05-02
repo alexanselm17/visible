@@ -9,6 +9,7 @@ import 'package:visible/model/campaign/campaign_product.dart' as prod;
 import 'package:visible/model/campaign/campaign_model.dart';
 import 'package:visible/screens/admin/add_new_product.dart';
 import 'package:visible/screens/admin/campaign/edit_campaign.dart';
+import 'package:visible/widgets/loading_indicator.dart';
 
 class AdminCampaignDetailsPage extends StatefulWidget {
   final Datum campaign;
@@ -459,10 +460,9 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
           Obx(
             () => campaignController.isLoading.value
                 ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: CircularProgressIndicator(
-                          color: AppColors.accentOrange),
+                    child: AnimatedLoadingIndicator(
+                      isLoading: true,
+                      loadingText: "Loading products...",
                     ),
                   )
                 : campaignController.productsInCampaign.isEmpty

@@ -143,9 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.next,
                     animationDelay: const Duration(milliseconds: 300),
                   ),
-
                   const SizedBox(height: 20),
-
                   PasswordFormField(
                     label: 'Password',
                     hintText: 'Enter your password',
@@ -153,9 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     animationDelay: const Duration(milliseconds: 400),
                   ),
-
                   const SizedBox(height: 20),
-
                   Padding(
                     padding: const EdgeInsets.all(0),
                     child: Row(
@@ -217,12 +213,9 @@ class _LoginPageState extends State<LoginPage> {
                           end: 0,
                           duration: 400.ms,
                           curve: Curves.easeOut),
-
                   const SizedBox(height: 40),
-
-                  // Loading indicator or Sign In button
                   Obx(
-                    () => authenticationController.isLoading.value
+                    () => authenticationController.isLoggingIn.value
                         ? Container(
                             width: double.infinity,
                             height: 50,
@@ -247,10 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                             animationDelay: const Duration(milliseconds: 500),
                           ),
                   ),
-
                   const SizedBox(height: 30),
-
-                  // Don't have an account? Sign up
                   AuthLinkText(
                     leadText: "Don't have an account?",
                     linkText: 'Sign up',
