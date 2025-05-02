@@ -249,10 +249,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     // Multi-step form
                     SizedBox(
                       height: _currentPage == 0
-                          ? MediaQuery.of(context).size.height * 0.95
+                          ? 650
                           : _currentPage == 1
-                              ? MediaQuery.of(context).size.height * 0.65
-                              : MediaQuery.of(context).size.height * 0.85,
+                              ? 450
+                              : 600,
                       child: PageView(
                         controller: _pageController,
                         physics: const NeverScrollableScrollPhysics(),

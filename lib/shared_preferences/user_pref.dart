@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:visible/constants/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visible/model/auth/sign_in_model.dart';
 
 class UserPreferences with ChangeNotifier {
   static const String INTRO_SCREEN_KEY = "isIntroScreenShown";
@@ -14,8 +15,36 @@ class UserPreferences with ChangeNotifier {
   static const String STATION_ID = "STATION_ID";
   static const String STATION_TYPE = "STATION_TYPE";
   static const String _userKey = 'user_data';
+  static const String _userDataKey = 'userData';
 
   static const String SLUG = "SLUG";
+
+  // Singleton pattern
+  static final UserPreferences _instance = UserPreferences._internal();
+  factory UserPreferences() => _instance;
+  UserPreferences._internal();
+
+  Future<bool> storeSignInModel(SignInModel model) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String modelJson = jsonEncode(model.toJson());
+    return prefs.setString(_userDataKey, modelJson);
+  }
+
+  Future<SignInModel?> getSignInModel() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? modelJson = prefs.getString(_userDataKey);
+
+    if (modelJson == null || modelJson.isEmpty) {
+      return null;
+    }
+
+    try {
+      return SignInModel.fromJson(jsonDecode(modelJson));
+    } catch (e) {
+      print('Error parsing stored SignInModel: $e');
+      return null;
+    }
+  }
 
   Future<void> storeToken(String token) async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();

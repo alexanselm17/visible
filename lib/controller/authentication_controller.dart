@@ -31,6 +31,8 @@ class AuthenticationController extends GetxController {
   final usernameController = TextEditingController();
   final loginPasswordController = TextEditingController();
 
+  Rx<Data> currentUser = Data().obs;
+
   final isLoading = false.obs;
 
   final isLoggingIn = false.obs;
@@ -38,8 +40,23 @@ class AuthenticationController extends GetxController {
 
   @override
   void onInit() {
-    // getUserDetails();
     super.onInit();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    try {
+      final signInModel = await UserPreferences().getSignInModel();
+      if (signInModel != null && signInModel.data != null) {
+        currentUser.value = signInModel.data!;
+        currentUser.refresh();
+        Logger().i("User data loaded from preferences");
+      } else {
+        Logger().w("No stored user data found");
+      }
+    } catch (e) {
+      Logger().e("Error loading user data: $e");
+    }
   }
 
   Future<void> handleSignUp({
@@ -95,6 +112,7 @@ class AuthenticationController extends GetxController {
   }) async {
     try {
       isLoggingIn.value = true;
+      isLoading.refresh();
 
       final userSignInResponse = await authRepository.userSign(
         username: userName,
@@ -102,10 +120,13 @@ class AuthenticationController extends GetxController {
       );
 
       isLoggingIn.value = false;
+      isLoading.refresh();
+
       Logger().i(userSignInResponse!.data);
 
       if (userSignInResponse.statusCode == 200) {
         final data = SignInModel.fromJson(userSignInResponse.data);
+        await UserPreferences().storeSignInModel(data);
         await UserPreferences().storeToken(data.token!);
         await UserPreferences().storeUserId(data.data!.id!);
         await UserPreferences().storeRoleId(data.data!.role!.id!);

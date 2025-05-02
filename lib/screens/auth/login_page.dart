@@ -135,8 +135,8 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   StandardFormField(
-                    label: 'Email',
-                    hintText: 'Enter your email address',
+                    label: 'Username',
+                    hintText: 'Enter your username',
                     controller: _emailController,
                     prefixIconData: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
@@ -220,15 +220,32 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 40),
 
-                  // Sign In Button with animation
-                  FormActionButton(
-                    text: 'Sign In',
-                    onPressed: () {
-                      authenticationController.handleSignIn(
-                          userName: _emailController.text,
-                          password: _passwordController.text);
-                    },
-                    animationDelay: const Duration(milliseconds: 500),
+                  // Loading indicator or Sign In button
+                  Obx(
+                    () => authenticationController.isLoading.value
+                        ? Container(
+                            width: double.infinity,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: AppColors.darkBlue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.accentOrange,
+                                strokeWidth: 3,
+                              ),
+                            ),
+                          ).animate().fadeIn(duration: 300.ms)
+                        : FormActionButton(
+                            text: 'Sign In',
+                            onPressed: () async {
+                              await authenticationController.handleSignIn(
+                                  userName: _emailController.text,
+                                  password: _passwordController.text);
+                            },
+                            animationDelay: const Duration(milliseconds: 500),
+                          ),
                   ),
 
                   const SizedBox(height: 30),

@@ -52,6 +52,20 @@ class Data {
   String? fullname;
   String? username;
   String? phone;
+  String? email;
+  int? isActive;
+  String? roleId;
+  dynamic isVerified;
+  int? nationalId;
+  int? isLoggedIn;
+  dynamic cardNumber;
+  String? occupation;
+  String? location;
+  String? gender;
+  dynamic emailVerifiedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  dynamic deletedAt;
   Role? role;
 
   Data({
@@ -59,6 +73,20 @@ class Data {
     this.fullname,
     this.username,
     this.phone,
+    this.email,
+    this.isActive,
+    this.roleId,
+    this.isVerified,
+    this.nationalId,
+    this.isLoggedIn,
+    this.cardNumber,
+    this.occupation,
+    this.location,
+    this.gender,
+    this.emailVerifiedAt,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
     this.role,
   });
 
@@ -67,6 +95,24 @@ class Data {
         fullname: json["fullname"],
         username: json["username"],
         phone: json["phone"],
+        email: json["email"],
+        isActive: json["is_active"],
+        roleId: json["role_id"],
+        isVerified: json["is_verified"],
+        nationalId: json["national_id"],
+        isLoggedIn: json["is_logged_in"],
+        cardNumber: json["card_number"],
+        occupation: json["occupation"],
+        location: json["location"],
+        gender: json["gender"],
+        emailVerifiedAt: json["email_verified_at"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.parse(json["updated_at"]),
+        deletedAt: json["deleted_at"],
         role: json["role"] == null ? null : Role.fromJson(json["role"]),
       );
 
@@ -75,6 +121,20 @@ class Data {
         "fullname": fullname,
         "username": username,
         "phone": phone,
+        "email": email,
+        "is_active": isActive,
+        "role_id": roleId,
+        "is_verified": isVerified,
+        "national_id": nationalId,
+        "is_logged_in": isLoggedIn,
+        "card_number": cardNumber,
+        "occupation": occupation,
+        "location": location,
+        "gender": gender,
+        "email_verified_at": emailVerifiedAt,
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
+        "deleted_at": deletedAt,
         "role": role?.toJson(),
       };
 }

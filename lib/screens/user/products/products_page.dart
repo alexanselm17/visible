@@ -34,41 +34,43 @@ class _ProductsPageState extends State<ProductsPage> {
   ];
 
   Future _shareToWhatsAppStatus(Datum product) async {
-    try {
-      Get.dialog(
-        const Center(
-          child: CircularProgressIndicator(
-            color: AppColors.accentOrange,
-          ),
+    // try {
+    Get.dialog(
+      const Center(
+        child: CircularProgressIndicator(
+          color: AppColors.accentOrange,
         ),
-        barrierDismissible: false,
-      );
+      ),
+      barrierDismissible: false,
+    );
 
-      final imageFile =
-          await productController.downloadImage(product.downloadUrl!);
+    final imageFile =
+        await productController.downloadImage(product.downloadUrl!);
 
-      if (imageFile == null) {
-        throw Exception("Image couldn't be downloaded");
-      }
-
-      await Share.shareXFiles(
-        [XFile(imageFile.path)],
-        text:
-            'Check out this product: ${product.category}\n${product.createdAt!}\n\nShared via Visible App',
-        sharePositionOrigin: Rect.zero,
-      );
-
-      _showVerificationDialog(product);
-    } catch (e) {
-      Get.back();
-      Get.snackbar(
-        'Error',
-        'Failed to share product. Please try again.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+    if (imageFile == null) {
+      throw Exception("Image couldn't be downloaded");
     }
+
+    await Share.shareXFiles(
+      [XFile(imageFile.path)],
+      text:
+          'Check out this product: ${product.category}\n${product.createdAt!}\n\nShared via Visible App',
+      sharePositionOrigin: Rect.zero,
+    );
+
+    _showVerificationDialog(product);
+    Get.back();
+
+    // } catch (e) {
+    //   Get.back();
+    //   Get.snackbar(
+    //     'Error',
+    //     'Failed to share product. Please try again.',
+    //     backgroundColor: Colors.red,
+    //     colorText: Colors.white,
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    // }
   }
 
   void _showVerificationDialog(Datum product) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:visible/screens/admin/bottom_navigation.dart';
 import 'package:visible/screens/admin/campaign/campain_page.dart';
 import 'package:visible/screens/admin/dashboard.dart';
-import 'package:visible/screens/admin/products_upload_page.dart';
 import 'package:visible/screens/profile_page.dart';
 
 class MainScreen extends StatefulWidget {
@@ -15,11 +14,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  // Pages to show based on selected tab
   final List<Widget> _pages = [
     const AdminDashboardPage(),
     const AdminCampaignPage(),
-    const AdminProductsPage(),
     const ProfilePage(),
   ];
 

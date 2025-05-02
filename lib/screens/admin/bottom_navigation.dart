@@ -15,7 +15,6 @@ class MainBottomNavigation extends StatefulWidget {
 }
 
 class _MainBottomNavigationState extends State<MainBottomNavigation> {
-  // Define colors to match your theme
   static const Color primaryBlack = Color(0xFF121212);
   static const Color pureWhite = Color(0xFFFFFFFF);
   static const Color accentOrange = Color(0xFFFF7F00);
@@ -72,12 +71,6 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                   icon: Icons.shopping_bag_outlined,
                   activeIcon: Icons.shopping_bag,
                   label: 'Campaign',
-                  selectedItemColor: selectedItemColor,
-                ),
-                _buildNavItem(
-                  icon: Icons.shopping_bag_outlined,
-                  activeIcon: Icons.shopping_bag,
-                  label: 'Products',
                   selectedItemColor: selectedItemColor,
                 ),
                 _buildNavItem(
