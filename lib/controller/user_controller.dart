@@ -84,7 +84,6 @@ class UsersController extends GetxController {
       if (userResponse!.statusCode == 200) {
         await getAllUsers(isRefresh: true);
         Get.back();
-        Get.back();
         return CommonUtils.showToast(userResponse.data['message']);
       } else {
         return CommonUtils.showToast(userResponse.data['message']);
@@ -124,22 +123,5 @@ class UsersController extends GetxController {
     } catch (e) {
       CommonUtils.showErrorToast(' $e');
     } finally {}
-  }
-
-  void fetchRoles() async {
-    try {
-      final response = await userRepository.fetchRoles();
-      if (response!.statusCode == 200) {
-        roles.value = response.data['roles']
-            .map<Map<String, dynamic>>((role) => {
-                  'id': role['id'],
-                  'name': role['name'],
-                  'slug': role['slug'],
-                })
-            .toList();
-      }
-    } catch (e) {
-      print("Error fetching roles: $e");
-    }
   }
 }

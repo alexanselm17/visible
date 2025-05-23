@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_model.dart';
 import 'package:visible/screens/admin/users/users_search_deligate.dart';
 import 'package:visible/widgets/custom_app_bar.dart';
+import 'package:visible/widgets/input_widgets.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -184,26 +186,29 @@ class _UsersScreenState extends State<UsersScreen> {
                     ),
                   ),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Role',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user.role ?? 'No role',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                      child: ElevatedButton(
+                    onPressed: () {
+                      if (controller.isLoading.value) return;
+                      controller.accountActivation(user.id!);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          user.isActive == 1 ? Colors.red : AppColors.darkBlue,
+                      foregroundColor: AppColors.pureWhite,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      disabledBackgroundColor: Colors.grey.shade400,
                     ),
-                  ),
+                    child: Text(
+                      user.isActive == 1 ? "Deactivate" : "Activate",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )),
                 ],
               ),
             ],
