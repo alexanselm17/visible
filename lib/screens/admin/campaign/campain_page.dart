@@ -70,12 +70,10 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
       ),
       body: Obx(
         () => campaignController.isLoading.value
-            ? const Expanded(
-                child: Center(
-                  child: AnimatedLoadingIndicator(
-                    isLoading: true,
-                    loadingText: "Loading campaigns...",
-                  ),
+            ? const Center(
+                child: AnimatedLoadingIndicator(
+                  isLoading: true,
+                  loadingText: "Loading campaigns...",
                 ),
               )
             : campaignController.campaigns.isEmpty

@@ -55,9 +55,8 @@ class AuthRepository {
       var body = {
         'username': username,
         'password': password,
-        'app_version': '1.0.4'
+        'app_version': '1.0.0'
       };
-      print(ApiEndpoints.signInEndpoint);
       final Response? response =
           await dioClient.noTokenPost(ApiEndpoints.signInEndpoint, body);
       return response;

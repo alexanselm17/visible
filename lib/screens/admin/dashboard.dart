@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/screens/admin/users/user_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -114,6 +115,80 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     ],
   };
 
+  void _showPopupMenu(BuildContext context) async {
+    final RenderBox button = context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(
+          button.localToGlobal(Offset.zero, ancestor: overlay),
+          button.localToGlobal(button.size.bottomRight(Offset.zero),
+              ancestor: overlay),
+        ),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        const PopupMenuItem(
+          value: '1',
+          child: Row(
+            children: [
+              Text('Profile'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: '3',
+          child: Row(
+            children: [
+              Text('Employees'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: '2',
+          child: Row(
+            children: [
+              Text(
+                'Log Out',
+                style: TextStyle(color: Colors.red),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Icon(
+                Icons.logout_rounded,
+                color: Colors.red,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        _handleAction(value);
+      }
+    });
+  }
+
+  void _handleAction(String value) {
+    switch (value) {
+      case '2':
+        Get.put<AuthenticationController>(AuthenticationController()).logOut();
+        break;
+      case '3':
+        Get.to(const UsersScreen());
+        break;
+      // case '1':
+      //   Get.to(const ProfileScreen());
+      case 'delete':
+        print('Delete selected');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,10 +202,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           padding: const EdgeInsets.only(left: 16.0),
           child: Row(
             children: [
-              const CircleAvatar(
-                radius: 18,
-                backgroundImage: AssetImage(
-                  'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
+              GestureDetector(
+                onTap: () {
+                  _showPopupMenu(context);
+                },
+                child: const CircleAvatar(
+                  radius: 18,
+                  backgroundImage: AssetImage(
+                    'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
