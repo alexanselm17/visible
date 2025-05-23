@@ -116,6 +116,7 @@ class Datum {
   DateTime? updatedAt;
   String? imagePath;
   String? imageUrl;
+  int? uploadedCount;
   String? downloadUrl;
   String? userScreenshot;
   String? screenshotUrl;
@@ -133,6 +134,7 @@ class Datum {
     this.screenshotUrl,
     this.screenshotId,
     this.name,
+    this.uploadedCount,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -151,6 +153,7 @@ class Datum {
         userScreenshot: json["user_screenshot"],
         screenshotUrl: json["screenshot_url"],
         screenshotId: json["screenshot_id"],
+        uploadedCount: json["screenshot_count"],
       );
 
   Map<String, dynamic> toJson() => {

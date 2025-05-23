@@ -135,8 +135,8 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 children: [
                   StandardFormField(
-                    label: 'Username',
-                    hintText: 'Enter your username',
+                    label: 'Username or Email',
+                    hintText: 'Enter your username or email',
                     controller: _emailController,
                     prefixIconData: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,

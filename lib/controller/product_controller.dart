@@ -25,6 +25,15 @@ class ProductController extends GetxController {
   RxBool isDownloading = false.obs;
   RxBool isUploading = false.obs;
 
+  RxList<Datum> availableProductsList = <Datum>[].obs;
+  RxList<Datum> progressProductsList = <Datum>[].obs;
+  RxList<Datum> completedProductsList = <Datum>[].obs;
+
+  // Loading states for each filter
+  RxBool isLoadingAvailable = false.obs;
+  RxBool isLoadingProgress = false.obs;
+  RxBool isLoadingCompleted = false.obs;
+
   Future<void> uploadProductAdvert({
     required File imageFile,
     required String campaignId,
@@ -55,12 +64,13 @@ class ProductController extends GetxController {
     }
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts({required String filter}) async {
     try {
       isLoading.value = true;
       final String userId = await UserPreferences().getUserId();
 
-      final response = await _productRepository.getProducts(userId: userId);
+      final response =
+          await _productRepository.getProducts(userId: userId, filter: filter);
       isLoading.value = false;
       productsList.clear();
       productsList.refresh();
@@ -75,6 +85,94 @@ class ProductController extends GetxController {
       CommonUtils.showErrorToast('Failed to load products');
     } finally {}
   }
+
+  Future fetchProductsByFilter({required String filter}) async {
+    try {
+      // Set appropriate loading state
+      _setLoadingState(filter, true);
+
+      final String userId = await UserPreferences().getUserId();
+
+      final response =
+          await _productRepository.getProducts(userId: userId, filter: filter);
+
+      Logger().i("$filter products response: ${response!.data}");
+
+      if (response.statusCode == 200) {
+        var productModel = ProductModel.fromJson(response.data);
+
+        // Store in appropriate list based on filter
+        switch (filter) {
+          case 'available':
+            availableProductsList.clear();
+            availableProductsList.addAll(productModel.data!.data!);
+            availableProductsList.refresh();
+            break;
+          case 'ongoing':
+            progressProductsList.clear();
+            progressProductsList.addAll(productModel.data!.data!);
+            progressProductsList.refresh();
+            break;
+          case 'completed':
+            completedProductsList.clear();
+            completedProductsList.addAll(productModel.data!.data!);
+            completedProductsList.refresh();
+            break;
+        }
+      }
+    } catch (e) {
+      Logger().e("Error fetching $filter products: $e");
+      CommonUtils.showErrorToast('Failed to load $filter products');
+    } finally {
+      _setLoadingState(filter, false);
+    }
+  }
+
+  void _setLoadingState(String filter, bool loading) {
+    switch (filter) {
+      case 'available':
+        isLoadingAvailable.value = loading;
+        break;
+      case 'progress':
+        isLoadingProgress.value = loading;
+        break;
+      case 'completed':
+        isLoadingCompleted.value = loading;
+        break;
+    }
+  }
+
+  // Get loading state for current filter
+  RxBool getLoadingState(String filter) {
+    switch (filter) {
+      case 'available':
+        return isLoadingAvailable;
+      case 'ongoing':
+        return isLoadingProgress;
+      case 'completed':
+        return isLoadingCompleted;
+      default:
+        return isLoadingAvailable;
+    }
+  }
+
+  // Get current list based on filter
+  RxList<Datum> getCurrentList(String filter) {
+    switch (filter) {
+      case 'available':
+        return availableProductsList;
+      case 'ongoing':
+        return progressProductsList;
+      case 'completed':
+        return completedProductsList;
+      default:
+        return availableProductsList;
+    }
+  }
+
+  int get availableCount => availableProductsList.length;
+  int get progressCount => progressProductsList.length;
+  int get completedCount => completedProductsList.length;
 
   Future<void> uploadProductScreenShot({
     required File imageFile,

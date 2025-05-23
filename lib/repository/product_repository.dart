@@ -37,10 +37,11 @@ class ProductRepository {
     }
   }
 
-  Future<Response?> getProducts({required String userId}) async {
+  Future<Response?> getProducts(
+      {required String userId, required String filter}) async {
     try {
       final Response? response = await dioClient.getHTTP(
-          "${ApiEndpoints.baseUrl}/campaign/get_product_advert?user_id=$userId");
+          "${ApiEndpoints.baseUrl}/campaign/get_product_advert?user_id=$userId&status=$filter");
 
       return response;
     } on DioException catch (e) {
