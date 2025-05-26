@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
+import 'package:visible/screens/user/products/completed_product.dart';
 import 'package:visible/screens/user/products/product_detail_page.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
@@ -516,7 +517,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Widget _buildCompletedProductCard(Datum product, int index) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => ProductDetailPage(product: product));
+        Get.to(() => ProductAnalyticsPage(product: product));
       },
       child: Container(
         decoration: BoxDecoration(
