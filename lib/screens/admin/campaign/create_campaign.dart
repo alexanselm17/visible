@@ -22,15 +22,35 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
   final TextEditingController _rewardController = TextEditingController();
   final TextEditingController _capacityController = TextEditingController();
   final TextEditingController _validUntilController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+
   DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   final CampaignController campaignController = Get.find<CampaignController>();
+
+  // Auto-calculation variables
+  int _calculatedCapacity = 0;
+  bool _isAutoCalculationEnabled = true;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now().add(const Duration(days: 1));
+    _selectedTime = const TimeOfDay(hour: 23, minute: 59);
     _validUntilController.text =
         DateFormat('yyyy-MM-dd').format(_selectedDate!);
+
+    // Add listeners for auto-calculation
+    _capitalController.addListener(_calculateCapacity);
+    _rewardController.addListener(_calculateCapacity);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_timeController.text.isEmpty && _selectedTime != null) {
+      _timeController.text = _selectedTime!.format(context);
+    }
   }
 
   @override
@@ -40,7 +60,51 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
     _rewardController.dispose();
     _capacityController.dispose();
     _validUntilController.dispose();
+    _timeController.dispose();
     super.dispose();
+  }
+
+  // Auto-calculate capacity based on budget and reward
+  void _calculateCapacity() {
+    if (!_isAutoCalculationEnabled) return;
+
+    final budgetText = _capitalController.text.replaceAll(',', '');
+    final rewardText = _rewardController.text;
+
+    if (budgetText.isNotEmpty && rewardText.isNotEmpty) {
+      try {
+        final budget = int.parse(budgetText);
+        final reward = int.parse(rewardText);
+
+        if (reward > 0) {
+          final capacity = (budget / reward).floor();
+          setState(() {
+            _calculatedCapacity = capacity;
+            _capacityController.text =
+                NumberFormat('#,###', 'en_US').format(capacity);
+          });
+        }
+      } catch (e) {
+        // Handle parsing errors silently
+      }
+    } else {
+      setState(() {
+        _calculatedCapacity = 0;
+        if (_capacityController.text.isNotEmpty) {
+          _capacityController.clear();
+        }
+      });
+    }
+  }
+
+  // Toggle auto-calculation
+  void _toggleAutoCalculation(bool value) {
+    setState(() {
+      _isAutoCalculationEnabled = value;
+      if (value) {
+        _calculateCapacity();
+      }
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -71,34 +135,69 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
     }
   }
 
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? const TimeOfDay(hour: 23, minute: 59),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.accentOrange,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: AppColors.primaryBlack,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+        _timeController.text = picked.format(context);
+      });
+    }
+  }
+
+  String _getCombinedDateTime() {
+    if (_selectedDate != null && _selectedTime != null) {
+      final combinedDateTime = DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedTime!.hour,
+        _selectedTime!.minute,
+      );
+      return combinedDateTime.toIso8601String();
+    }
+    return '';
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      campaignController
-          .createCampaign(
-        name: _nameController.text.trim(),
-        capitalInvested: int.parse(_capitalController.text.replaceAll(',', '')),
-        validUntil: _validUntilController.text.trim(),
-        reward: int.parse(_rewardController.text),
-        capacity: int.parse(_capacityController.text.replaceAll(',', '')),
-      )
-          .then((_) {
-        Get.back();
-        Get.snackbar(
-          'Success',
-          'Campaign created successfully',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+      final combinedDateTime = _getCombinedDateTime();
+
+      try {
+        campaignController.createCampaign(
+          name: _nameController.text.trim(),
+          capitalInvested:
+              int.parse(_capitalController.text.replaceAll(',', '')),
+          validUntil: combinedDateTime,
+          reward: int.parse(_rewardController.text),
+          capacity: int.parse(_capacityController.text.replaceAll(',', '')),
         );
-      }).catchError((error) {
+      } catch (e) {
         Get.snackbar(
           'Error',
-          'Failed to create campaign: $error',
+          e.toString(),
           backgroundColor: Colors.red,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
-      });
+        return;
+      }
     }
   }
 
@@ -137,7 +236,6 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                 _buildInfoCard(
                   child: Column(
                     children: [
-                      // Campaign Name Field
                       _buildTextField(
                         controller: _nameController,
                         label: 'Campaign Name',
@@ -151,14 +249,12 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Valid Until Date Field
                       GestureDetector(
                         onTap: () => _selectDate(context),
                         child: AbsorbPointer(
                           child: _buildTextField(
                             controller: _validUntilController,
-                            label: 'Valid Until',
+                            label: 'Valid Until (Date)',
                             hint: 'Select end date',
                             prefixIcon: Icons.calendar_today,
                             validator: (value) {
@@ -170,6 +266,55 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => _selectTime(context),
+                        child: AbsorbPointer(
+                          child: _buildTextField(
+                            controller: _timeController,
+                            label: 'Valid Until (Time)',
+                            hint: 'Select end time',
+                            prefixIcon: Icons.access_time,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select end time';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentOrange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.accentOrange.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.schedule,
+                              color: AppColors.accentOrange,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Campaign ends: ${_selectedDate != null && _selectedTime != null ? DateFormat('MMM dd, yyyy \'at\' h:mm a').format(DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _selectedTime!.hour, _selectedTime!.minute)) : 'Select date and time'}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.accentOrange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -179,7 +324,6 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                 _buildInfoCard(
                   child: Column(
                     children: [
-                      // Capital Invested Field
                       _buildTextField(
                         controller: _capitalController,
                         label: 'Budget (KSh)',
@@ -198,8 +342,6 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Reward Field
                       _buildTextField(
                         controller: _rewardController,
                         label: 'Reward per Participant (KSh)',
@@ -226,28 +368,88 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                 _buildInfoCard(
                   child: Column(
                     children: [
-                      // Capacity Field
+                      // Auto-calculation toggle
+                      Row(
+                        children: [
+                          Switch(
+                            value: _isAutoCalculationEnabled,
+                            onChanged: _toggleAutoCalculation,
+                            activeColor: AppColors.accentOrange,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Auto-calculate from budget',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                       _buildTextField(
                         controller: _capacityController,
                         label: 'Maximum Participants',
-                        hint: 'e.g. 10,000',
+                        hint: _isAutoCalculationEnabled
+                            ? 'Auto-calculated'
+                            : 'e.g. 10,000',
                         prefixIcon: Icons.group,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          _ThousandsSeparatorInputFormatter(),
-                        ],
+                        inputFormatters: _isAutoCalculationEnabled
+                            ? null
+                            : [
+                                FilteringTextInputFormatter.digitsOnly,
+                                _ThousandsSeparatorInputFormatter(),
+                              ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter participant capacity';
                           }
                           return null;
                         },
+                        readOnly: _isAutoCalculationEnabled,
                       ),
                       const SizedBox(height: 8),
-                      // Help text
+                      // Calculation display
+                      if (_isAutoCalculationEnabled && _calculatedCapacity > 0)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.calculate,
+                                color: Colors.green,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Calculation: KSh ${_capitalController.text} ÷ KSh ${_rewardController.text} = ${NumberFormat('#,###', 'en_US').format(_calculatedCapacity)} participants',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 8),
                       Text(
-                        'This is the maximum number of participants who can join this campaign.',
+                        _isAutoCalculationEnabled
+                            ? 'Capacity is automatically calculated based on your budget and reward per participant.'
+                            : 'This is the maximum number of participants who can join this campaign.',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -342,24 +544,29 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
+    bool readOnly = false,
   }) {
     return TextFormField(
       controller: controller,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(prefixIcon, color: Colors.grey[600]),
+        prefixIcon: Icon(prefixIcon,
+            color: readOnly ? Colors.grey[400] : Colors.grey[600]),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: BorderSide(
+              color: readOnly ? Colors.grey[200]! : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.accentOrange),
+          borderSide: BorderSide(
+              color: readOnly ? Colors.grey[200]! : AppColors.accentOrange),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -367,6 +574,8 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        filled: readOnly,
+        fillColor: readOnly ? Colors.grey[50] : null,
       ),
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
@@ -385,20 +594,16 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    // Only process if the new value is different and has digits
     if (newValue.text != oldValue.text &&
         RegExp(r'\d').hasMatch(newValue.text)) {
-      // Extract digits only
       final String digitsOnly = newValue.text.replaceAll(',', '');
 
-      // Don't format if backspacing a comma
       if (oldValue.text.length > newValue.text.length &&
           oldValue.text.contains(',') &&
           !newValue.text.contains(',')) {
         return newValue;
       }
 
-      // Format number
       String formatted = _numberFormat.format(int.parse(digitsOnly));
 
       return TextEditingValue(

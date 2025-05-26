@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/app_theme.dart';
 import 'package:visible/screens/auth/on_board_page.dart';
@@ -11,8 +12,8 @@ import 'package:visible/shared_preferences/user_pref.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
   // await Firebase.initializeApp();
-
   try {
     setupLocator();
     PushNotification().initialize();

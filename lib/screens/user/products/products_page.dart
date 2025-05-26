@@ -25,7 +25,7 @@ class _ProductsPageState extends State<ProductsPage> {
   // Filter categories with their keys
   final List<Map<String, dynamic>> _categories = [
     {'name': 'Available', 'key': 'available'},
-    {'name': 'On Going', 'key': 'ongoing'},
+    {'name': 'OnGoing', 'key': 'ongoing'},
     {'name': 'Completed', 'key': 'completed'},
   ];
 
@@ -413,15 +413,19 @@ class _ProductsPageState extends State<ProductsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${product.uploadedCount} screenshots uploaded',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Leotaro',
-                      color: Colors.black,
-                    ),
-                  ),
+                  const SizedBox(height: 8),
+
+                  // OPTION 1: Circular Progress with Dots
+                  _buildCircularProgressWithDots(
+                      product.screenshotCount ?? 0, 5),
+
+                  // OPTION 2: Linear Progress Bar (Alternative)
+                  // _buildLinearProgressBar(product.uploadedCount ?? 0, 5),
+
+                  // OPTION 3: Screenshot Icons Grid (Alternative)
+                  // _buildScreenshotIconsGrid(product.uploadedCount ?? 0, 5),
+
+                  const SizedBox(height: 8),
                   Text(
                     'Waiting for verification...',
                     style: TextStyle(
@@ -430,33 +434,82 @@ class _ProductsPageState extends State<ProductsPage> {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          Get.to(ProductDetailPage(product: product)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: AppColors.pureWhite,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'View Status',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+// OPTION 1: Circular Progress with Dots
+  Widget _buildCircularProgressWithDots(int uploaded, int total) {
+    double progress = uploaded / total;
+
+    return Row(
+      children: [
+        // Circular progress indicator
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: Stack(
+            children: [
+              CircularProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.grey.shade300,
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
+                strokeWidth: 3,
+              ),
+              Center(
+                child: Text(
+                  '$uploaded/$total',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+
+        // Dots representation
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Screenshots',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Leotaro',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: List.generate(total, (index) {
+                  return Container(
+                    margin: const EdgeInsets.only(right: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: index < uploaded
+                          ? Colors.orange
+                          : Colors.grey.shade300,
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

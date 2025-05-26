@@ -177,6 +177,8 @@ class ProductController extends GetxController {
   Future<void> uploadProductScreenShot({
     required File imageFile,
     required String productId,
+    required bool isCompleted,
+    required bool isOngoing,
   }) async {
     try {
       isUploading.value = true;
@@ -189,6 +191,18 @@ class ProductController extends GetxController {
 
       if (response.statusCode == 200) {
         Logger().i(response.data);
+        if (isCompleted) {
+          progressProductsList
+              .removeWhere((product) => product.id == productId);
+          progressProductsList.refresh();
+        }
+        if (isOngoing) {
+          fetchProductsByFilter(filter: 'ongoing');
+          availableProductsList
+              .removeWhere((product) => product.id == productId);
+          availableProductsList.refresh();
+        }
+
         CommonUtils.showToast(response.data['message']);
       } else {
         CommonUtils.showErrorToast('Failed !, Please try again later .');

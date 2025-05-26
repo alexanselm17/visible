@@ -46,10 +46,6 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
           ),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
-          onPressed: () => Get.back(),
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.accentOrange),

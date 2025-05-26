@@ -110,31 +110,34 @@ class Data {
 class Datum {
   String? id;
   String? category;
-  String? name;
-
   DateTime? createdAt;
+  String? name;
   DateTime? updatedAt;
+  DateTime? validUntil;
   String? imagePath;
   String? imageUrl;
-  int? uploadedCount;
   String? downloadUrl;
   String? userScreenshot;
   String? screenshotUrl;
   String? screenshotId;
+  int? screenshotCount;
+  List<AllScreenshot>? allScreenshots;
 
   Datum({
     this.id,
     this.category,
     this.createdAt,
+    this.name,
     this.updatedAt,
+    this.validUntil,
     this.imagePath,
     this.imageUrl,
     this.downloadUrl,
     this.userScreenshot,
     this.screenshotUrl,
     this.screenshotId,
-    this.name,
-    this.uploadedCount,
+    this.screenshotCount,
+    this.allScreenshots,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -143,30 +146,59 @@ class Datum {
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
+        name: json["name"],
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
+        validUntil: json["valid_until"] == null
+            ? null
+            : DateTime.parse(json["valid_until"]),
         imagePath: json["image_path"],
-        name: json['name'],
         imageUrl: json["image_url"],
         downloadUrl: json["download_url"],
         userScreenshot: json["user_screenshot"],
         screenshotUrl: json["screenshot_url"],
         screenshotId: json["screenshot_id"],
-        uploadedCount: json["screenshot_count"],
+        screenshotCount: json["screenshot_count"],
+        allScreenshots: json["all_screenshots"] == null
+            ? []
+            : List<AllScreenshot>.from(
+                json["all_screenshots"]!.map((x) => AllScreenshot.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "category": category,
         "created_at": createdAt?.toIso8601String(),
+        "name": name,
         "updated_at": updatedAt?.toIso8601String(),
+        "valid_until": validUntil?.toIso8601String(),
         "image_path": imagePath,
         "image_url": imageUrl,
         "download_url": downloadUrl,
         "user_screenshot": userScreenshot,
         "screenshot_url": screenshotUrl,
         "screenshot_id": screenshotId,
+        "screenshot_count": screenshotCount,
+        "all_screenshots": allScreenshots == null
+            ? []
+            : List<dynamic>.from(allScreenshots!.map((x) => x.toJson())),
+      };
+}
+
+class AllScreenshot {
+  int? views;
+
+  AllScreenshot({
+    this.views,
+  });
+
+  factory AllScreenshot.fromJson(Map<String, dynamic> json) => AllScreenshot(
+        views: json["views"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "views": views,
       };
 }
 

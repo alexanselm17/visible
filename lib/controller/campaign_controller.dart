@@ -102,7 +102,7 @@ class CampaignController extends GetxController {
         CommonUtils.showToast("Campaign created successfully!");
         await fetchCampaigns();
       } else {
-        CommonUtils.showErrorToast("Failed to create campaign.");
+        CommonUtils.showErrorToast(response?.data['message']);
       }
     } catch (e) {
       CommonUtils.showErrorToast(e.toString());

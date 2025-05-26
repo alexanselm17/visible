@@ -99,7 +99,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                     ),
                   ),
-                  if (widget.product.screenshotUrl != null)
+                  if (widget.product.screenshotCount == 5)
                     Positioned(
                       top: 16,
                       right: 16,
@@ -294,7 +294,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 ),
                               ),
                             ),
-                          if (widget.product.screenshotId == null)
+                          if (widget.product.screenshotCount != 5)
                             Row(
                               children: [
                                 Expanded(
@@ -326,8 +326,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                               .uploadProductScreenShot(
                                                   imageFile:
                                                       _selectedScreenshot!,
-                                                  productId:
-                                                      widget.product.id!),
+                                                  productId: widget.product.id!,
+                                                  isCompleted: widget.product
+                                                              .screenshotCount ==
+                                                          4
+                                                      ? true
+                                                      : false,
+                                                  isOngoing: widget.product
+                                                                  .screenshotCount ==
+                                                              0 ||
+                                                          widget.product
+                                                                  .screenshotCount! <=
+                                                              4
+                                                      ? true
+                                                      : false),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.accentOrange,
                                         foregroundColor: AppColors.pureWhite,
