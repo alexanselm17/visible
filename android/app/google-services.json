@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "231270698505",
+    "project_id": "visible-b9c23",
+    "storage_bucket": "visible-b9c23.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231270698505:android:4ac2b5f49457b75e96f2d8",
+        "android_client_info": {
+          "package_name": "com.example.visible"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt8Rc7gyQsvxZM1bGSImvN8SFEIAox9dg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

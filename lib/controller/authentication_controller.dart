@@ -12,6 +12,7 @@ import 'package:visible/repository/auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visible/screens/auth/login_page.dart';
 import 'package:visible/service/network/dio_exception.dart';
+import 'package:visible/service/notification/pushNotification.dart';
 import 'package:visible/shared_preferences/user_pref.dart';
 
 import 'package:visible/screens/user/main_screen.dart' as user;
@@ -129,6 +130,13 @@ class AuthenticationController extends GetxController {
         await UserPreferences().storeUserId(data.data!.id!);
         await UserPreferences().storeRoleId(data.data!.role!.id!);
         await UserPreferences().storeUserSlug(data.data!.role!.slug!);
+
+        final fcmToken = await PushNotification().getDeviceToken();
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('fcm_token', fcmToken);
+        await updateFcmToken(fcmToken);
+
         isLoggingIn.value = false;
         Get.offUntil(
           MaterialPageRoute(
@@ -168,38 +176,19 @@ class AuthenticationController extends GetxController {
     }
   }
 
-  Future<void> getUserDetails() async {
-    isLoading.value = true;
-
-    String userId = await UserPreferences().getUserId();
-    String roleId = await UserPreferences().getUserRoleId();
-    String companyId = await UserPreferences().getUserCompanyId();
-    String visibleStationId = await UserPreferences().getUserStationId();
-
-    var response = await authRepository.getUserHomeDetails(
-      roleId: roleId,
-      userId: userId,
-      companyId: companyId,
-      visibleStationId: visibleStationId,
-    );
-    isLoading.value = false;
-    Logger().f(response!.realUri);
-
-    Logger().i(response.data);
-
-    if (response.statusCode == 200) {
-      // final userDetail = homePage.HomePageUserDetails.fromJson(response.data!);
-      // currentUserDetails.value = userDetail.data!;
-      // await UserPreferences.saveUserData(
-      //   name: currentUserDetails.value.visibleStation!.first.name!,
-      //   email: currentUserDetails.value.visibleStation!.first.email!,
-      //   phone: currentUserDetails.value.visibleStation!.first.phone!,
-      // );
-      // currentUserDetails.refresh();
-    } else {
-      CommonUtils.showErrorToast(response.data['message']);
+  Future updateFcmToken(String token) async {
+    try {
+      String id = await UserPreferences().getUserId();
+      final response =
+          await authRepository.updatefcmToken(userId: id, fcmToken: token);
+      if (response!.statusCode == 200) {
+        Logger().i("FCM Token updated successfully");
+      } else {
+        CommonUtils.showErrorToast(response.data['message']);
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Failed to update FCM Token: $e");
     }
-    // } finally {}
   }
 
   Future<void> resetPassword({

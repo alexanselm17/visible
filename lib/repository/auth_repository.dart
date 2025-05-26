@@ -114,39 +114,17 @@ class AuthRepository {
     }
   }
 
-  Future<Response?> getUserHomeDetails({
-    required String roleId,
+  Future updatefcmToken({
     required String userId,
-    required String companyId,
-    required String visibleStationId,
+    required String fcmToken,
   }) async {
     try {
-      print(
-          "${ApiEndpoints.baseUrl}/dashboard/$userId/$roleId/$companyId?visible_id=$visibleStationId");
-      final Response? response = await dioClient.getHTTP(
-          "${ApiEndpoints.baseUrl}/dashboard/$userId/$roleId/$companyId?visible_id=$visibleStationId");
-      return response;
-    } on DioException catch (e) {
-      final errorMessage = DioExceptions.fromDioError(e).toString();
-      throw errorMessage;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<Response?> createvisibleStation({
-    required String name,
-    required String type,
-    required String companyId,
-  }) async {
-    try {
-      var body = {
-        'name': name,
-        'type': type,
-      };
       final Response? response = await dioClient.postHTTP(
-        '${ApiEndpoints.baseUrl}/setup/company/visible_station/$companyId',
-        body,
+        '${ApiEndpoints.baseUrl}/auth/fcm-token',
+        {
+          'fcm_token': fcmToken,
+          'user_id': userId,
+        },
       );
       return response;
     } on DioException catch (e) {
