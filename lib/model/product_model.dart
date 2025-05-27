@@ -112,6 +112,7 @@ class Datum {
   String? category;
   DateTime? createdAt;
   String? name;
+  int? reward;
   DateTime? updatedAt;
   DateTime? validUntil;
   String? imagePath;
@@ -128,6 +129,7 @@ class Datum {
     this.category,
     this.createdAt,
     this.name,
+    this.reward,
     this.updatedAt,
     this.validUntil,
     this.imagePath,
@@ -147,6 +149,7 @@ class Datum {
             ? null
             : DateTime.parse(json["created_at"]),
         name: json["name"],
+        reward: json["reward"],
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
@@ -171,6 +174,7 @@ class Datum {
         "category": category,
         "created_at": createdAt?.toIso8601String(),
         "name": name,
+        "reward": reward,
         "updated_at": updatedAt?.toIso8601String(),
         "valid_until": validUntil?.toIso8601String(),
         "image_path": imagePath,

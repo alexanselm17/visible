@@ -41,6 +41,43 @@ class _ProductsPageState extends State<ProductsPage> {
   RxBool get currentLoadingState =>
       productController.getLoadingState(currentFilter);
 
+  // Helper method to calculate remaining time
+  String _getRemainingTime(DateTime? validUntil) {
+    if (validUntil == null) return 'No expiry';
+
+    final now = DateTime.now();
+    final difference = validUntil.difference(now);
+
+    if (difference.isNegative) return 'Expired';
+
+    final days = difference.inDays;
+    final hours = difference.inHours % 24;
+    final minutes = difference.inMinutes % 60;
+
+    if (days > 0) {
+      return '${days}d ${hours}h';
+    } else if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else {
+      return '${minutes}m';
+    }
+  }
+
+  // Helper method to get time color based on urgency
+  Color _getTimeColor(DateTime? validUntil) {
+    if (validUntil == null) return Colors.grey;
+
+    final now = DateTime.now();
+    final difference = validUntil.difference(now);
+
+    if (difference.isNegative) return Colors.red;
+
+    final hoursLeft = difference.inHours;
+    if (hoursLeft <= 24) return Colors.red;
+    if (hoursLeft <= 72) return Colors.orange;
+    return Colors.green;
+  }
+
   Future _shareToWhatsAppStatus(Datum product) async {
     try {
       Get.dialog(
@@ -237,6 +274,54 @@ class _ProductsPageState extends State<ProductsPage> {
     }
   }
 
+  Widget _buildRewardAndTimeInfo(Datum product, bool isCompleted) {
+    final remainingTime = _getRemainingTime(product.validUntil);
+    final timeColor = _getTimeColor(product.validUntil);
+
+    return Column(
+      children: [
+        // Reward Info
+        Row(
+          children: [
+            const Icon(
+              Icons.monetization_on,
+              size: 14,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Reward KSH ${product.reward ?? 0}',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppColors.accentOrange,
+              ),
+            ),
+            // Time Info
+          ],
+        ),
+        if (!isCompleted)
+          Row(
+            children: [
+              const Icon(
+                Icons.timer,
+                size: 14,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                "Expires in $remainingTime",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: timeColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+
   Widget _buildAvailableProductCard(Datum product, int index) {
     return GestureDetector(
       onTap: () {
@@ -296,6 +381,8 @@ class _ProductsPageState extends State<ProductsPage> {
                       color: Colors.grey[600],
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  _buildRewardAndTimeInfo(product, false),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
@@ -415,26 +502,10 @@ class _ProductsPageState extends State<ProductsPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // OPTION 1: Circular Progress with Dots
+                  _buildRewardAndTimeInfo(product, false),
+                  const SizedBox(height: 8),
                   _buildCircularProgressWithDots(
                       product.screenshotCount ?? 0, 5),
-
-                  // OPTION 2: Linear Progress Bar (Alternative)
-                  // _buildLinearProgressBar(product.uploadedCount ?? 0, 5),
-
-                  // OPTION 3: Screenshot Icons Grid (Alternative)
-                  // _buildScreenshotIconsGrid(product.uploadedCount ?? 0, 5),
-
-                  const SizedBox(height: 8),
-                  Text(
-                    'Waiting for verification...',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.orange[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -603,11 +674,13 @@ class _ProductsPageState extends State<ProductsPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
+                  _buildRewardAndTimeInfo(product, true),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Icon(
-                        Icons.monetization_on,
+                        Icons.check_circle,
                         size: 16,
                         color: Colors.green[600],
                       ),
@@ -771,7 +844,8 @@ class _ProductsPageState extends State<ProductsPage> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
-                              childAspectRatio: 0.75,
+                              childAspectRatio:
+                                  0.68, // Adjusted to accommodate reward and time info
                             ),
                             itemCount: currentProductsList.length,
                             itemBuilder: (context, index) {
