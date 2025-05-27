@@ -134,4 +134,20 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  Future getUserDashboard({
+    required String userId,
+  }) async {
+    try {
+      final Response? response = await dioClient.getHTTP(
+        '${ApiEndpoints.baseUrl}/campaign/dashboard/$userId',
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

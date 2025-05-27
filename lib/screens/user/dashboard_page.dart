@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/model/users/user_dashboard.dart';
+import 'package:visible/widgets/loading_indicator.dart';
 
 class UserDashboardPage extends StatefulWidget {
   const UserDashboardPage({super.key});
@@ -16,142 +18,38 @@ class UserDashboardPage extends StatefulWidget {
 class _UserDashboardPageState extends State<UserDashboardPage> {
   AuthenticationController authenticationController =
       Get.put(AuthenticationController());
-  bool _isLoading = false;
+  bool _isLoading = true;
+  UserDashboardModel? _dashboardData;
 
-  // Mock data for user dashboard
-  final Map<String, dynamic> _userStats = {
-    'name': 'Rahul Mehta',
-    'level': 'Gold',
-    'totalEarnings': 'Ksh  3,250',
-    'pendingEarnings': 'Ksh  250',
-    'earnedToday': 'Ksh  75',
-    'statusShared': 48,
-    'pendingVerifications': 2,
-    'completedCampaigns': 23,
-    'streak': 5,
-    'rewardsHistory': [
-      {
-        'date': '2025-04-19',
-        'campaign': 'Summer Sale',
-        'reward': 'Ksh 75',
-        'status': 'Credited',
-      },
-      {
-        'date': '2025-04-18',
-        'campaign': 'New Launch',
-        'reward': 'Ksh 50',
-        'status': 'Credited',
-      },
-      {
-        'date': '2025-04-17',
-        'campaign': 'Weekend Special',
-        'reward': 'Ksh 100',
-        'status': 'Credited',
-      },
-      {
-        'date': '2025-04-16',
-        'campaign': 'Flash Discount',
-        'reward': 'Ksh 75',
-        'status': 'Credited',
-      },
-      {
-        'date': '2025-04-15',
-        'campaign': 'Summer Sale',
-        'reward': 'Ksh 75',
-        'status': 'Credited',
-      },
-    ],
-    'pendingVerifications': [
-      {
-        'id': 123,
-        'campaign': 'Summer Offer',
-        'submittedAt': '10:23 AM',
-        'reward': 'Ksh 75',
-        'image':
-            'assets/images/coco-noir-chanel-pink-aesthetic-plrz6za4j9w81o44.png',
-      },
-      {
-        'id': 124,
-        'campaign': 'Flash Sale',
-        'submittedAt': 'Yesterday, 4:30 PM',
-        'reward': 'Ksh 50',
-        'image': 'assets/images/668adc4fcd57736f5c718ef6_product-12.png',
-      },
-    ],
-    'availableCampaigns': [
-      {
-        'id': 1,
-        'name': 'Summer Sale',
-        'reward': 'Ksh 75 Cashback',
-        'duration': '2 days left',
-        'image': 'assets/images/Glowify-gallery-img-1.png',
-        'completed': false,
-      },
-      {
-        'id': 2,
-        'name': 'New Launch',
-        'reward': 'Ksh 100 Discount',
-        'duration': '5 days left',
-        'image': 'assets/images/668adc4fcd57736f5c718ef9_product-18.png',
-        'completed': false,
-      },
-      {
-        'id': 3,
-        'name': 'Weekend Special',
-        'reward': 'Ksh 50 Cashback',
-        'duration': '1 day left',
-        'image': 'assets/images/668adc4fcd57736f5c718ef0_product-06.png',
-        'completed': true,
-      },
-    ],
-    'goals': {
-      'daily': {
-        'target': 2,
-        'completed': 1,
-      },
-      'weekly': {
-        'target': 10,
-        'completed': 5,
-      },
-      'monthly': {
-        'target': 40,
-        'completed': 23,
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final data = await authenticationController.getUserDashboard();
+      if (data != null) {
+        setState(() {
+          _dashboardData = UserDashboardModel.fromJson(data);
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
-    },
-    'achievements': [
-      {
-        'name': 'First Share',
-        'description': 'Share your first status',
-        'completed': true,
-        'icon': Icons.share,
-      },
-      {
-        'name': 'Streak Master',
-        'description': 'Complete 5-day streak',
-        'completed': true,
-        'icon': Icons.local_fire_department,
-      },
-      {
-        'name': 'Campaign Pro',
-        'description': 'Complete 20 campaigns',
-        'completed': true,
-        'icon': Icons.campaign,
-      },
-      {
-        'name': 'Earning Milestone',
-        'description': 'Earn total of Ksh 3,000',
-        'completed': true,
-        'icon': Icons.stars,
-      },
-      {
-        'name': 'Social Butterfly',
-        'description': 'Share 50 statuses',
-        'completed': false,
-        'progress': 0.96, // 48/50
-        'icon': Icons.publish,
-      },
-    ],
-  };
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +59,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         backgroundColor: AppColors.pureWhite,
         elevation: 0,
         centerTitle: false,
-        leadingWidth: 180, // enough space for avatar + name
+        leadingWidth: 180,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Row(
@@ -175,7 +73,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               const SizedBox(width: 8),
               Obx(
                 () => Text(
-                  authenticationController.currentUser.value.username!,
+                  authenticationController.currentUser.value.username ?? 'User',
                   style: const TextStyle(
                     fontFamily: 'TT Hoves Pro Trial',
                     color: AppColors.primaryBlack,
@@ -198,79 +96,100 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.primaryBlack),
-            onPressed: () {
-              setState(() {
-                _isLoading = true;
-              });
-
-              // Simulate loading delay
-              Future.delayed(const Duration(milliseconds: 800), () {
-                setState(() {
-                  _isLoading = false;
-                });
-              });
-            },
+            onPressed: _loadDashboardData,
           ),
         ],
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.accentOrange))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // User profile and earnings summary
-                  _buildEarningsSummary(),
-                  const SizedBox(height: 24),
-
-                  // Daily Goals
-                  _buildSectionTitle('Your Goals', 'Progress tracker'),
-                  const SizedBox(height: 8),
-                  _buildGoalsProgress(),
-                  const SizedBox(height: 24),
-
-                  // Available Campaigns
-                  _buildSectionTitle('Available Campaigns', 'Earn rewards'),
-                  const SizedBox(height: 8),
-                  _buildAvailableCampaigns(),
-                  const SizedBox(height: 24),
-
-                  // Pending Verifications
-                  if (_userStats['pendingVerifications'].length > 0)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionTitle(
-                            'Pending Verifications', 'Waiting for approval'),
-                        const SizedBox(height: 8),
-                        _buildPendingVerifications(),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-
-                  // Recent Rewards
-                  _buildSectionTitle('Recent Rewards', 'Your earnings'),
-                  const SizedBox(height: 8),
-                  _buildRecentRewards(),
-                  const SizedBox(height: 24),
-
-                  // Achievements
-                  _buildSectionTitle('Achievements', 'Your milestones'),
-                  const SizedBox(height: 8),
-                  _buildAchievements(),
-                  const SizedBox(height: 24),
-
-                  // Refer a Friend Card
-                  _buildReferralCard(),
-                ],
+              child: AnimatedLoadingIndicator(
+                isLoading: true,
+                primaryColor: AppColors.accentOrange,
+                secondaryColor: Colors.white,
+                size: 50,
+                loadingText: 'Loading dashboard...',
               ),
+            )
+          : _dashboardData?.data == null
+              ? _buildErrorState()
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // User profile and earnings summary
+                      _buildEarningsSummary(),
+                      const SizedBox(height: 24),
+
+                      // Daily Goals
+                      _buildSectionTitle('Your Goals', 'Progress tracker'),
+                      const SizedBox(height: 8),
+                      _buildGoalsProgress(),
+                      const SizedBox(height: 24),
+
+                      // Recent Rewards
+                      if (_dashboardData!.data!.recentRewards?.isNotEmpty ??
+                          false)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                                'Recent Rewards', 'Your earnings'),
+                            const SizedBox(height: 8),
+                            _buildRecentRewards(),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+
+                      // Ongoing Campaigns Section
+                      _buildSectionTitle(
+                          'Campaign Status', 'Current activities'),
+                      const SizedBox(height: 8),
+                      _buildOngoingSection(),
+                      const SizedBox(height: 24),
+
+                      // Refer a Friend Card
+                      _buildReferralCard(),
+                    ],
+                  ),
+                ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Failed to load dashboard data',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
             ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _loadDashboardData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.accentOrange,
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildEarningsSummary() {
+    final data = _dashboardData!.data!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -306,7 +225,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _userStats['totalEarnings'],
+                    'Ksh ${data.totalRewards ?? 0}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -321,17 +240,17 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Icon(
-                      Icons.local_fire_department,
+                    Icon(
+                      Icons.trending_up,
                       color: Colors.white,
                       size: 20,
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
-                      '${_userStats['streak']} Day Streak',
-                      style: const TextStyle(
+                      'Active',
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -345,12 +264,12 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildEarningsDetail('Today', _userStats['earnedToday']),
-              _buildEarningsDetail('Pending', _userStats['pendingEarnings']),
               _buildEarningsDetail(
-                  'Campaigns', _userStats['completedCampaigns'].toString()),
+                  'Today', 'Ksh ${data.todayRewards?.amount ?? 0}'),
+              _buildEarningsDetail('Pending', data.pendingBalance ?? 'Ksh 0'),
+              _buildEarningsDetail('Campaigns', '${data.totalCampaigns ?? 0}'),
               _buildEarningsDetail(
-                  'Shared', _userStats['statusShared'].toString()),
+                  'Today Tasks', '${data.todayRewards?.count ?? 0}'),
             ],
           ),
         ],
@@ -404,6 +323,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   Widget _buildGoalsProgress() {
+    final achievements = _dashboardData!.data!.achievements;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -423,20 +343,20 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         children: [
           _buildGoalProgressIndicator(
             'Daily',
-            _userStats['goals']['daily']['completed'],
-            _userStats['goals']['daily']['target'],
+            achievements?.daily?.completed ?? 0,
+            achievements?.daily?.created ?? 1,
             Colors.blue,
           ),
           _buildGoalProgressIndicator(
             'Weekly',
-            _userStats['goals']['weekly']['completed'],
-            _userStats['goals']['weekly']['target'],
+            achievements?.weekly?.completed ?? 0,
+            achievements?.weekly?.created ?? 1,
             Colors.purple,
           ),
           _buildGoalProgressIndicator(
             'Monthly',
-            _userStats['goals']['monthly']['completed'],
-            _userStats['goals']['monthly']['target'],
+            achievements?.monthly?.completed ?? 0,
+            achievements?.monthly?.created ?? 1,
             AppColors.accentOrange,
           ),
         ],
@@ -446,7 +366,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
   Widget _buildGoalProgressIndicator(
       String title, int completed, int target, Color color) {
-    double percent = completed / target;
+    double percent = target > 0 ? completed / target : 0;
     if (percent > 1) percent = 1.0;
 
     return Column(
@@ -480,183 +400,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     );
   }
 
-  Widget _buildAvailableCampaigns() {
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _userStats['availableCampaigns'].length,
-        itemBuilder: (context, index) {
-          final campaign = _userStats['availableCampaigns'][index];
-          return Container(
-            width: 160,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Campaign image
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                  ),
-                  child: Stack(
-                    children: [
-                      Image.asset(
-                        campaign['image'],
-                        height: 100,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                      if (campaign['completed'])
-                        Container(
-                          height: 100,
-                          width: double.infinity,
-                          color: Colors.black.withOpacity(0.6),
-                          child: const Center(
-                            child: Icon(
-                              Icons.check_circle,
-                              color: Colors.white,
-                              size: 40,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        campaign['name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        campaign['reward'],
-                        style: const TextStyle(
-                          color: AppColors.accentOrange,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        campaign['duration'],
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: (100 * index).ms)
-              .slideX(begin: 0.2, end: 0);
-        },
-      ),
-    );
-  }
-
-  Widget _buildPendingVerifications() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children:
-            _userStats['pendingVerifications'].map<Widget>((verification) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    verification['image'],
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        verification['campaign'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Submitted at ${verification['submittedAt']}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Pending reward: ${verification['reward']}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.hourglass_top,
-                  color: Colors.orange,
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
-  }
-
   Widget _buildRecentRewards() {
+    final recentRewards = _dashboardData!.data!.recentRewards ?? [];
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -672,8 +418,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         ],
       ),
       child: Column(
-        children: _userStats['rewardsHistory'].take(3).map<Widget>((reward) {
-          final date = DateTime.parse(reward['date']);
+        children: recentRewards.take(5).map<Widget>((reward) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
@@ -698,7 +443,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          reward['campaign'],
+                          reward.advertName ?? 'Campaign Reward',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
@@ -706,7 +451,10 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          DateFormat('dd MMM yyyy').format(date),
+                          reward.createdAt != null
+                              ? DateFormat('dd MMM yyyy')
+                                  .format(reward.createdAt!)
+                              : 'N/A',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
@@ -720,7 +468,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      reward['reward'],
+                      'Ksh ${reward.amount ?? '0'}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -729,7 +477,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      reward['status'],
+                      reward.type?.toUpperCase() ?? 'CREDITED',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -745,98 +493,86 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0);
   }
 
-  Widget _buildAchievements() {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _userStats['achievements'].length,
-        itemBuilder: (context, index) {
-          final achievement = _userStats['achievements'][index];
-          final bool completed = achievement['completed'] ?? false;
-          final double progress = achievement['progress'] ?? 0.0;
+  Widget _buildOngoingSection() {
+    final ongoing = _dashboardData!.data!.ongoing;
 
-          return Container(
-            width: 100,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.campaign,
+                color: AppColors.accentOrange,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircularPercentIndicator(
-                      radius: 25.0,
-                      lineWidth: 4.0,
-                      percent: completed ? 1.0 : progress,
-                      progressColor:
-                          completed ? Colors.green : AppColors.accentOrange,
-                      backgroundColor: Colors.grey.withOpacity(0.2),
-                      circularStrokeCap: CircularStrokeCap.round,
-                      animation: true,
-                      center: Icon(
-                        achievement['icon'],
-                        color:
-                            completed ? Colors.green : AppColors.accentOrange,
-                        size: 22,
+                    Text(
+                      ongoing?.message ?? 'Campaign Status',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
                       ),
                     ),
-                    if (completed)
-                      const Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: CircleAvatar(
-                          radius: 8,
-                          backgroundColor: Colors.green,
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 10,
-                          ),
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Total ongoing: ${ongoing?.pagination?.total ?? 0}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
                       ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  achievement['name'],
-                  textAlign: TextAlign.center,
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.accentOrange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${ongoing?.pagination?.total ?? 0}',
                   style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  completed ? 'Completed' : 'In progress',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: completed ? Colors.green : Colors.grey[600],
+                    color: AppColors.accentOrange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          if (ongoing?.pagination?.total == 0) ...[
+            const SizedBox(height: 16),
+            Text(
+              'No ongoing campaigns at the moment',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: (100 * index).ms)
-              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1));
-        },
+          ],
+        ],
       ),
-    );
+    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
   }
 
   Widget _buildReferralCard() {

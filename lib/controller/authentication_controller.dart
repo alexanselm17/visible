@@ -232,4 +232,20 @@ class AuthenticationController extends GetxController {
       CommonUtils.showErrorToast(e.toString());
     }
   }
+
+  Future getUserDashboard() async {
+    try {
+      String id = await UserPreferences().getUserId();
+      final response = await authRepository.getUserDashboard(userId: id);
+      if (response!.statusCode == 200) {
+        Logger().i("User dashboard data fetched successfully");
+        return response.data;
+      } else {
+        CommonUtils.showErrorToast(response.data['message']);
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Failed to fetch user dashboard: $e");
+    }
+    return null;
+  }
 }
