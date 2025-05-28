@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
-import 'package:visible/screens/auth/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -20,6 +19,12 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _locationEnabled = true;
   final AuthenticationController _authenticationController =
       Get.put(AuthenticationController());
+
+  @override
+  void initState() {
+    _authenticationController.loadUserData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

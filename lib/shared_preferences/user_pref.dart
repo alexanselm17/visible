@@ -171,4 +171,27 @@ class UserPreferences with ChangeNotifier {
 
     return null;
   }
+
+  Future<void> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    try {
+      await Future.wait([
+        prefs.remove(ApiEndpoints.TOKEN_KEY),
+        prefs.remove(USER_ID),
+        prefs.remove(ROLE_ID),
+        prefs.remove(COMPANY_ID),
+        prefs.remove(STATION_ID),
+        prefs.remove(STATION_TYPE),
+        prefs.remove(SLUG),
+        prefs.remove(_userDataKey),
+        prefs.remove(_userKey),
+        prefs.remove('fcm_token'),
+      ]);
+
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

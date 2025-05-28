@@ -421,13 +421,13 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              // Expanded(
-              //   child: _buildDetailItem(
-              //     'Product ID',
-              //     widget.product. ?? 'N/A',
-              //     Icons.tag,
-              //   ),
-              // ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Reward',
+                  "Ksh ${widget.product.reward}",
+                  Icons.tag,
+                ),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildDetailItem(

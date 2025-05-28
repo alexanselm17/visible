@@ -48,15 +48,22 @@ class AuthenticationController extends GetxController {
   Future<void> loadUserData() async {
     try {
       final signInModel = await UserPreferences().getSignInModel();
-      if (signInModel != null && signInModel.data != null) {
+      final token = await UserPreferences().getToken();
+
+      if (signInModel != null && signInModel.data != null && token.isNotEmpty) {
         currentUser.value = signInModel.data!;
         currentUser.refresh();
+        refresh();
         Logger().i("User data loaded from preferences");
       } else {
-        Logger().w("No stored user data found");
+        currentUser.value = Data();
+        await UserPreferences().logout();
+        Logger().w("No valid stored user data found - cleared preferences");
       }
     } catch (e) {
       Logger().e("Error loading user data: $e");
+      currentUser.value = Data();
+      await UserPreferences().logout();
     }
   }
 
@@ -166,6 +173,7 @@ class AuthenticationController extends GetxController {
       final response = await authRepository.logoutUserApi(userId: id);
       if (response!.statusCode == 200) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        await UserPreferences().logout();
         await prefs.clear();
         CommonUtils.showToast('Logged out sucessfully');
         Get.offAll(const LoginPage());

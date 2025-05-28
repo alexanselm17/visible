@@ -24,6 +24,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   @override
   void initState() {
     super.initState();
+    authenticationController.loadUserData();
     _loadDashboardData();
   }
 
@@ -48,6 +49,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
       setState(() {
         _isLoading = false;
       });
+      debugPrint('Error loading dashboard data: $e');
     }
   }
 
@@ -73,7 +75,11 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               const SizedBox(width: 8),
               Obx(
                 () => Text(
-                  authenticationController.currentUser.value.username ?? 'User',
+                  authenticationController
+                              .currentUser.value.username?.isNotEmpty ==
+                          true
+                      ? authenticationController.currentUser.value.username!
+                      : 'User',
                   style: const TextStyle(
                     fontFamily: 'TT Hoves Pro Trial',
                     color: AppColors.primaryBlack,
@@ -126,30 +132,23 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                       const SizedBox(height: 8),
                       _buildGoalsProgress(),
                       const SizedBox(height: 24),
+                      _buildSectionTitle(
+                          'Ongoing Campaigns', 'Participate and earn'),
+                      const SizedBox(height: 8),
+
+                      _buildAvailableCampaigns(_dashboardData!.data!),
 
                       // Recent Rewards
-                      if (_dashboardData!.data!.recentRewards?.isNotEmpty ??
-                          false)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildSectionTitle(
-                                'Recent Rewards', 'Your earnings'),
-                            const SizedBox(height: 8),
-                            _buildRecentRewards(),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
-
-                      // Ongoing Campaigns Section
-                      _buildSectionTitle(
-                          'Campaign Status', 'Current activities'),
-                      const SizedBox(height: 8),
-                      _buildOngoingSection(),
-                      const SizedBox(height: 24),
-
-                      // Refer a Friend Card
-                      _buildReferralCard(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          _buildSectionTitle('Recent Rewards', 'Your earnings'),
+                          const SizedBox(height: 8),
+                          _buildRecentRewards(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -189,7 +188,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   Widget _buildEarningsSummary() {
-    final data = _dashboardData!.data!;
+    final data = _dashboardData?.data;
+    if (data == null) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -266,15 +267,304 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             children: [
               _buildEarningsDetail(
                   'Today', 'Ksh ${data.todayRewards?.amount ?? 0}'),
-              _buildEarningsDetail('Pending', data.pendingBalance ?? 'Ksh 0'),
+              _buildEarningsDetail(
+                  'Pending', data.pendingBalance!.toString() ?? 'Ksh 0'),
               _buildEarningsDetail('Campaigns', '${data.totalCampaigns ?? 0}'),
               _buildEarningsDetail(
-                  'Today Tasks', '${data.todayRewards?.count ?? 0}'),
+                  'Tasks Today', '${data.todayRewards?.count ?? 0}'),
             ],
           ),
         ],
       ),
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.3, end: 0);
+  }
+
+  Widget _buildAvailableCampaigns(UserDashboardModelData data) {
+    final campaignsData = data.ongoing?.data?.data;
+
+    if (campaignsData == null || campaignsData.isEmpty) {
+      return Container(
+        height: 200,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.campaign_outlined,
+                size: 48,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'No Ongoing available',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Check back later for new opportunities',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ).animate().fadeIn(duration: 300.ms);
+    }
+    return SizedBox(
+      height: 220,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        itemCount: campaignsData.length,
+        itemBuilder: (context, index) {
+          Datum campaign = campaignsData[index];
+          final timeRemaining = _getTimeRemaining(campaign.validUntil);
+          final isExpiringSoon = _isExpiringSoon(campaign.validUntil);
+
+          return Container(
+            width: 180,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  spreadRadius: 0,
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: Colors.grey[200]!,
+                width: 0.5,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 170,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.grey[300]!,
+                              Colors.grey[200]!,
+                            ],
+                          ),
+                        ),
+                        child: campaign.imageUrl != null &&
+                                campaign.imageUrl!.isNotEmpty
+                            ? Image.network(
+                                campaign.imageUrl!,
+                                height: 110,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildPlaceholderImage(),
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return _buildLoadingImage();
+                                },
+                              )
+                            : _buildPlaceholderImage(),
+                      ),
+                      // Time remaining badge
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isExpiringSoon
+                                ? Colors.red[600]!.withOpacity(0.9)
+                                : AppColors.accentOrange.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.access_time_rounded,
+                                size: 12,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                timeRemaining,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              campaign.name ?? 'Untitled Campaign',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Colors.black87,
+                                height: 1.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: (120 * index).ms)
+              .slideX(begin: 0.3, end: 0, curve: Curves.easeOutCubic);
+        },
+      ),
+    );
+  }
+
+// Helper method to build placeholder image
+  Widget _buildPlaceholderImage() {
+    return Container(
+      height: 110,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey[300]!,
+            Colors.grey[200]!,
+          ],
+        ),
+      ),
+      child: Icon(
+        Icons.image_outlined,
+        size: 32,
+        color: Colors.grey[500],
+      ),
+    );
+  }
+
+// Helper method to build loading image
+  Widget _buildLoadingImage() {
+    return Container(
+      height: 110,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey[300]!,
+            Colors.grey[200]!,
+          ],
+        ),
+      ),
+      child: const Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+          ),
+        ),
+      ),
+    );
+  }
+
+// Helper method to calculate time remaining
+  String _getTimeRemaining(DateTime? validUntil) {
+    if (validUntil == null) return 'No limit';
+
+    final now = DateTime.now();
+    final difference = validUntil.difference(now);
+
+    if (difference.isNegative) return 'Expired';
+
+    final days = difference.inDays;
+    final hours = difference.inHours % 24;
+    final minutes = difference.inMinutes % 60;
+
+    if (days > 0) {
+      return '${days}d ${hours}h';
+    } else if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else if (minutes > 0) {
+      return '${minutes}m';
+    } else {
+      return 'Ending soon';
+    }
+  }
+
+  bool _isExpiringSoon(DateTime? validUntil) {
+    if (validUntil == null) return false;
+
+    final now = DateTime.now();
+    final difference = validUntil.difference(now);
+
+    return difference.inHours < 24 && difference.inHours >= 0;
   }
 
   Widget _buildEarningsDetail(String title, String value) {
@@ -323,7 +613,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   Widget _buildGoalsProgress() {
-    final achievements = _dashboardData!.data!.achievements;
+    final achievements = _dashboardData?.data?.achievements;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -366,8 +657,11 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
   Widget _buildGoalProgressIndicator(
       String title, int completed, int target, Color color) {
-    double percent = target > 0 ? completed / target : 0;
+    // Ensure target is never 0 to avoid division by zero
+    final safeTarget = target > 0 ? target : 1;
+    double percent = completed / safeTarget;
     if (percent > 1) percent = 1.0;
+    if (percent < 0) percent = 0.0;
 
     return Column(
       children: [
@@ -401,7 +695,56 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   Widget _buildRecentRewards() {
-    final recentRewards = _dashboardData!.data!.recentRewards ?? [];
+    final recentRewards = _dashboardData!.data!.recentRewards;
+
+    if (recentRewards == null || recentRewards.isEmpty) {
+      return Container(
+        height: 200,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.campaign_outlined,
+                size: 48,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'No recent rewards',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Start participating in campaigns to earn your first rewards and unlock exciting benefits!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ).animate().fadeIn(duration: 300.ms);
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -443,7 +786,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          reward.advertName ?? 'Campaign Reward',
+                          reward.advertName?.isNotEmpty == true
+                              ? reward.advertName!
+                              : 'Campaign Reward',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
@@ -468,7 +813,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Ksh ${reward.amount ?? '0'}',
+                      'Ksh ${reward.amount?.toString() ?? '0'}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -477,7 +822,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      reward.type?.toUpperCase() ?? 'CREDITED',
+                      reward.type?.isNotEmpty == true
+                          ? reward.type!.toUpperCase()
+                          : 'CREDITED',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -491,152 +838,5 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         }).toList(),
       ),
     ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0);
-  }
-
-  Widget _buildOngoingSection() {
-    final ongoing = _dashboardData!.data!.ongoing;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.campaign,
-                color: AppColors.accentOrange,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      ongoing?.message ?? 'Campaign Status',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Total ongoing: ${ongoing?.pagination?.total ?? 0}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.accentOrange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${ongoing?.pagination?.total ?? 0}',
-                  style: const TextStyle(
-                    color: AppColors.accentOrange,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (ongoing?.pagination?.total == 0) ...[
-            const SizedBox(height: 16),
-            Text(
-              'No ongoing campaigns at the moment',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ],
-      ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
-  }
-
-  Widget _buildReferralCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.indigo.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.people,
-              color: Colors.indigo,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Refer a Friend',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Earn Ksh 100 for each friend who joins and completes their first campaign',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Show referral options
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.indigo,
-            ),
-            child: const Text('Invite'),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 700.ms).slideY(begin: 0.2, end: 0);
   }
 }

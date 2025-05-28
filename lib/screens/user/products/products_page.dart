@@ -78,110 +78,6 @@ class _ProductsPageState extends State<ProductsPage> {
     return Colors.green;
   }
 
-  Future _shareToWhatsAppStatus(Datum product) async {
-    try {
-      Get.dialog(
-        const Center(
-          child: CircularProgressIndicator(
-            color: AppColors.accentOrange,
-          ),
-        ),
-        barrierDismissible: false,
-      );
-
-      final imageFile =
-          await productController.downloadImage(product.downloadUrl!);
-
-      if (imageFile == null) {
-        throw Exception("Image couldn't be downloaded");
-      }
-
-      await Share.shareXFiles(
-        [XFile(imageFile.path)],
-        text:
-            'Check out this product: ${product.category}\n${product.createdAt!}\n\nShared via Visible App',
-        sharePositionOrigin: Rect.zero,
-      );
-
-      // Move product to progress list
-      // productController.moveProductToProgress(product);
-
-      _showVerificationDialog(product);
-      Get.back();
-    } catch (e) {
-      Get.back();
-      Get.snackbar(
-        'Error',
-        'Failed to share product. Please try again.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
-
-  void _showVerificationDialog(Datum product) {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: const Text(
-          'Verify Your Share',
-          style: TextStyle(
-            fontFamily: 'Leotaro',
-            color: AppColors.primaryBlack,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Please take a screenshot of your WhatsApp status showing this product and upload it here to earn your reward.',
-              style: TextStyle(
-                fontFamily: 'TT Hoves Pro Trial',
-                color: AppColors.primaryBlack,
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Get.to(ProductDetailPage(product: product)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentOrange,
-                  foregroundColor: AppColors.pureWhite,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: const Text('Upload Screenshot'),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: const Text(
-                  'I\'ll do this later',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _onCategoryChanged(int index) {
     setState(() {
       _selectedCategory = index;
@@ -383,26 +279,6 @@ class _ProductsPageState extends State<ProductsPage> {
                   ),
                   const SizedBox(height: 8),
                   _buildRewardAndTimeInfo(product, false),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => _shareToWhatsAppStatus(product),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accentOrange,
-                        foregroundColor: AppColors.pureWhite,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Share Now',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
