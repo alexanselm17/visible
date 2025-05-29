@@ -256,4 +256,19 @@ class AuthenticationController extends GetxController {
     }
     return null;
   }
+
+  Future getAdminDashboard({required String query}) async {
+    try {
+      final response = await authRepository.getAdminDashboard(query: query);
+      if (response!.statusCode == 200) {
+        Logger().i("User dashboard data fetched successfully");
+        return response.data;
+      } else {
+        CommonUtils.showErrorToast(response.data['message']);
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Failed to fetch user dashboard: $e");
+    }
+    return null;
+  }
 }

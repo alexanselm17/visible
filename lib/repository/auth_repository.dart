@@ -150,4 +150,20 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  Future getAdminDashboard({
+    required String query,
+  }) async {
+    try {
+      final Response? response = await dioClient.getHTTP(
+        '${ApiEndpoints.baseUrl}/campaign/admin_dashboard?time_filter=$query',
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

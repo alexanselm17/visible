@@ -155,19 +155,20 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
           final int daysRemaining =
               validUntil.difference(DateTime.now()).inDays;
 
-          // Calculate progress
-          final double progress = campaign.capitalInvested != null &&
-                  campaign.capacity != null
-              ? (double.parse(campaign.capitalInvested!) / campaign.capacity!)
-              : 0.0;
+          // Calculate progress based on task completion
+          final int totalTasks = (campaign.completed ?? 0) +
+              (campaign.ongoing ?? 0) +
+              (campaign.available ?? 0);
+          final int completedTasks = campaign.completed ?? 0;
+          final double progress =
+              totalTasks > 0 ? (completedTasks / totalTasks) : 0.0;
 
           // Format currency values
           final String formattedBudget = currencyFormat
               .format(double.tryParse(campaign.capitalInvested ?? '0') ?? 0);
           final String formattedReward = currencyFormat
               .format(double.tryParse(campaign.reward ?? '0') ?? 0);
-          final String formattedCapacity = currencyFormat
-              .format(double.tryParse(campaign.capacity.toString()) ?? 0);
+          final String formattedCapacity = campaign.capacity.toString();
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -331,7 +332,7 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Campaign Progress',
+                                'Task Progress',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -373,11 +374,24 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            '$formattedBudget of $formattedCapacity',
+                            '$completedTasks of $totalTasks tasks completed',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],
                             ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _buildTaskStatus('Completed',
+                                  campaign.completed ?? 0, Colors.green),
+                              const SizedBox(width: 12),
+                              _buildTaskStatus('Ongoing', campaign.ongoing ?? 0,
+                                  Colors.orange),
+                              const SizedBox(width: 12),
+                              _buildTaskStatus('Available',
+                                  campaign.available ?? 0, Colors.blue),
+                            ],
                           ),
                         ],
                       ),
@@ -447,10 +461,34 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
     );
   }
 
+  Widget _buildTaskStatus(String label, int count, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label: $count',
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
   Color _getProgressColor(double progress) {
     if (progress < 0.3) return Colors.blue;
     if (progress < 0.7) return AppColors.accentOrange;
     if (progress < 0.9) return Colors.amber[700]!;
-    return Colors.red[500]!;
+    return Colors.green[500]!;
   }
 }

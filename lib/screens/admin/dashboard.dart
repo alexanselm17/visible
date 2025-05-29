@@ -190,6 +190,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    authenticationController.getAdminDashboard(query: 'this_month');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],

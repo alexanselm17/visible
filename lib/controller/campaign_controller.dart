@@ -32,7 +32,7 @@ class CampaignController extends GetxController {
 
       if (response.statusCode == 200) {
         var data = campaign.CampaignModel.fromJson(response.data);
-        campaigns.value = data.data!.data!;
+        campaigns.value = data.data!;
       } else {
         CommonUtils.showErrorToast("Failed to fetch campaigns.");
       }
