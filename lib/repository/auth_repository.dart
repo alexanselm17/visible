@@ -70,6 +70,7 @@ class AuthRepository {
 
   Future<Response?> resetPassword({
     required String username,
+    required String email,
     required String phone,
     required String nationalId,
     required String password,
@@ -77,6 +78,7 @@ class AuthRepository {
   }) async {
     try {
       var body = {
+        "email": email,
         "username": username,
         "phone": phone,
         "national_id": nationalId,
@@ -85,7 +87,9 @@ class AuthRepository {
       };
       print(body);
       final Response? response = await dioClient.noTokenPut(
-          '${ApiEndpoints.baseUrl}/user/reset_password', body);
+        '${ApiEndpoints.baseUrl}/user/reset_password',
+        body,
+      );
       return response;
     } on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();

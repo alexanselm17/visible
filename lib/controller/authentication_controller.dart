@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/roles_constants.dart';
@@ -38,6 +39,8 @@ class AuthenticationController extends GetxController {
 
   final isLoggingIn = false.obs;
   final passwordVisible = false.obs;
+
+  final RxBool isPasswordReset = false.obs;
 
   @override
   void onInit() {
@@ -201,6 +204,7 @@ class AuthenticationController extends GetxController {
 
   Future<void> resetPassword({
     required String username,
+    required String email,
     required String phone,
     required String nationalId,
     required String password,
@@ -215,6 +219,7 @@ class AuthenticationController extends GetxController {
           : '+254${phone.replaceAll(RegExp(r'\s+'), '').replaceFirst(RegExp(r'^0'), '')}';
 
       final userSignInResponse = await authRepository.resetPassword(
+        email: email,
         username: username,
         password: password,
         phone: formattedPhone,
@@ -227,13 +232,16 @@ class AuthenticationController extends GetxController {
       Logger().f(userSignInResponse!.data);
 
       if (userSignInResponse.data['ok'] == true) {
+        isPasswordReset.value = true;
         CommonUtils.showToast(userSignInResponse.data['message']);
         Get.off(const LoginPage());
       } else {
+        isPasswordReset.value = false;
         CommonUtils.showErrorToast(userSignInResponse.data['message']);
       }
       isLoggingIn.value = false;
     } catch (e) {
+      isPasswordReset.value = false;
       usernameController.text = "";
       passwordController.text = "";
       isLoggingIn.value = false;
