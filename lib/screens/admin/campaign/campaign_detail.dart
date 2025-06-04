@@ -9,6 +9,7 @@ import 'package:visible/model/campaign/campaign_product.dart' as prod;
 import 'package:visible/model/campaign/campaign_model.dart';
 import 'package:visible/screens/admin/add_new_product.dart';
 import 'package:visible/screens/admin/campaign/edit_campaign.dart';
+import 'package:visible/screens/reports/specific_campaign_report.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
 class AdminCampaignDetailsPage extends StatefulWidget {
@@ -25,6 +26,10 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
   final CampaignController campaignController = Get.find<CampaignController>();
   final ProductController productController = Get.put(ProductController());
   final numberFormat = NumberFormat('#,###');
+  final currencyFormat = NumberFormat.currency(
+    symbol: 'KSh ',
+    decimalDigits: 0,
+  );
   final dateFormat = DateFormat('MMM d, yyyy');
 
   @override
@@ -45,20 +50,29 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
     return validUntil.isAfter(DateTime.now());
   }
 
-  double get progressPercentage {
-    const int participants = 10;
-    final int capacity = widget.campaign.capacity ?? 1;
-    return (participants / capacity).clamp(0.0, 1.0);
-  }
+  // Fixed analytics calculations matching the campaign list page
+  int get totalTasks =>
+      (widget.campaign.completed ?? 0) +
+      (widget.campaign.ongoing ?? 0) +
+      (widget.campaign.available ?? 0);
 
-  // Added missing property getters
-  int get participants => 10;
-  int get capacity => widget.campaign.capacity ?? 1;
-  double get budget => double.parse(widget.campaign.capitalInvested!) ?? 0.0;
-  double get amountSpent => 10.0;
-  double get budgetRemaining => budget - amountSpent;
-  double get budgetUsagePercentage =>
-      budget > 0 ? (amountSpent / budget).clamp(0.0, 1.0) : 0.0;
+  int get completedTasks => widget.campaign.completed ?? 0;
+  int get ongoingTasks => widget.campaign.ongoing ?? 0;
+  int get availableTasks => widget.campaign.available ?? 0;
+
+  double get taskProgress =>
+      totalTasks > 0 ? (completedTasks / totalTasks) : 0.0;
+
+  double get budget =>
+      double.tryParse(widget.campaign.capitalInvested ?? '0') ?? 0.0;
+  double get reward => double.tryParse(widget.campaign.reward ?? '0') ?? 0.0;
+  int get capacity => widget.campaign.capacity ?? 0;
+
+  // Calculate days remaining
+  int get daysRemaining {
+    final DateTime validUntil = widget.campaign.validUntil!;
+    return validUntil.difference(DateTime.now()).inDays;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +96,12 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
           onPressed: () => Get.back(),
         ),
         actions: [
+          // Report button in app bar
+          IconButton(
+            icon: const Icon(Icons.analytics, color: AppColors.primaryBlack),
+            onPressed: () => _showCampaignReportOptions(context),
+            tooltip: 'Generate Report',
+          ),
           IconButton(
             icon: const Icon(Icons.edit, color: AppColors.primaryBlack),
             onPressed: () {
@@ -177,6 +197,16 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                   color: AppColors.primaryBlack,
                 ),
               ),
+              if (isActive) ...[
+                const SizedBox(width: 16),
+                Text(
+                  '($daysRemaining days left)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -185,7 +215,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
               const Icon(Icons.redeem, size: 18, color: AppColors.accentOrange),
               const SizedBox(width: 8),
               Text(
-                'Reward: KSh ${widget.campaign.reward}',
+                'Reward: ${currencyFormat.format(reward)}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryBlack,
@@ -194,112 +224,184 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             ],
           ),
           const SizedBox(height: 16),
+
+          // Task Progress Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Task Progress',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlack,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getProgressColor(taskProgress).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${(taskProgress * 100).toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: _getProgressColor(taskProgress),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: taskProgress.clamp(0.0, 1.0),
+                  backgroundColor: Colors.grey[200],
+                  minHeight: 8,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getProgressColor(taskProgress),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '$completedTasks of $totalTasks tasks completed',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildTaskStatus('Completed', completedTasks, Colors.green),
+                  const SizedBox(width: 12),
+                  _buildTaskStatus('Ongoing', ongoingTasks, Colors.orange),
+                  const SizedBox(width: 12),
+                  _buildTaskStatus('Available', availableTasks, Colors.blue),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskStatus(String label, int count, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label: $count',
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getProgressColor(double progress) {
+    if (progress < 0.3) return Colors.blue;
+    if (progress < 0.7) return AppColors.accentOrange;
+    if (progress < 0.9) return Colors.amber[700]!;
+    return Colors.green[500]!;
+  }
+
+  Widget _buildCampaignStats() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Campaign Overview',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryBlack,
+                ),
+              ),
+              // Alternative report button location in stats section
+              OutlinedButton.icon(
+                onPressed: () => _showCampaignReportOptions(context),
+                icon: const Icon(Icons.analytics, size: 18),
+                label: const Text('Report'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.accentOrange,
+                  side: const BorderSide(color: AppColors.accentOrange),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: _buildStatCard(
-                  title: 'Remaining Budget',
-                  value: 'KSh ${numberFormat.format(budgetRemaining)}',
-                  icon: Icons.savings,
-                  color: Colors.green,
+                  title: 'Total Budget',
+                  value: currencyFormat.format(budget),
+                  icon: Icons.account_balance_wallet,
+                  color: Colors.blue,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatCard(
-                  title: 'Participants',
-                  value:
-                      '${numberFormat.format(participants)}/${numberFormat.format(capacity)}',
+                  title: 'Reward Amount',
+                  value: currencyFormat.format(reward),
+                  icon: Icons.redeem,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  title: 'Capacity',
+                  value: numberFormat.format(capacity),
                   icon: Icons.people,
                   color: Colors.purple,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Budget usage progress
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Budget Usage',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryBlack,
-                    ),
-                  ),
-                  Text(
-                    '${(budgetUsagePercentage * 100).toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: budgetUsagePercentage > 0.9
-                          ? Colors.red[700]
-                          : Colors.grey[700],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              LinearProgressIndicator(
-                value: budgetUsagePercentage,
-                backgroundColor: Colors.grey[200],
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  budgetUsagePercentage > 0.9
-                      ? Colors.red[400]!
-                      : Colors.blue[400]!,
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  title: 'Days Remaining',
+                  value: isActive ? '$daysRemaining days' : 'Expired',
+                  icon: Icons.timer,
+                  color: isActive
+                      ? (daysRemaining <= 7 ? Colors.red : Colors.orange)
+                      : Colors.grey,
                 ),
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Participants progress
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Participant Capacity',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryBlack,
-                    ),
-                  ),
-                  Text(
-                    '${(progressPercentage * 100).toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: progressPercentage > 0.9
-                          ? Colors.red[700]
-                          : Colors.grey[700],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              LinearProgressIndicator(
-                value: progressPercentage,
-                backgroundColor: Colors.grey[200],
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  progressPercentage > 0.9
-                      ? Colors.red[400]!
-                      : AppColors.accentOrange,
-                ),
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(4),
               ),
             ],
           ),
@@ -333,11 +435,13 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             children: [
               Icon(icon, color: color, size: 20),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ),
             ],
@@ -350,69 +454,6 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
               fontWeight: FontWeight.bold,
               color: AppColors.primaryBlack,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCampaignStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Campaign Statistics',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryBlack,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  title: 'Budget',
-                  value: 'KSh ${numberFormat.format(budget)}',
-                  icon: Icons.account_balance_wallet,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  title: 'Amount Spent',
-                  value: 'KSh ${numberFormat.format(amountSpent)}',
-                  icon: Icons.money_off,
-                  color: Colors.orange,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  title: 'Remaining Budget',
-                  value: 'KSh ${numberFormat.format(budgetRemaining)}',
-                  icon: Icons.savings,
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  title: 'Participant Count',
-                  value: numberFormat.format(participants),
-                  icon: Icons.people,
-                  color: Colors.purple,
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -542,6 +583,183 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
         prod.Datum product = campaignController.productsInCampaign[index];
         return _buildProductCard(product);
       },
+    );
+  }
+
+  // Updated report options for campaign-specific reports
+  void _showCampaignReportOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentOrange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.analytics_rounded,
+                    color: AppColors.accentOrange,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Campaign Report',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Generate detailed reports for this campaign',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            ListTile(
+              onTap: () {
+                Get.back();
+                _generatePerformanceReport();
+              },
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.trending_up_rounded,
+                  color: Colors.blue[700],
+                  size: 20,
+                ),
+              ),
+              title: const Text(
+                'Full Report',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                'Performance, tasks, and engagement',
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios,
+                  color: Colors.grey[400], size: 16),
+            ),
+
+            const SizedBox(height: 8),
+
+            // // Financial Report Option
+            // ListTile(
+            //   onTap: () {
+            //     Get.back();
+            //     _generateFinancialReport();
+            //   },
+            //   leading: Container(
+            //     padding: const EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //       color: Colors.green.withOpacity(0.1),
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     child: Icon(
+            //       Icons.account_balance_wallet_rounded,
+            //       color: Colors.green[700],
+            //       size: 20,
+            //     ),
+            //   ),
+            //   title: const Text(
+            //     'Financial Report',
+            //     style: TextStyle(fontWeight: FontWeight.w600),
+            //   ),
+            //   subtitle: Text(
+            //     'Budget utilization, rewards distributed',
+            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            //   ),
+            //   trailing: Icon(Icons.arrow_forward_ios,
+            //       color: Colors.grey[400], size: 16),
+            // ),
+
+            // const SizedBox(height: 8),
+
+            // // Product Report Option
+            // ListTile(
+            //   onTap: () {
+            //     Get.back();
+            //     _generateProductReport();
+            //   },
+            //   leading: Container(
+            //     padding: const EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //       color: Colors.purple.withOpacity(0.1),
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     child: Icon(
+            //       Icons.inventory_rounded,
+            //       color: Colors.purple[700],
+            //       size: 20,
+            //     ),
+            //   ),
+            //   title: const Text(
+            //     'Product Report',
+            //     style: TextStyle(fontWeight: FontWeight.w600),
+            //   ),
+            //   subtitle: Text(
+            //     'Product performance and engagement',
+            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            //   ),
+            //   trailing: Icon(Icons.arrow_forward_ios,
+            //       color: Colors.grey[400], size: 16),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _generatePerformanceReport() {
+    Get.to(() => CampaignReportPage(campaignId: widget.campaign.id!));
+  }
+
+  void _generateFinancialReport() {
+    // Navigate to financial report page or generate report
+    // Get.to(() => CampaignFinancialReport(campaign: widget.campaign));
+    Get.snackbar(
+      'Report',
+      'Generating financial report...',
+      backgroundColor: Colors.green[100],
+      colorText: Colors.green[800],
+    );
+  }
+
+  void _generateProductReport() {
+    // Navigate to product report page or generate report
+    // Get.to(() => CampaignProductReport(campaign: widget.campaign));
+    Get.snackbar(
+      'Report',
+      'Generating product report...',
+      backgroundColor: Colors.purple[100],
+      colorText: Colors.purple[800],
     );
   }
 

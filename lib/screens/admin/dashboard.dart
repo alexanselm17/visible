@@ -22,7 +22,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     'Today',
     'This Week',
     'This Month',
-    'All Time'
+    'This Year'
   ];
   String _selectedTimeFilter = 'This Week';
   bool _isLoading = false;
@@ -145,8 +145,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return 'this_week';
       case 'This Month':
         return 'this_month';
-      case 'All Time':
-        return 'all_time';
+      case 'This Year':
+        return 'this_year';
       default:
         return 'this_week';
     }
@@ -409,8 +409,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       // Top Campaigns
                       if (_dashboardData!.topCampaigns != null &&
                           _dashboardData!.topCampaigns!.isNotEmpty) ...[
-                        _buildSectionTitle('Top Performing Campaigns',
-                            'Highest completion rates'),
+                        _buildSectionTitle(
+                            'Top Campaigns', 'Highest completion rates'),
                         const SizedBox(height: 8),
                         _buildTopCampaignsList(),
                         const SizedBox(height: 24),

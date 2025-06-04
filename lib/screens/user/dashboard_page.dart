@@ -128,12 +128,13 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                       const SizedBox(height: 24),
 
                       // Daily Goals
-                      _buildSectionTitle('Your Goals', 'Progress tracker'),
+                      _buildSectionTitle(
+                          'Progress tracker', 'Progress tracker'),
                       const SizedBox(height: 8),
                       _buildGoalsProgress(),
                       const SizedBox(height: 24),
                       _buildSectionTitle(
-                          'Ongoing Campaigns', 'Participate and earn'),
+                          'Active Campaigns', 'Participate and earn'),
                       const SizedBox(height: 8),
 
                       _buildAvailableCampaigns(_dashboardData!.data!),
@@ -143,7 +144,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 8),
-                          _buildSectionTitle('Recent Rewards', 'Your earnings'),
+                          _buildSectionTitle(
+                              'Recent Earnings', 'Your earnings'),
                           const SizedBox(height: 8),
                           _buildRecentRewards(),
                           const SizedBox(height: 24),
@@ -309,7 +311,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                'No Ongoing available',
+                'No Active Campaigns',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -318,7 +320,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Check back later for new opportunities',
+                'Your active and ongoing campaigns will appear here.',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[500],

@@ -5,6 +5,7 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_model.dart';
 import 'package:visible/screens/admin/users/users_search_deligate.dart';
+import 'package:visible/screens/reports/customer_report.dart';
 import 'package:visible/widgets/custom_app_bar.dart';
 import 'package:visible/widgets/input_widgets.dart';
 
@@ -48,6 +49,39 @@ class _UsersScreenState extends State<UsersScreen> {
 
   Future<void> _refreshUsers() async {
     await controller.getAllUsers();
+  }
+
+  void _generateUserReport(Datum user) {
+    // TODO: Implement user report generation logic
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Generate Report for ${user.fullname}'),
+          content: Text(
+              'Generate detailed report for ${user.fullname ?? 'Unknown User'}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // TODO: Implement actual report generation here
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Generating report for ${user.fullname}...'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: const Text('Generate'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildSearchBar() {
@@ -185,8 +219,26 @@ class _UsersScreenState extends State<UsersScreen> {
                       ],
                     ),
                   ),
-                  Expanded(
-                      child: ElevatedButton(
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => Get.to(CustomerReport(
+                      customerId: user.id!,
+                      customerName: user.username!,
+                    )),
+                    icon: const Icon(Icons.assessment_outlined, size: 16),
+                    label: const Text('Report'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.darkBlue,
+                      side: const BorderSide(color: AppColors.darkBlue),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
                     onPressed: () {
                       if (controller.isLoading.value) return;
                       controller.accountActivation(user.id!);
@@ -197,18 +249,20 @@ class _UsersScreenState extends State<UsersScreen> {
                       foregroundColor: AppColors.pureWhite,
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       disabledBackgroundColor: Colors.grey.shade400,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                     child: Text(
                       user.isActive == 1 ? "Deactivate" : "Activate",
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ],
