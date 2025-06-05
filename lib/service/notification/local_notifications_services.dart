@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 class LocalNotificationService {
@@ -42,7 +43,10 @@ class LocalNotificationService {
         "bus-truck",
         importance: Importance.max,
         priority: Priority.high,
-        icon: '@drawable/ic_launcher',
+        icon: 'ic_notification',
+
+        //  '@drawable/ic_notif_white',
+        // '@drawable/ic_notif_black',
         enableVibration: true,
       ));
 
