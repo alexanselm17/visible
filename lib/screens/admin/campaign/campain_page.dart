@@ -5,6 +5,7 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/campaign_controller.dart';
 import 'package:visible/screens/admin/campaign/campaign_detail.dart';
 import 'package:visible/screens/admin/campaign/create_campaign.dart';
+import 'package:visible/screens/reports/all_campaigns_report.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
 class AdminCampaignPage extends StatefulWidget {
@@ -53,6 +54,9 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
               campaignController.fetchCampaigns();
             },
           ),
+          IconButton(
+              onPressed: () => _showCampaignReportOptions(context),
+              icon: const Icon(Icons.more_vert, color: AppColors.accentOrange)),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -75,6 +79,160 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
             : campaignController.campaigns.isEmpty
                 ? _buildEmptyState()
                 : _buildCampaignList(),
+      ),
+    );
+  }
+
+  void _generatePerformanceReport() {
+    Get.to(() => const AllCampaignsReport());
+  }
+
+  void _showCampaignReportOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentOrange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.analytics_rounded,
+                    color: AppColors.accentOrange,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Campaigns Report',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Generate detailed reports for all campaigns',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            ListTile(
+              onTap: () {
+                Get.back();
+                _generatePerformanceReport();
+              },
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.trending_up_rounded,
+                  color: Colors.blue[700],
+                  size: 20,
+                ),
+              ),
+              title: const Text(
+                'Full Campaigns Report',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                'Performance, available,ongoing, and engagement',
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios,
+                  color: Colors.grey[400], size: 16),
+            ),
+
+            const SizedBox(height: 8),
+
+            // // Financial Report Option
+            // ListTile(
+            //   onTap: () {
+            //     Get.back();
+            //     _generateFinancialReport();
+            //   },
+            //   leading: Container(
+            //     padding: const EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //       color: Colors.green.withOpacity(0.1),
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     child: Icon(
+            //       Icons.account_balance_wallet_rounded,
+            //       color: Colors.green[700],
+            //       size: 20,
+            //     ),
+            //   ),
+            //   title: const Text(
+            //     'Financial Report',
+            //     style: TextStyle(fontWeight: FontWeight.w600),
+            //   ),
+            //   subtitle: Text(
+            //     'Budget utilization, rewards distributed',
+            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            //   ),
+            //   trailing: Icon(Icons.arrow_forward_ios,
+            //       color: Colors.grey[400], size: 16),
+            // ),
+
+            // const SizedBox(height: 8),
+
+            // // Product Report Option
+            // ListTile(
+            //   onTap: () {
+            //     Get.back();
+            //     _generateProductReport();
+            //   },
+            //   leading: Container(
+            //     padding: const EdgeInsets.all(8),
+            //     decoration: BoxDecoration(
+            //       color: Colors.purple.withOpacity(0.1),
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     child: Icon(
+            //       Icons.inventory_rounded,
+            //       color: Colors.purple[700],
+            //       size: 20,
+            //     ),
+            //   ),
+            //   title: const Text(
+            //     'Product Report',
+            //     style: TextStyle(fontWeight: FontWeight.w600),
+            //   ),
+            //   subtitle: Text(
+            //     'Product performance and engagement',
+            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            //   ),
+            //   trailing: Icon(Icons.arrow_forward_ios,
+            //       color: Colors.grey[400], size: 16),
+            // ),
+          ],
+        ),
       ),
     );
   }

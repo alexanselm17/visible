@@ -191,6 +191,7 @@ class ProductController extends GetxController {
 
       if (response.statusCode == 200) {
         Logger().i(response.data);
+        Get.back();
         if (isCompleted) {
           progressProductsList
               .removeWhere((product) => product.id == productId);

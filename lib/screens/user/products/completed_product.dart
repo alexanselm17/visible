@@ -80,7 +80,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Views Today (Hourly)',
+            'Reported Views',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -218,7 +218,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Screenshots',
+            'Total Reports',
             totalScreenshots.toString(),
             Icons.screenshot,
             Colors.green,
@@ -227,7 +227,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Avg Views',
+            'Avarage Views',
             avgViewsPerScreenshot.toStringAsFixed(1),
             Icons.trending_up,
             Colors.orange,
@@ -536,7 +536,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Screenshots Performance',
+            'Performance Report',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

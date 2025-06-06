@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/app_theme.dart';
-import 'package:visible/screens/auth/on_board_page.dart';
+import 'package:visible/screens/auth/login_page.dart';
+import 'package:visible/screens/auth/onboarding_page.dart';
 import 'package:visible/service/notification/pushNotification.dart';
 import 'package:visible/service/notification/service_locator.dart';
 import 'package:visible/screens/user/main_screen.dart' as user;
@@ -41,10 +42,17 @@ class LandingPage extends StatelessWidget {
 
   Future<Widget> _getInitialPage() async {
     final userPrefs = UserPreferences();
+
+    final introShown = await userPrefs.isIntroScreenShown();
+
+    if (!introShown) {
+      return const OnboardingScreen();
+    }
+
     final token = await userPrefs.getToken();
 
     if (token.isEmpty) {
-      return const OnBoardingPage();
+      return const LoginPage();
     }
 
     final signInModel = await userPrefs.getSignInModel();
@@ -64,11 +72,45 @@ class LandingPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Colors.white,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFFF6B35),
+              ),
+            ),
           );
         } else if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(child: Text('An error occurred')),
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'An error occurred',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Error: ${snapshot.error}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           );
         } else {
           return snapshot.data!;

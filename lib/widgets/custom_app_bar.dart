@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visible/constants/colors.dart';
 
 class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -17,28 +18,29 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.grey.shade700, Colors.grey.shade900],
+          colors: [AppColors.accentOrange, AppColors.accentOrange],
         ),
       ),
       child: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            // const Text(
-            //   'Manage your active pump sessions sessions',
-            //   style: TextStyle(
-            //     color: Colors.white,
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.normal,
-            //   ),
-            // ),
           ],
         ),
         centerTitle: centerTitle,
