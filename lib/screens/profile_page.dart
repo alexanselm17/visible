@@ -3,6 +3,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/screens/reports/customer_report.dart';
+
+import '../model/auth/sign_in_model.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -46,104 +49,107 @@ class _ProfilePageState extends State<ProfilePage> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(
+                  // Profile Header
+                  Container(
                     width: double.infinity,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0x00FFFFFF), AppColors.pureWhite],
-                          stops: [0.7, 1],
-                          begin: AlignmentDirectional(0, -1),
-                          end: AlignmentDirectional(0, 1),
-                        ),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0x00FFFFFF), AppColors.pureWhite],
+                        stops: [0.7, 1],
+                        begin: AlignmentDirectional(0, -1),
+                        end: AlignmentDirectional(0, 1),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 60),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: const Color(0xCCFFFFFF),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.pureWhite,
-                                  width: 4,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 60),
+                      child: Column(
+                        children: [
+                          // Profile Picture
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: const Color(0xCCFFFFFF),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.pureWhite,
+                                width: 4,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/images/profile_placeholder.png',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 60,
+                                      color: AppColors.primaryBlack,
+                                    ),
+                                  );
+                                },
                               ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/profile_placeholder.png',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Center(
-                                      child: Icon(
-                                        Icons.person,
-                                        size: 60,
-                                        color: AppColors.primaryBlack,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                                .animate()
-                                .fadeIn(duration: 400.ms, delay: 200.ms)
-                                .scale(
-                                    begin: const Offset(0.8, 0.8),
-                                    end: const Offset(1, 1),
-                                    duration: 400.ms,
-                                    curve: Curves.easeOut),
-                            const SizedBox(height: 16),
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 400.ms, delay: 200.ms)
+                              .scale(
+                                  begin: const Offset(0.8, 0.8),
+                                  end: const Offset(1, 1),
+                                  duration: 400.ms,
+                                  curve: Curves.easeOut),
+                          const SizedBox(height: 16),
+                          // Name
+                          Text(
+                            displayName!,
+                            style: const TextStyle(
+                              fontFamily: 'Leotaro',
+                              color: AppColors.primaryBlack,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
+                          const SizedBox(height: 8),
+                          // Email
+                          Text(
+                            email,
+                            style: const TextStyle(
+                              fontFamily: 'TT Hoves Pro Trial',
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ).animate().fadeIn(duration: 400.ms, delay: 350.ms),
+                          const SizedBox(height: 16),
+                          // Occupation
+                          if (user.occupation != null)
                             Text(
-                              displayName!,
-                              style: const TextStyle(
-                                fontFamily: 'Leotaro',
-                                color: AppColors.primaryBlack,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
-                            const SizedBox(height: 8),
-                            Text(
-                              email,
+                              occupation,
                               style: const TextStyle(
                                 fontFamily: 'TT Hoves Pro Trial',
                                 color: Colors.grey,
-                                fontSize: 16,
+                                fontSize: 14,
                               ),
-                            ).animate().fadeIn(duration: 400.ms, delay: 350.ms),
-                            const SizedBox(height: 16),
-                            if (user.occupation != null)
-                              Text(
-                                occupation,
-                                style: const TextStyle(
-                                  fontFamily: 'TT Hoves Pro Trial',
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                              )
-                                  .animate()
-                                  .fadeIn(duration: 400.ms, delay: 380.ms),
-                          ],
-                        ),
+                              textAlign: TextAlign.center,
+                            ).animate().fadeIn(duration: 400.ms, delay: 380.ms),
+                        ],
                       ),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Personal Information Section
                         const Text(
                           'Personal Information',
                           style: TextStyle(
@@ -152,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 450.ms),
+                        ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
                         const SizedBox(height: 16),
                         Container(
                           decoration: BoxDecoration(
@@ -173,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Icons.phone,
                                 'Phone',
                                 phone,
-                                500.ms,
+                                450.ms,
                               ),
                               const Divider(
                                   height: 1, thickness: 1, indent: 56),
@@ -181,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Icons.location_on,
                                 'Location',
                                 location,
-                                550.ms,
+                                500.ms,
                               ),
                               if (user.gender != null) ...[
                                 const Divider(
@@ -190,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Icons.person,
                                   'Gender',
                                   gender,
-                                  600.ms,
+                                  550.ms,
                                 ),
                               ],
                               if (user.nationalId != null) ...[
@@ -200,13 +206,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Icons.badge,
                                   'National ID',
                                   user.nationalId.toString(),
-                                  650.ms,
+                                  600.ms,
                                 ),
                               ],
                             ],
                           ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
+                        ).animate().fadeIn(duration: 400.ms, delay: 450.ms),
+
                         const SizedBox(height: 30),
+
+                        // Settings Section
                         const Text(
                           'Settings',
                           style: TextStyle(
@@ -215,7 +224,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 700.ms),
+                        ).animate().fadeIn(duration: 400.ms, delay: 650.ms),
                         const SizedBox(height: 16),
                         Container(
                           decoration: BoxDecoration(
@@ -232,6 +241,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           child: Column(
                             children: [
+                              _buildReportsButton(700.ms, user),
+                              const Divider(
+                                  height: 1, thickness: 1, indent: 56),
                               _buildSettingItem(
                                 Icons.notifications,
                                 'Notifications',
@@ -271,8 +283,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ],
                           ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 750.ms),
+                        ).animate().fadeIn(duration: 400.ms, delay: 700.ms),
+
                         const SizedBox(height: 30),
+
+                        // Logout Button
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -315,6 +330,53 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  Widget _buildReportsButton(Duration delay, Data user) {
+    return InkWell(
+      onTap: () {
+        Get.to(CustomerReport(
+          customerId: user.id!,
+          customerName: user.fullname!,
+        ));
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.accentOrange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.analytics_outlined,
+                color: AppColors.accentOrange,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text(
+                'My Reports',
+                style: TextStyle(
+                  fontFamily: 'TT Hoves Pro Trial',
+                  color: AppColors.primaryBlack,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 400.ms, delay: delay);
   }
 
   Widget _buildInfoItem(
