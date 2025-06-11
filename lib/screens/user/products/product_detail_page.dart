@@ -29,14 +29,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Hide system UI for immersive experience
+    // Hide system UI for immersive experience with dark status bar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.black,
+        systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
   }
@@ -143,46 +143,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                 ),
               ),
-              // Optional: Add download button in fullscreen view
-              Positioned(
-                bottom: MediaQuery.of(context).padding.bottom + 24,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.zoom_in,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Pinch to zoom • Drag to pan',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         );
@@ -213,422 +173,225 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(
-          widget.product.name ?? 'Product Details',
-          style: const TextStyle(
-            fontFamily: 'Leotaro',
-            color: AppColors.primaryBlack,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
-          onPressed: () => Get.back(),
-        ),
-      ),
+      backgroundColor: Colors.black,
       body: Obx(
         () => SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Image with gradient overlay - Tappable
-              GestureDetector(
-                onTap: _showImageDialog,
+              // Product Image Card with rounded corners matching the screenshot
+              Container(
+                margin: const EdgeInsets.fromLTRB(16, 50, 16, 16),
                 child: Stack(
                   children: [
+                    // Main product card
                     Container(
-                      width: double.infinity,
-                      height: 300,
                       decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.product.imageUrl!),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(24),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 3,
                         ),
                       ),
-                    ),
-                    // Tap indicator
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(17),
+                        child: Stack(
                           children: [
-                            Icon(
-                              Icons.zoom_in,
-                              color: Colors.white,
-                              size: 14,
+                            // Product image
+                            GestureDetector(
+                              onTap: _showImageDialog,
+                              child: Container(
+                                width: double.infinity,
+                                height: 300,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image:
+                                        NetworkImage(widget.product.imageUrl!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
                             ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Tap to view',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
+
+                            // Download icon overlay (bottom right)
+                            Positioned(
+                              bottom: 16,
+                              right: 16,
+                              child: GestureDetector(
+                                onTap: productController.isDownloading.value
+                                    ? null
+                                    : () => productController.downloadImage(
+                                        widget.product.downloadUrl!),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: productController.isDownloading.value
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.black,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.download,
+                                          color: Colors.black,
+                                          size: 20,
+                                        ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(24),
-                          ),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              AppColors.primaryBlack.withOpacity(0.7),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (widget.product.screenshotCount == 5)
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.check_circle,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Verified',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ).animate().fadeIn(duration: 400.ms),
 
+              // Price and details section
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product Details Card
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.darkBlue.withOpacity(0.05),
-                            AppColors.accentOrange.withOpacity(0.05),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.darkBlue.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Product Details',
+                    // Price row
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.yellow,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            '\$',
                             style: TextStyle(
-                              fontFamily: 'Leotaro',
-                              color: AppColors.primaryBlack,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Reward Amount
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      AppColors.accentOrange.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.monetization_on,
-                                  color: AppColors.accentOrange,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Reward Amount',
-                                    style: TextStyle(
-                                      fontFamily: 'TT Hoves Pro Trial',
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Text(
-                                    'KSh ${widget.product.reward ?? 'N/A'}',
-                                    style: const TextStyle(
-                                      fontFamily: 'Leotaro',
-                                      color: AppColors.primaryBlack,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // Expiry Information
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            AppColors.darkBlue.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(
-                                        Icons.schedule,
-                                        color: AppColors.darkBlue,
-                                        size: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Time Remaining',
-                                          style: TextStyle(
-                                            fontFamily: 'TT Hoves Pro Trial',
-                                            color: Colors.grey,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          _getTimeRemaining(),
-                                          style: TextStyle(
-                                            fontFamily: 'Leotaro',
-                                            color:
-                                                _getTimeRemaining() == "Expired"
-                                                    ? Colors.red
-                                                    : AppColors.primaryBlack,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // Expiry Date
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.event,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Expires On',
-                                    style: TextStyle(
-                                      fontFamily: 'TT Hoves Pro Trial',
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Text(
-                                    widget.product.validUntil != null
-                                        ? DateFormat('dd MMM yyyy, hh:mm a')
-                                            .format(DateTime.parse(widget
-                                                .product.validUntil
-                                                .toString()))
-                                        : 'No expiry date',
-                                    style: const TextStyle(
-                                      fontFamily: 'Leotaro',
-                                      color: AppColors.primaryBlack,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-
-                    const SizedBox(height: 24),
-
-                    // Step 1: Download
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.pureWhite,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Step 1: Download and Share',
-                            style: TextStyle(
-                              fontFamily: 'Leotaro',
-                              color: AppColors.primaryBlack,
+                              color: Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Download this product image and share it on your WhatsApp status to earn rewards.',
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Ksh ${widget.product.reward}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        // Status badges
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'EXECUTIVE',
                             style: TextStyle(
-                              fontFamily: 'TT Hoves Pro Trial',
-                              color: Colors.black87,
-                              fontSize: 14,
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: productController.isDownloading.value
-                                  ? null
-                                  : () => productController.downloadImage(
-                                      widget.product.downloadUrl!),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.darkBlue,
-                                foregroundColor: AppColors.pureWhite,
-                                elevation: 0,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              icon: productController.isDownloading.value
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.download),
-                              label: Text(
-                                productController.isDownloading.value
-                                    ? 'Downloading...'
-                                    : 'Download Image',
-                              ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.purple,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'LUXURY',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 250.ms),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Timer row
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          color: Colors.white70,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Expires in ${_getTimeRemaining()}",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Text(
+                          "NSFW",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
 
                     const SizedBox(height: 24),
 
-                    // Step 2: Verification section
+                    // Ad Description section
+                    const Text(
+                      'Ad Description:',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'The contents above in the Ad description should be posted as the corresponding WhatsApp Caption for the above media on your WhatsApp. If there is none, leave the Caption blank. Download the media above, post it on your WhatsApp Story, wait for it to load completely and part it on your WhatsApp Status. Copy the screenshot exactly as you have posted and upload below for verification.',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
+
+                    const SizedBox(height: 24),
+
+                    // Verify Your Post section
                     Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.pureWhite,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        color: Colors.grey[900],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,16 +400,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             children: [
                               const Expanded(
                                 child: Text(
-                                  'Step 2: Upload Screenshot for Verification',
+                                  'VERIFY YOUR POST',
                                   style: TextStyle(
-                                    fontFamily: 'Leotaro',
-                                    color: AppColors.primaryBlack,
+                                    color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
                               ),
-                              if (widget.product.screenshotId != null)
+                              if (widget.product.screenshotCount == 5)
                                 const Icon(
                                   Icons.check_circle,
                                   color: Colors.green,
@@ -654,106 +417,120 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Take a screenshot of your WhatsApp status showing this product and upload it here to verify your share.',
-                            style: TextStyle(
-                              fontFamily: 'TT Hoves Pro Trial',
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
                           const SizedBox(height: 16),
-                          if (_selectedScreenshot != null &&
-                              widget.product.screenshotId == null)
-                            Container(
+
+                          // Image preview area
+                          GestureDetector(
+                            onTap: _pickScreenshot,
+                            child: Container(
                               width: double.infinity,
-                              height: 150,
-                              margin: const EdgeInsets.only(bottom: 16),
+                              height: 200,
                               decoration: BoxDecoration(
+                                color: Colors.grey[800],
                                 borderRadius: BorderRadius.circular(12),
-                                image: DecorationImage(
-                                  image: FileImage(_selectedScreenshot!),
-                                  fit: BoxFit.cover,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1,
                                 ),
                               ),
-                            ),
-                          if (widget.product.screenshotCount != 5)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: _pickScreenshot,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey[200],
-                                      foregroundColor: AppColors.primaryBlack,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      shape: RoundedRectangleBorder(
+                              child: _selectedScreenshot != null
+                                  ? GestureDetector(
+                                      onTap: _pickScreenshot,
+                                      child: ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    icon: const Icon(Icons.photo_library),
-                                    label: const Text('Choose Screenshot'),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Obx(
-                                  () => Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: productController
-                                                  .isUploading.value ||
-                                              _selectedScreenshot == null
-                                          ? null
-                                          : () async => await productController
-                                              .uploadProductScreenShot(
-                                                  imageFile:
-                                                      _selectedScreenshot!,
-                                                  productId: widget.product.id!,
-                                                  isCompleted: widget.product
-                                                              .screenshotCount ==
-                                                          4
-                                                      ? true
-                                                      : false,
-                                                  isOngoing: widget.product
-                                                                  .screenshotCount ==
-                                                              0 ||
-                                                          widget.product
-                                                                  .screenshotCount! <=
-                                                              4
-                                                      ? true
-                                                      : false),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.accentOrange,
-                                        foregroundColor: AppColors.pureWhite,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                        child: Image.file(
+                                          _selectedScreenshot!,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
                                         ),
                                       ),
-                                      icon: productController.isUploading.value
-                                          ? const SizedBox(
-                                              width: 18,
-                                              height: 18,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 2,
-                                              ),
-                                            )
-                                          : const Icon(Icons.upload),
-                                      label: Text(
-                                        productController.isUploading.value
-                                            ? 'Uploading...'
-                                            : 'Verify',
+                                    )
+                                  : const Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.image_outlined,
+                                            color: Colors.white54,
+                                            size: 48,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            'No image selected,',
+                                            style: TextStyle(
+                                              color: Colors.white54,
+                                              fontSize: 14,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Text(
+                                            ' Tap to select',
+                                            style: TextStyle(
+                                              color: Colors.white54,
+                                              fontSize: 14,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
                                       ),
                                     ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Choose Screenshot button
+                          if (widget.product.screenshotCount != 5)
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: productController
+                                            .isUploading.value ||
+                                        _selectedScreenshot == null
+                                    ? null
+                                    : () async => await productController
+                                        .uploadProductScreenShot(
+                                            imageFile: _selectedScreenshot!,
+                                            productId: widget.product.id!,
+                                            isCompleted: widget.product
+                                                        .screenshotCount ==
+                                                    4
+                                                ? true
+                                                : false,
+                                            isOngoing: widget.product
+                                                            .screenshotCount ==
+                                                        0 ||
+                                                    widget.product
+                                                            .screenshotCount! <=
+                                                        4
+                                                ? true
+                                                : false),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  elevation: 0,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                              ],
+                                child: Text(
+                                  productController.isUploading.value
+                                      ? 'Uploading...'
+                                      : 'VERIFY YOUR POST',
+                                  style: TextStyle(
+                                    color: productController.isUploading.value
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ),
                             )
                           else
                             SizedBox(
@@ -762,25 +539,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 onPressed: null,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
-                                  foregroundColor: AppColors.pureWhite,
+                                  foregroundColor: Colors.white,
                                   elevation: 0,
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                                 icon: const Icon(Icons.check_circle),
-                                label: const Text('Verified'),
+                                label: const Text(
+                                  'VERIFIED',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
                               ),
                             ),
                         ],
                       ),
                     ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
 
-                    // Add bottom padding to account for system navigation
+                    // Add bottom padding
                     SizedBox(
-                        height: MediaQuery.of(context).padding.bottom + 16),
+                        height: MediaQuery.of(context).padding.bottom + 32),
                   ],
                 ),
               ),

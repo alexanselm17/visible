@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/model/product_model.dart';
+import 'package:visible/widgets/custom_app_bar.dart';
 
 class ProductAnalyticsPage extends StatefulWidget {
   final Datum product;
@@ -44,18 +45,15 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
         height: 250,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF1F2937),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(color: const Color(0xFF374151), width: 1),
         ),
         child: const Center(
-          child: Text('No data available'),
+          child: Text(
+            'No data available',
+            style: TextStyle(color: Colors.white70),
+          ),
         ),
       );
     }
@@ -66,25 +64,20 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
       height: 280,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1F2937),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: const Color(0xFF374151), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Reported Views',
+            'Your trend',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'Leotaro',
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 16),
@@ -96,8 +89,8 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                   drawVerticalLine: false,
                   horizontalInterval: maxY / 4,
                   getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: Colors.grey[200]!,
+                    return const FlLine(
+                      color: Color(0xFF374151),
                       strokeWidth: 1,
                     );
                   },
@@ -121,8 +114,8 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
                             'SS ${index + 1}',
-                            style: TextStyle(
-                              color: Colors.grey[600],
+                            style: const TextStyle(
+                              color: Colors.white54,
                               fontSize: 10,
                             ),
                           ),
@@ -138,8 +131,8 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                       getTitlesWidget: (double value, TitleMeta meta) {
                         return Text(
                           value.toInt().toString(),
-                          style: TextStyle(
-                            color: Colors.grey[600],
+                          style: const TextStyle(
+                            color: Colors.white54,
                             fontSize: 10,
                           ),
                         );
@@ -149,7 +142,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                 ),
                 borderData: FlBorderData(
                   show: true,
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
+                  border: Border.all(color: const Color(0xFF374151), width: 1),
                 ),
                 minX: 0,
                 maxX: spots.length.toDouble() - 1,
@@ -159,10 +152,10 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [
-                        AppColors.accentOrange,
-                        AppColors.accentOrange.withOpacity(0.6),
+                        Colors.white,
+                        Colors.white70,
                       ],
                     ),
                     barWidth: 3,
@@ -172,9 +165,9 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                       getDotPainter: (spot, percent, barData, index) {
                         return FlDotCirclePainter(
                           radius: 4,
-                          color: AppColors.accentOrange,
+                          color: Colors.white,
                           strokeWidth: 2,
-                          strokeColor: Colors.white,
+                          strokeColor: const Color(0xFF1F2937),
                         );
                       },
                     ),
@@ -182,8 +175,8 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.accentOrange.withOpacity(0.2),
-                          AppColors.accentOrange.withOpacity(0.05),
+                          Colors.white.withOpacity(0.2),
+                          Colors.white.withOpacity(0.05),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -209,75 +202,58 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
       children: [
         Expanded(
           child: _buildStatCard(
-            'Total Views',
+            'Total views',
             totalViews.toString(),
             Icons.visibility,
-            Colors.blue,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Total Reports',
+            'Total reports',
             totalScreenshots.toString(),
-            Icons.screenshot,
-            Colors.green,
+            Icons.smartphone,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            'Avarage Views',
+            'Average views',
             avgViewsPerScreenshot.toStringAsFixed(1),
             Icons.trending_up,
-            Colors.orange,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatCard(
-      String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(String title, String value, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.black,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          Icon(icon, color: Colors.white, size: 24),
           const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryBlack,
+              color: Colors.white,
             ),
           ),
         ],
@@ -286,427 +262,183 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
   }
 
   Widget _buildProductHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: NetworkImage(widget.product.imageUrl!),
-                fit: BoxFit.cover,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width - 40,
+          height: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 2),
+            image: DecorationImage(
+              image: NetworkImage(widget.product.imageUrl!),
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
+        ),
+        const SizedBox(height: 16),
+
+        // Completed Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.green, width: 1),
+          ),
+          child: const Text(
+            'COMPLETED',
+            style: TextStyle(
+              color: Colors.green,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Reward Amount
+        Text(
+          'Ksh ${widget.product.reward} was added to your wallet.',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateCards() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.product.name ?? 'Product Name',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Leotaro',
+                const Icon(Icons.calendar_today, color: Colors.white, size: 24),
+                const SizedBox(height: 8),
+                const Text(
+                  'Created',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  widget.product.category ?? 'Category',
-                  style: TextStyle(
+                  widget.product.createdAt != null
+                      ? '${widget.product.createdAt!.day}/${widget.product.createdAt!.month}/${widget.product.createdAt!.year}'
+                      : 'N/A',
+                  style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Completed',
-                        style: TextStyle(
-                          color: Colors.green[700],
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductDetails() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Product Information',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Leotaro',
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildDetailItem(
-                  'Created',
-                  widget.product.createdAt != null
-                      ? '${widget.product.createdAt!.day}/${widget.product.createdAt!.month}/${widget.product.createdAt!.year}'
-                      : 'N/A',
-                  Icons.calendar_today,
+            child: Column(
+              children: [
+                const Icon(Icons.event_available,
+                    color: Colors.white, size: 24),
+                const SizedBox(height: 8),
+                const Text(
+                  'Valid until',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildDetailItem(
-                  'Valid Until',
+                const SizedBox(height: 4),
+                Text(
                   widget.product.validUntil != null
                       ? '${widget.product.validUntil!.day}/${widget.product.validUntil!.month}/${widget.product.validUntil!.year}'
                       : 'N/A',
-                  Icons.event_available,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildDetailItem(
-                  'Reward',
-                  "Ksh ${widget.product.reward}",
-                  Icons.tag,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildDetailItem(
-                  'Total Screenshots',
-                  (widget.product.screenshotCount ?? 0).toString(),
-                  Icons.photo_camera,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailItem(String label, String value, IconData icon) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 16, color: Colors.grey[600]),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryBlack,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildScreenshotsList() {
-    if (widget.product.allScreenshots == null ||
-        widget.product.allScreenshots!.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            const Text(
-              'Screenshots Performance',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Leotaro',
-              ),
-            ),
-            const SizedBox(height: 16),
-            Icon(
-              Icons.photo_library_outlined,
-              size: 48,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'No screenshot data available',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Performance Report',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Leotaro',
-            ),
-          ),
-          const SizedBox(height: 16),
-          ...widget.product.allScreenshots!.asMap().entries.map((entry) {
-            int index = entry.key;
-            AllScreenshot screenshot = entry.value;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.accentOrange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.accentOrange,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Screenshot ${index + 1}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.visibility,
-                              size: 16,
-                              color: Colors.blue,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${screenshot.views ?? 0} views',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${screenshot.views ?? 0}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green[700],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          "${widget.product.name} Analytics",
-          style: const TextStyle(
-            fontFamily: 'Leotaro',
-            color: AppColors.primaryBlack,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildProductHeader()
+                  .animate()
+                  .fadeIn(
+                    duration: 400.ms,
+                  )
+                  .slideY(
+                    begin: -0.2,
+                    duration: 400.ms,
+                    curve: Curves.easeOut,
+                  ),
+
+              const SizedBox(height: 20),
+
+              // Stats Cards
+              _buildStatsCards().animate().fadeIn(
+                    duration: 500.ms,
+                    delay: 200.ms,
+                  ),
+
+              const SizedBox(height: 20),
+
+              // Date Cards
+              _buildDateCards().animate().fadeIn(
+                    duration: 500.ms,
+                    delay: 300.ms,
+                  ),
+
+              const SizedBox(height: 20),
+
+              // Views Chart
+              _buildViewsLineChart().animate().slideY(
+                    begin: 0.3,
+                    duration: 500.ms,
+                    delay: 400.ms,
+                    curve: Curves.easeOut,
+                  ),
+
+              const SizedBox(height: 32),
+            ],
           ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
-          onPressed: () => Get.back(),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Header
-            _buildProductHeader()
-                .animate()
-                .fadeIn(
-                  duration: 400.ms,
-                )
-                .slideY(
-                  begin: -0.2,
-                  duration: 400.ms,
-                  curve: Curves.easeOut,
-                ),
-
-            const SizedBox(height: 20),
-
-            // Stats Cards
-            _buildStatsCards().animate().fadeIn(
-                  duration: 500.ms,
-                  delay: 200.ms,
-                ),
-
-            const SizedBox(height: 20),
-
-            // Views Chart
-            _buildViewsLineChart().animate().slideY(
-                  begin: 0.3,
-                  duration: 500.ms,
-                  delay: 300.ms,
-                  curve: Curves.easeOut,
-                ),
-
-            const SizedBox(height: 20),
-
-            // Product Details
-            _buildProductDetails().animate().fadeIn(
-                  duration: 500.ms,
-                  delay: 400.ms,
-                ),
-
-            const SizedBox(height: 20),
-
-            // Screenshots List
-            _buildScreenshotsList().animate().fadeIn(
-                  duration: 500.ms,
-                  delay: 500.ms,
-                ),
-
-            const SizedBox(height: 32),
-          ],
         ),
       ),
     );

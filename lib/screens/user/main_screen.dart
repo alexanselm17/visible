@@ -18,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const UserDashboardPage(),
     const ProductsPage(),
-    const ProfilePage(),
+    // const ProfilePage(),
   ];
 
   void _onTabTapped(int index) {

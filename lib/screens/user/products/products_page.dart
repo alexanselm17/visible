@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
+import 'package:visible/screens/profile_page.dart';
 import 'package:visible/screens/user/products/completed_product.dart';
 import 'package:visible/screens/user/products/product_detail_page.dart';
 import 'package:visible/widgets/loading_indicator.dart';
@@ -605,16 +606,19 @@ class _ProductsPageState extends State<ProductsPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.black,
                   borderRadius: BorderRadius.circular(0),
                 ),
                 margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, color: Colors.white),
+                    GestureDetector(
+                      onTap: () => Get.to(const ProfilePage()),
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     const Column(
@@ -624,6 +628,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           'Jefferson',
                           style: TextStyle(
                             fontSize: 18,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -631,6 +636,7 @@ class _ProductsPageState extends State<ProductsPage> {
                           'Inyanje',
                           style: TextStyle(
                             fontSize: 18,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -638,11 +644,14 @@ class _ProductsPageState extends State<ProductsPage> {
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh, color: Colors.white),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(Icons.notifications_outlined),
+                      icon: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.white,
+                      ),
                       onPressed: () {},
                     ),
                   ],

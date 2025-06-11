@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/reports/customer_report.dart';
+import 'package:visible/widgets/custom_app_bar.dart';
 
 import '../model/auth/sign_in_model.dart';
 
@@ -27,12 +29,24 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     _authenticationController.loadUserData();
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.white, // White status bar
+        statusBarIconBrightness: Brightness.dark, // Dark icons on white
+        systemNavigationBarColor: Colors.black,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: const GradientAppBar(
+          title: 'Profile',
+        ),
         backgroundColor: Colors.grey[50],
         body: Obx(
           () {

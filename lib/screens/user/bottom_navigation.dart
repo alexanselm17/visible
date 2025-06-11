@@ -15,26 +15,27 @@ class MainBottomNavigation extends StatefulWidget {
 }
 
 class _MainBottomNavigationState extends State<MainBottomNavigation> {
-  // Define colors to match your theme
-  static const Color primaryBlack = Color(0xFF121212);
+  // Define black and white colors
+  static const Color primaryBlack = Color(0xFF000000);
   static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color accentOrange = Color(0xFFFF7F00);
-  static const Color darkBlue = Color(0xFF1A365D);
+  static const Color selectedBlack = Color(0xFF000000);
+  static const Color unselectedGray = Color(0xFF666666);
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDarkMode ? primaryBlack : pureWhite;
-    const selectedItemColor = accentOrange;
-    final unselectedItemColor =
-        isDarkMode ? Colors.grey[400] : Colors.grey[600];
+    // Force black background for visibility
+    const backgroundColor = primaryBlack;
+    const selectedItemColor = pureWhite;
+    const unselectedItemColor =
+        Color(0xFFBBBBBB); // Lighter gray for better visibility on black
 
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.white
+                .withOpacity(0.1), // Light shadow on black background
             blurRadius: 10,
             offset: const Offset(0, -1),
           ),
@@ -54,10 +55,12 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
               selectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
+                color: pureWhite, // Ensure white text for visibility
               ),
               unselectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 11,
+                color: Color(0xFFBBBBBB), // Light gray for unselected labels
               ),
               type: BottomNavigationBarType.fixed,
               elevation: 0,
@@ -74,12 +77,12 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
                   label: 'campaigns',
                   selectedItemColor: selectedItemColor,
                 ),
-                _buildNavItem(
-                  icon: Icons.person_outline_rounded,
-                  activeIcon: Icons.person,
-                  label: 'Profile',
-                  selectedItemColor: selectedItemColor,
-                ),
+                // _buildNavItem(
+                //   icon: Icons.person_outline_rounded,
+                //   activeIcon: Icons.person,
+                //   label: 'Profile',
+                //   selectedItemColor: selectedItemColor,
+                // ),
               ],
             ),
           ),
@@ -99,8 +102,13 @@ class _MainBottomNavigationState extends State<MainBottomNavigation> {
       activeIcon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: selectedItemColor.withOpacity(0.15),
+          color: pureWhite.withOpacity(
+              0.2), // Semi-transparent white background for better visibility
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: pureWhite.withOpacity(0.3), // Subtle white border
+            width: 1,
+          ),
         ),
         child: Icon(activeIcon),
       ),

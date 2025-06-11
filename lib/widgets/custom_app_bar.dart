@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:visible/constants/colors.dart';
 
 class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -19,15 +18,11 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.accentOrange, AppColors.accentOrange],
-        ),
+        color: Colors.white,
       ),
       child: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
@@ -36,7 +31,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
             Text(
               title,
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
