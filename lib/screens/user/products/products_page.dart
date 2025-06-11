@@ -26,7 +26,7 @@ class _ProductsPageState extends State<ProductsPage> {
   // Filter categories with their keys
   final List<Map<String, dynamic>> _categories = [
     {'name': 'Available', 'key': 'available'},
-    {'name': 'OnGoing', 'key': 'ongoing'},
+    {'name': 'Ongoing', 'key': 'ongoing'},
     {'name': 'Completed', 'key': 'completed'},
   ];
 
@@ -99,7 +99,7 @@ class _ProductsPageState extends State<ProductsPage> {
       case 'available':
         count = productController.availableCount;
         break;
-      case 'progress':
+      case 'ongoing':
         count = productController.progressCount;
         break;
       case 'completed':
@@ -110,48 +110,23 @@ class _ProductsPageState extends State<ProductsPage> {
     return GestureDetector(
       onTap: () => _onCategoryChanged(index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accentOrange : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.accentOrange : Colors.grey.shade300,
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? AppColors.accentOrange : Colors.transparent,
+              width: 2,
+            ),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              categoryName,
-              style: TextStyle(
-                fontFamily: 'TT Hoves Pro Trial',
-                color:
-                    isSelected ? AppColors.pureWhite : AppColors.primaryBlack,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            if (count > 0) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? AppColors.pureWhite : AppColors.accentOrange,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  count.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected
-                        ? AppColors.accentOrange
-                        : AppColors.pureWhite,
-                  ),
-                ),
-              ),
-            ],
-          ],
+        child: Text(
+          categoryName,
+          style: TextStyle(
+            fontFamily: 'TT Hoves Pro Trial',
+            color: isSelected ? AppColors.accentOrange : Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
       ),
     );
@@ -161,13 +136,247 @@ class _ProductsPageState extends State<ProductsPage> {
     switch (_selectedCategory) {
       case 0: // Available
         return _buildAvailableProductCard(product, index);
-      case 1: // Progress
-        return _buildProgressProductCard(product, index);
+      case 1: // Ongoing
+        return _buildOngoingProductCard(product, index);
       case 2: // Completed
         return _buildCompletedProductCard(product, index);
       default:
         return _buildAvailableProductCard(product, index);
     }
+  }
+
+  Widget _buildAvailableProductCard(Datum product, int index) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => ProductDetailPage(product: product));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: DecorationImage(
+                  image: NetworkImage(product.imageUrl!),
+                  fit: BoxFit.cover,
+                  onError: (exception, stackTrace) =>
+                      const Icon(Icons.image_not_supported),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+
+            // Product Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Name
+                  Text(
+                    product.name!.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: 'Leotaro',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      _buildBadge('EXECUTIVE', Colors.green),
+                      if (product.category?.contains('luxury') == true ||
+                          product.name!.toLowerCase().contains('cognac') ||
+                          product.name!.toLowerCase().contains('walker'))
+                        _buildBadge('LUXURY', Colors.purple),
+                      if (product.name!.toLowerCase().contains('cognac') ||
+                          product.name!.toLowerCase().contains('walker'))
+                        _buildBadge('NSFW', Colors.red),
+                      if (index == 0) _buildBadge('BADGE 2', Colors.red),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Description:',
+                    style: TextStyle(
+                      color: Colors.orange[400],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'The ${product.name} is a premium product that offers exceptional quality and value. It is designed to meet the highest standards of excellence and provide an unparalleled experience.',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      height: 1.3,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.monetization_on,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Ksh ${product.reward ?? 50}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.timer,
+                        color: Colors.orange,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Expires in ${_getRemainingTime(product.validUntil)}',
+                        style: const TextStyle(
+                          color: Colors.orange,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOngoingProductCard(Datum product, int index) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => ProductDetailPage(product: product));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              width: 150,
+              height: 170,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: DecorationImage(
+                  image: NetworkImage(product.imageUrl!),
+                  fit: BoxFit.cover,
+                  onError: (exception, stackTrace) =>
+                      const Icon(Icons.image_not_supported),
+                ),
+              ),
+            ),
+
+            // const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.name!.toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: 'Leotaro',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Progress Circle
+                Row(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${product.screenshotCount ?? 3}/5',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Price and Time Row
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.monetization_on,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Ksh ${product.reward ?? 50}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.timer,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Expires in ${_getRemainingTime(product.validUntil)}',
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildRewardAndTimeInfo(Datum product, bool isCompleted) {
@@ -218,255 +427,13 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildAvailableProductCard(Datum product, int index) {
-    return GestureDetector(
-      onTap: () {
-        Get.to(() => ProductDetailPage(product: product));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.pureWhite,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  image: DecorationImage(
-                    image: NetworkImage(product.imageUrl!),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) =>
-                        const Icon(Icons.image_not_supported),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Leotaro',
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.category ?? 'Category',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildRewardAndTimeInfo(product, false),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressProductCard(Datum product, int index) {
-    return GestureDetector(
-      onTap: () {
-        Get.to(() => ProductDetailPage(product: product));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.pureWhite,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.shade200, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.orange.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      image: DecorationImage(
-                        image: NetworkImage(product.imageUrl!),
-                        fit: BoxFit.cover,
-                        onError: (exception, stackTrace) =>
-                            const Icon(Icons.image_not_supported),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.hourglass_empty,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'In Progress',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Leotaro',
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildRewardAndTimeInfo(product, false),
-                  const SizedBox(height: 8),
-                  _buildCircularProgressWithDots(
-                      product.screenshotCount ?? 0, 5),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-// OPTION 1: Circular Progress with Dots
-  Widget _buildCircularProgressWithDots(int uploaded, int total) {
-    double progress = uploaded / total;
-
-    return Row(
-      children: [
-        // Circular progress indicator
-        SizedBox(
-          width: 40,
-          height: 40,
-          child: Stack(
-            children: [
-              CircularProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey.shade300,
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
-                strokeWidth: 3,
-              ),
-              Center(
-                child: Text(
-                  '$uploaded/$total',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-
-        // Dots representation
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Screenshots',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Leotaro',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: List.generate(total, (index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: index < uploaded
-                          ? Colors.orange
-                          : Colors.grey.shade300,
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildCompletedProductCard(Datum product, int index) {
     return GestureDetector(
       onTap: () {
         Get.to(() => ProductAnalyticsPage(product: product));
       },
       child: Container(
+        height: 250,
         decoration: BoxDecoration(
           color: AppColors.pureWhite,
           borderRadius: BorderRadius.circular(12),
@@ -603,6 +570,24 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     productController.fetchProductsByFilter(filter: _categories[0]['key']);
@@ -611,140 +596,142 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: AppColors.pureWhite,
-        elevation: 0,
-        title: const Text(
-          'Share & Earn',
-          style: TextStyle(
-            fontFamily: 'Leotaro',
-            color: AppColors.primaryBlack,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey,
+                      child: Icon(Icons.person, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Jefferson',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Inyanje',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+
+              // Category Tabs
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(
+                    _categories.length,
+                    (index) => _buildCategoryTab(index),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Products List
+              Expanded(
+                child: Obx(
+                  () => currentLoadingState.value
+                      ? const Center(
+                          child: AnimatedLoadingIndicator(
+                            isLoading: true,
+                            loadingText: "Loading products...",
+                          ),
+                        )
+                      : currentProductsList.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    _selectedCategory == 0
+                                        ? Icons.inventory_2_outlined
+                                        : _selectedCategory == 1
+                                            ? Icons.hourglass_empty
+                                            : Icons.check_circle_outline,
+                                    size: 64,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    _selectedCategory == 0
+                                        ? 'No available products'
+                                        : _selectedCategory == 1
+                                            ? 'No products in progress'
+                                            : 'No completed products',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: currentProductsList.length,
+                              itemBuilder: (context, index) {
+                                Datum product = currentProductsList[index];
+                                return Column(
+                                  children: [
+                                    _buildProductCard(product, index),
+                                    if (index < currentProductsList.length - 1)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Container(
+                                          height: 2,
+                                          color: Colors.white,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 16, horizontal: 10),
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
+                            ),
+                ),
+              ),
+
+              // Bottom Navigation
+            ],
           ),
         ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined,
-                color: AppColors.primaryBlack),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            color: AppColors.pureWhite,
-            padding: const EdgeInsets.only(bottom: 12),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Obx(() => Row(
-                    children: List.generate(
-                      _categories.length,
-                      (index) => Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: _buildCategoryTab(index),
-                      ),
-                    ),
-                  )),
-            ),
-          ).animate().fadeIn(duration: 400.ms).slideY(
-              begin: -0.2, end: 0, duration: 400.ms, curve: Curves.easeOut),
-
-          // Products grid with separate lists
-          Obx(
-            () => currentLoadingState.value
-                ? const Expanded(
-                    child: Center(
-                      child: AnimatedLoadingIndicator(
-                        isLoading: true,
-                        loadingText: "Loading products...",
-                      ),
-                    ),
-                  )
-                : currentProductsList.isEmpty
-                    ? Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _selectedCategory == 0
-                                    ? Icons.inventory_2_outlined
-                                    : _selectedCategory == 1
-                                        ? Icons.hourglass_empty
-                                        : Icons.check_circle_outline,
-                                size: 64,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _selectedCategory == 0
-                                    ? 'No available products'
-                                    : _selectedCategory == 1
-                                        ? 'No products in progress'
-                                        : 'No completed products',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                  fontFamily: 'TT Hoves Pro Trial',
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _selectedCategory == 0
-                                    ? 'Check back later for new products to share'
-                                    : _selectedCategory == 1
-                                        ? 'Share some products to see them here'
-                                        : 'Complete some shares to see them here',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
-                                  fontFamily: 'TT Hoves Pro Trial',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio:
-                                  0.68, // Adjusted to accommodate reward and time info
-                            ),
-                            itemCount: currentProductsList.length,
-                            itemBuilder: (context, index) {
-                              Datum product = currentProductsList[index];
-                              return _buildProductCard(product, index)
-                                  .animate()
-                                  .fadeIn(
-                                    duration: 400.ms,
-                                    delay: Duration(milliseconds: 100 * index),
-                                  )
-                                  .scale(
-                                    begin: const Offset(0.9, 0.9),
-                                    end: const Offset(1, 1),
-                                    duration: 300.ms,
-                                    delay: Duration(milliseconds: 100 * index),
-                                    curve: Curves.easeOut,
-                                  );
-                            },
-                          ),
-                        ),
-                      ),
-          ),
-        ],
       ),
     );
   }

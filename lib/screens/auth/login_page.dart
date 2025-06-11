@@ -34,139 +34,150 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.pureWhite,
+      backgroundColor: Colors.black,
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Header with gradient and logo
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.4,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.darkBlue,
-                    AppColors.accentOrange,
-                    AppColors.primaryBlack
-                  ],
-                  stops: [0, 0.5, 1],
-                  begin: AlignmentDirectional(-1, -1),
-                  end: AlignmentDirectional(1, 1),
+        child: SizedBox(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo Section
+              Container(
+                width: 160,
+                height: 160,
+                margin: const EdgeInsets.only(bottom: 60),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
-              ),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0x00FFFFFF), AppColors.pureWhite],
-                    stops: [0, 1],
-                    begin: AlignmentDirectional(0, -1),
-                    end: AlignmentDirectional(0, 1),
+                child: const Center(
+                  child: Text(
+                    'Visible.',
+                    style: TextStyle(
+                      fontFamily: 'Leotaro',
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+              ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
+                  begin: const Offset(0.6, 0.6),
+                  end: const Offset(1, 1),
+                  duration: 300.ms,
+                  delay: 300.ms,
+                  curve: Curves.bounceOut),
+
+              // Form Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: const BoxDecoration(
-                        color: Color(0xCCFFFFFF),
-                        shape: BoxShape.circle,
+                    // Username/Email Field
+                    const Text(
+                      'Username Or Email',
+                      style: TextStyle(
+                        fontFamily: 'TT Hoves Pro Trial',
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(0),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/logo_foreground.png',
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: TextFormField(
+                        controller: _emailController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
                           ),
                         ),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                       ),
-                    ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
-                        begin: const Offset(0.6, 0.6),
-                        end: const Offset(1, 1),
-                        duration: 300.ms,
-                        delay: 300.ms,
-                        curve: Curves.bounceOut),
-                    Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(0, 40, 0, 0),
-                      child: const Text(
-                        'Sign In!',
-                        style: TextStyle(
-                          fontFamily: 'Leotaro',
-                          color: AppColors.primaryBlack,
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ).animate().fadeIn(duration: 400.ms, delay: 350.ms).moveY(
-                          begin: 30, end: 0, duration: 400.ms, delay: 350.ms),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(44, 8, 44, 0),
-                      child: const Text(
-                        'Use the account below to sign in',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'TT Hoves Pro Trial',
-                          color: AppColors.primaryBlack,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ).animate().fadeIn(duration: 400.ms, delay: 400.ms).moveY(
-                          begin: 30, end: 0, duration: 400.ms, delay: 400.ms),
-                    ),
-                  ],
-                ),
-              ),
-            ).animate().fadeIn(duration: 400.ms).scale(
-                begin: const Offset(3, 3),
-                end: const Offset(1, 1),
-                duration: 400.ms),
+                    )
+                        .animate(delay: const Duration(milliseconds: 300))
+                        .fadeIn(duration: 600.ms)
+                        .moveY(begin: 10, end: 0, duration: 400.ms),
 
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  StandardFormField(
-                    label: 'Username or Email',
-                    hintText: 'Enter your username or email',
-                    controller: _emailController,
-                    prefixIconData: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    animationDelay: const Duration(milliseconds: 300),
-                  ),
-                  const SizedBox(height: 20),
-                  PasswordFormField(
-                    label: 'Password',
-                    hintText: 'Enter your password',
-                    controller: _passwordController,
-                    textInputAction: TextInputAction.done,
-                    animationDelay: const Duration(milliseconds: 400),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: Row(
+                    const SizedBox(height: 24),
+
+                    // Password Field
+                    const Text(
+                      'Password',
+                      style: TextStyle(
+                        fontFamily: 'TT Hoves Pro Trial',
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        style: const TextStyle(color: Colors.white),
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                        textInputAction: TextInputAction.done,
+                      ),
+                    )
+                        .animate(delay: const Duration(milliseconds: 400))
+                        .fadeIn(duration: 600.ms)
+                        .moveY(begin: 10, end: 0, duration: 400.ms),
+
+                    const SizedBox(height: 24),
+
+                    // Remember me and Forgot password
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             SizedBox(
-                              height: 24,
-                              width: 24,
+                              height: 20,
+                              width: 20,
                               child: Checkbox(
                                 value: _rememberMe,
                                 activeColor: AppColors.accentOrange,
+                                checkColor: Colors.white,
+                                fillColor:
+                                    WidgetStateProperty.resolveWith<Color?>(
+                                  (Set<WidgetState> states) {
+                                    if (states.contains(WidgetState.disabled)) {
+                                      return null;
+                                    }
+                                    if (states.contains(WidgetState.selected)) {
+                                      return AppColors.accentOrange;
+                                    }
+                                    return Colors.transparent;
+                                  },
+                                ),
+                                side: const BorderSide(
+                                    color: Colors.white, width: 2),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
                                 onChanged: (bool? value) {
                                   setState(() {
@@ -181,20 +192,18 @@ class _LoginPageState extends State<LoginPage> {
                               style: TextStyle(
                                 fontFamily: 'TT Hoves Pro Trial',
                                 fontSize: 14,
-                                color: AppColors.primaryBlack,
+                                color: Colors.white,
                               ),
                             ),
                           ],
                         ),
-
-                        // Forgot password link
                         GestureDetector(
                           onTap: () {
                             Get.to(const ForgotPasswordPage());
                             debugPrint('Forgot password tapped');
                           },
                           child: const Text(
-                            'Forgot password?',
+                            'Forgot Password',
                             style: TextStyle(
                               fontFamily: 'TT Hoves Pro Trial',
                               fontSize: 14,
@@ -204,55 +213,99 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ],
-                    ),
-                  )
-                      .animate(delay: const Duration(milliseconds: 450))
-                      .fadeIn(duration: 600.ms)
-                      .moveY(
-                          begin: 10,
-                          end: 0,
-                          duration: 400.ms,
-                          curve: Curves.easeOut),
-                  const SizedBox(height: 40),
-                  Obx(
-                    () => authenticationController.isLoggingIn.value
-                        ? Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: AppColors.darkBlue.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.accentOrange,
-                                strokeWidth: 3,
+                    )
+                        .animate(delay: const Duration(milliseconds: 450))
+                        .fadeIn(duration: 600.ms)
+                        .moveY(begin: 10, end: 0, duration: 400.ms),
+
+                    const SizedBox(height: 40),
+
+                    // Sign In Button
+                    Obx(
+                      () => authenticationController.isLoggingIn.value
+                          ? Container(
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            ),
-                          ).animate().fadeIn(duration: 300.ms)
-                        : FormActionButton(
-                            text: 'Sign In',
-                            onPressed: () async {
-                              await authenticationController.handleSignIn(
-                                  userName: _emailController.text,
-                                  password: _passwordController.text);
-                            },
-                            animationDelay: const Duration(milliseconds: 500),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.accentOrange,
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            ).animate().fadeIn(duration: 300.ms)
+                          : SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  await authenticationController.handleSignIn(
+                                      userName: _emailController.text,
+                                      password: _passwordController.text);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    fontFamily: 'TT Hoves Pro Trial',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            )
+                              .animate(delay: const Duration(milliseconds: 500))
+                              .fadeIn(duration: 600.ms)
+                              .moveY(begin: 10, end: 0, duration: 400.ms),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Sign Up Link
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontFamily: 'TT Hoves Pro Trial',
+                            fontSize: 14,
                           ),
-                  ),
-                  const SizedBox(height: 30),
-                  AuthLinkText(
-                    leadText: "Don't have an account?",
-                    linkText: 'Sign up',
-                    onTap: () {
-                      Get.to(const SignUpPage());
-                    },
-                    animationDelay: const Duration(milliseconds: 600),
-                  ),
-                ],
+                          children: [
+                            const TextSpan(
+                              text: "Don't have an account? ",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            TextSpan(
+                              text: 'Sign Up.',
+                              style: const TextStyle(
+                                color: AppColors.accentOrange,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(const SignUpPage());
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                        .animate(delay: const Duration(milliseconds: 600))
+                        .fadeIn(duration: 600.ms)
+                        .moveY(begin: 10, end: 0, duration: 400.ms),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
