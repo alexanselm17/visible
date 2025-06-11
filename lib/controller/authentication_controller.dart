@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/roles_constants.dart';

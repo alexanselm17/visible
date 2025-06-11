@@ -6,7 +6,6 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/auth/forgot_password_page.dart';
 import 'package:visible/screens/auth/sign_up_page.dart';
-import 'package:visible/widgets/input_widgets.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

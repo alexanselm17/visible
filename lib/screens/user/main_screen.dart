@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:visible/screens/user/bottom_navigation.dart';
 import 'package:visible/screens/user/dashboard_page.dart';
 import 'package:visible/screens/user/products/products_page.dart';
-import 'package:visible/screens/profile_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

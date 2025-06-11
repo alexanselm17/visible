@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:visible/constants/colors.dart';
 import 'package:visible/model/product_model.dart';
-import 'package:visible/widgets/custom_app_bar.dart';
 
 class ProductAnalyticsPage extends StatefulWidget {
   final Datum product;

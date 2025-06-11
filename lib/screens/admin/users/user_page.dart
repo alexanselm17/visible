@@ -7,7 +7,6 @@ import 'package:visible/model/users/user_model.dart';
 import 'package:visible/screens/admin/users/users_search_deligate.dart';
 import 'package:visible/screens/reports/customer_report.dart';
 import 'package:visible/widgets/custom_app_bar.dart';
-import 'package:visible/widgets/input_widgets.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});

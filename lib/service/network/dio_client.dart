@@ -1,10 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart' as getx;
 import 'package:get/route_manager.dart';
 import 'package:logger/logger.dart';
-import 'package:visible/common/toast.dart';
 import 'package:visible/constants/app_constants.dart';
 
 import 'dart:io';

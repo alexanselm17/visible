@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
 
