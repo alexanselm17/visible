@@ -24,12 +24,28 @@ class _ProductsPageState extends State<ProductsPage> {
   int _selectedCategory = 0;
   ProductController productController = Get.put(ProductController());
 
+  // Add PageController for swipe functionality
+  late PageController _pageController;
+
   // Filter categories with their keys
   final List<Map<String, dynamic>> _categories = [
     {'name': 'Available', 'key': 'available'},
     {'name': 'Ongoing', 'key': 'ongoing'},
     {'name': 'Completed', 'key': 'completed'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedCategory);
+    productController.fetchProductsByFilter(filter: _categories[0]['key']);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   // Get current filter key
   String get currentFilter => _categories[_selectedCategory]['key'];
@@ -84,7 +100,25 @@ class _ProductsPageState extends State<ProductsPage> {
       _selectedCategory = index;
     });
 
-    // Always fetch products for selected filter (remove the isEmpty check)
+    // Animate to the selected page
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+
+    // Fetch products for selected filter
+    String filterKey = _categories[index]['key'];
+    productController.fetchProductsByFilter(filter: filterKey);
+  }
+
+  // Handle page view changes (when user swipes)
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedCategory = index;
+    });
+
+    // Fetch products for selected filter
     String filterKey = _categories[index]['key'];
     productController.fetchProductsByFilter(filter: filterKey);
   }
@@ -135,6 +169,87 @@ class _ProductsPageState extends State<ProductsPage> {
 
   Widget _buildProductCard(Datum product, int index) {
     switch (_selectedCategory) {
+      case 0: // Available
+        return _buildAvailableProductCard(product, index);
+      case 1: // Ongoing
+        return _buildOngoingProductCard(product, index);
+      case 2: // Completed
+        return _buildCompletedProductCard(product, index);
+      default:
+        return _buildAvailableProductCard(product, index);
+    }
+  }
+
+  // Build the content for each tab
+  Widget _buildTabContent(int tabIndex) {
+    String filterKey = _categories[tabIndex]['key'];
+    RxList<Datum> productsList = productController.getCurrentList(filterKey);
+    RxBool loadingState = productController.getLoadingState(filterKey);
+
+    return Obx(
+      () => loadingState.value
+          ? const Center(
+              child: AnimatedLoadingIndicator(
+                isLoading: true,
+                loadingText: "Loading products...",
+              ),
+            )
+          : productsList.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        tabIndex == 0
+                            ? Icons.inventory_2_outlined
+                            : tabIndex == 1
+                                ? Icons.hourglass_empty
+                                : Icons.check_circle_outline,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        tabIndex == 0
+                            ? 'No available products'
+                            : tabIndex == 1
+                                ? 'No products in progress'
+                                : 'No completed products',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: productsList.length,
+                  itemBuilder: (context, index) {
+                    Datum product = productsList[index];
+                    return Column(
+                      children: [
+                        _buildProductCardForTab(product, index, tabIndex),
+                        if (index < productsList.length - 1)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Container(
+                              height: 2,
+                              color: Colors.white,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 10),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+    );
+  }
+
+  Widget _buildProductCardForTab(Datum product, int index, int tabIndex) {
+    switch (tabIndex) {
       case 0: // Available
         return _buildAvailableProductCard(product, index);
       case 1: // Ongoing
@@ -590,12 +705,6 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   @override
-  void initState() {
-    productController.fetchProductsByFilter(filter: _categories[0]['key']);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -657,8 +766,6 @@ class _ProductsPageState extends State<ProductsPage> {
                   ],
                 ),
               ),
-
-              // Category Tabs
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -670,74 +777,16 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Products List
               Expanded(
-                child: Obx(
-                  () => currentLoadingState.value
-                      ? const Center(
-                          child: AnimatedLoadingIndicator(
-                            isLoading: true,
-                            loadingText: "Loading products...",
-                          ),
-                        )
-                      : currentProductsList.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    _selectedCategory == 0
-                                        ? Icons.inventory_2_outlined
-                                        : _selectedCategory == 1
-                                            ? Icons.hourglass_empty
-                                            : Icons.check_circle_outline,
-                                    size: 64,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    _selectedCategory == 0
-                                        ? 'No available products'
-                                        : _selectedCategory == 1
-                                            ? 'No products in progress'
-                                            : 'No completed products',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.builder(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: currentProductsList.length,
-                              itemBuilder: (context, index) {
-                                Datum product = currentProductsList[index];
-                                return Column(
-                                  children: [
-                                    _buildProductCard(product, index),
-                                    if (index < currentProductsList.length - 1)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: Container(
-                                          height: 2,
-                                          color: Colors.white,
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 16, horizontal: 10),
-                                        ),
-                                      ),
-                                  ],
-                                );
-                              },
-                            ),
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: _onPageChanged,
+                  itemCount: _categories.length,
+                  itemBuilder: (context, index) {
+                    return _buildTabContent(index);
+                  },
                 ),
               ),
-
-              // Bottom Navigation
             ],
           ),
         ),
