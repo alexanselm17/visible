@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/model/users/user_dashboard.dart';
+import 'package:visible/screens/profile_page.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
 class UserDashboardPage extends StatefulWidget {
@@ -20,12 +18,20 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
       Get.put(AuthenticationController());
   bool _isLoading = true;
   UserDashboardModel? _dashboardData;
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
     authenticationController.loadUserData();
     _loadDashboardData();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadDashboardData() async {
@@ -56,55 +62,81 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: AppColors.pureWhite,
+        backgroundColor: Colors.black,
         elevation: 0,
-        centerTitle: false,
-        leadingWidth: 180,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
+        automaticallyImplyLeading: false,
+        title: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              const CircleAvatar(
-                radius: 18,
-                backgroundImage: AssetImage(
-                  'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
+              GestureDetector(
+                onTap: () => Get.to(const ProfilePage()),
+                child: const CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.person, color: Colors.white, size: 20),
                 ),
               ),
-              const SizedBox(width: 8),
-              Obx(
-                () => Text(
-                  authenticationController
-                              .currentUser.value.username?.isNotEmpty ==
-                          true
-                      ? authenticationController.currentUser.value.username!
-                      : 'User',
-                  style: const TextStyle(
-                    fontFamily: 'TT Hoves Pro Trial',
-                    color: AppColors.primaryBlack,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
+              const SizedBox(width: 12),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(
+                      () => Text(
+                        authenticationController
+                                    .currentUser.value.username?.isNotEmpty ==
+                                true
+                            ? authenticationController
+                                .currentUser.value.username!
+                            : 'Jefferson\nInyanje',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          height: 1.1,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'APPROVED',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                  onTap: _loadDashboardData,
+                  child:
+                      const Icon(Icons.refresh, color: Colors.black, size: 24)),
+              const SizedBox(width: 8),
+              const Icon(Icons.notifications_outlined,
+                  color: Colors.black, size: 24),
             ],
           ),
         ),
-        title: null,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined,
-                color: AppColors.primaryBlack),
-            onPressed: () {
-              // Show notifications
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.primaryBlack),
-            onPressed: _loadDashboardData,
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(
@@ -116,429 +148,663 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 loadingText: 'Loading dashboard...',
               ),
             )
-          : _dashboardData?.data == null
-              ? _buildErrorState()
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // User profile and earnings summary
-                      _buildEarningsSummary(),
-                      const SizedBox(height: 24),
-
-                      // Daily Goals
-                      _buildSectionTitle(
-                          'Progress tracker', 'Progress tracker'),
-                      const SizedBox(height: 8),
-                      _buildGoalsProgress(),
-                      const SizedBox(height: 24),
-                      _buildSectionTitle(
-                          'Active Campaigns', 'Participate and earn'),
-                      const SizedBox(height: 8),
-
-                      _buildAvailableCampaigns(_dashboardData!.data!),
-
-                      // Recent Rewards
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          _buildSectionTitle(
-                              'Recent Earnings', 'Your earnings'),
-                          const SizedBox(height: 8),
-                          _buildRecentRewards(),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Failed to load dashboard data',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadDashboardData,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accentOrange,
-            ),
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEarningsSummary() {
-    final data = _dashboardData?.data;
-    if (data == null) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.accentOrange, Color(0xFFFF9800)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accentOrange.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 16),
+                  // Earnings Summary Card
+                  _buildEarningsSummaryCard(),
+                  const SizedBox(height: 24),
                   const Text(
-                    'Total Earnings',
+                    'Progress Tracker',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Ksh ${data.totalRewards ?? 0}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  _buildProgressTracker(),
+                  const SizedBox(height: 28),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 45),
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActiveCampaigns(),
+                  const SizedBox(height: 28),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 45),
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Recent Earnings
+                  _buildRecentEarnings(),
+                  const SizedBox(height: 100),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.trending_up,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      'Active',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildEarningsDetail(
-                  'Today', 'Ksh ${data.todayRewards?.amount ?? 0}'),
-              _buildEarningsDetail(
-                  'Pending', data.pendingBalance!.toString() ?? 'Ksh 0'),
-              _buildEarningsDetail('Campaigns', '${data.totalCampaigns ?? 0}'),
-              _buildEarningsDetail(
-                  'Tasks Today', '${data.todayRewards?.count ?? 0}'),
-            ],
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.3, end: 0);
+            ),
+    );
   }
 
-  Widget _buildAvailableCampaigns(UserDashboardModelData data) {
-    final campaignsData = data.ongoing?.data?.data;
+  Widget _buildEarningsSummaryCard() {
+    final data = _dashboardData?.data;
+    bool hasData = data != null &&
+        (data.totalRewards != null && data.totalRewards! > 0 ||
+            data.todayRewards?.amount != null &&
+                data.todayRewards!.amount! > 0);
 
-    if (campaignsData == null || campaignsData.isEmpty) {
-      return Container(
-        height: 200,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[700]!, width: 1),
+      ),
+      child: hasData
+          ? _buildEarningsWithData(data)
+          : _buildEarningsWithAchievements(),
+    );
+  }
+
+  Widget _buildEarningsWithData(UserDashboardModelData data) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left side - Earnings
+        Expanded(
+          flex: 1,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.campaign_outlined,
-                size: 48,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'No Active Campaigns',
+              const Text(
+                'Pending',
                 style: TextStyle(
+                  color: Colors.white,
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Your active and ongoing campaigns will appear here.',
+                'Ksh ${data.pendingBalance ?? 50}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                height: 1,
+                color: Colors.grey[700],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Today',
                 style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Ksh ${data.todayRewards?.amount ?? 25}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
         ),
-      ).animate().fadeIn(duration: 300.ms);
-    }
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        itemCount: campaignsData.length,
-        itemBuilder: (context, index) {
-          Datum campaign = campaignsData[index];
-          final timeRemaining = _getTimeRemaining(campaign.validUntil);
-          final isExpiringSoon = _isExpiringSoon(campaign.validUntil);
-
-          return Container(
-            width: 180,
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  spreadRadius: 0,
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+        const SizedBox(width: 24),
+        // Right side - Achievements
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'My Achievements',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-              border: Border.all(
-                color: Colors.grey[200]!,
-                width: 0.5,
+              ),
+              const SizedBox(height: 16),
+              _buildAchievementItem(
+                icon: Icons.emoji_events,
+                color: Colors.amber,
+                title: 'Completion Master',
+                subtitle:
+                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#LetsGetGo30',
+              ),
+              const SizedBox(height: 16),
+              _buildAchievementItem(
+                icon: Icons.emoji_events,
+                color: Colors.amber,
+                title: 'Here\'s a trophy',
+                subtitle:
+                    'Thanks for Signing up to Visible.\nWe have more trophies like these for you in store.\nYou are awesome.',
+              ),
+              const SizedBox(height: 16),
+              _buildAchievementItem(
+                icon: Icons.account_balance_wallet,
+                color: Colors.pink,
+                title: 'Money in the bank',
+                subtitle:
+                    'At this rate, you will need a bodyguard.\nYou have just made your first cash by posting\nan AD Campaign. Go post some more!',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEarningsWithAchievements() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left side - Earnings (No data)
+        Expanded(
+          flex: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Pending',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Ksh 0',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                height: 1,
+                color: Colors.grey[700],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Today',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Ksh 0',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 24),
+        // Right side - No Achievements
+        const Expanded(
+          flex: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'My Achievements',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 40),
+              Text(
+                'No Achievements yet.',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Start your journey with us and your achievements\nwill be displayed here.',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAchievementItem({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.white, size: 14),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.orange,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressTracker() {
+    final achievements = _dashboardData?.data?.achievements;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildProgressCircle(
+          'Daily',
+          achievements?.daily?.completed ?? 0,
+          achievements?.daily?.created ?? 0,
+        ),
+        _buildProgressCircle(
+          'Weekly',
+          achievements?.weekly?.completed ?? 0,
+          achievements?.weekly?.created ?? 0,
+        ),
+        _buildProgressCircle(
+          'Monthly',
+          achievements?.monthly?.completed ?? 0,
+          achievements?.monthly?.created ?? 0,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressCircle(String label, int completed, int total) {
+    return Column(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
+          ),
+          child: Center(
+            child: Text(
+              '$completed/$total',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 170,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.grey[300]!,
-                              Colors.grey[200]!,
-                            ],
-                          ),
-                        ),
-                        child: campaign.imageUrl != null &&
-                                campaign.imageUrl!.isNotEmpty
-                            ? Image.network(
-                                campaign.imageUrl!,
-                                height: 110,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    _buildPlaceholderImage(),
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return _buildLoadingImage();
-                                },
-                              )
-                            : _buildPlaceholderImage(),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActiveCampaigns() {
+    final campaignsData = _dashboardData?.data?.ongoing?.data?.data;
+    bool hasCampaigns = campaignsData != null && campaignsData.isNotEmpty;
+
+    if (!hasCampaigns) {
+      return _buildNoCampaigns();
+    }
+
+    return Column(
+      children: [
+        // Campaign card with sliding functionality
+        SizedBox(
+          height: 280,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemCount: campaignsData.length,
+            itemBuilder: (context, index) {
+              final campaign = campaignsData[index];
+              return _buildCampaignCard(campaign);
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Page indicators
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            campaignsData.length,
+            (index) => Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentPage == index ? Colors.white : Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCampaignCard(Datum campaign) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[700]!, width: 1),
+      ),
+      child: Column(
+        children: [
+          // Campaign image
+          Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              image: campaign.imageUrl != null && campaign.imageUrl!.isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(campaign.imageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : const DecorationImage(
+                      image: AssetImage(
+                          'assets/johnnie_walker.png'), // You'll need to add this asset
+                      fit: BoxFit.cover,
+                    ),
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Campaign details
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      campaign.name ?? 'JOHNNY WALKER',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      // Time remaining badge
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isExpiringSoon
-                                ? Colors.red[600]!.withOpacity(0.9)
-                                : AppColors.accentOrange.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.access_time_rounded,
-                                size: 12,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                timeRemaining,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    const SizedBox(height: 8),
+                    const Row(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              campaign.name ?? 'Untitled Campaign',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                                color: Colors.black87,
-                                height: 1.2,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                        Icon(Icons.attach_money, color: Colors.white, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'Ksh 50',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time,
+                            color: Colors.white, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          _getTimeRemaining(campaign.validUntil),
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                children: [
+                  // Progress circle
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '2/5',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'VERIFICATION PENDING',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoCampaigns() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Icon(
+            Icons.campaign_outlined,
+            size: 60,
+            color: Colors.grey[600],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Active Campaigns.',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Your Active and Ongoing Campaigns\nWill appear here. Select an Ad Campaign\nfrom the Ad campaigns tab to get going.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentEarnings() {
+    final recentRewards = _dashboardData?.data?.recentRewards;
+    bool hasEarnings = recentRewards != null && recentRewards.isNotEmpty;
+
+    if (!hasEarnings) {
+      return Column(
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            'No Recent Earnings.',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Your Earnings from successfully completed\nAd Campaigns will appear here.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      children: recentRewards.map((earning) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Text(
+                  earning.advertName!,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 400.ms, delay: (120 * index).ms)
-              .slideX(begin: 0.3, end: 0, curve: Curves.easeOutCubic);
-        },
-      ),
-    );
-  }
-
-// Helper method to build placeholder image
-  Widget _buildPlaceholderImage() {
-    return Container(
-      height: 110,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.grey[300]!,
-            Colors.grey[200]!,
-          ],
-        ),
-      ),
-      child: Icon(
-        Icons.image_outlined,
-        size: 32,
-        color: Colors.grey[500],
-      ),
-    );
-  }
-
-// Helper method to build loading image
-  Widget _buildLoadingImage() {
-    return Container(
-      height: 110,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.grey[300]!,
-            Colors.grey[200]!,
-          ],
-        ),
-      ),
-      child: const Center(
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'KSH ${earning.amount}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'EARNED',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ),
+        );
+      }).toList(),
     );
   }
 
-// Helper method to calculate time remaining
   String _getTimeRemaining(DateTime? validUntil) {
-    if (validUntil == null) return 'No limit';
+    if (validUntil == null) return 'Expires in 4h 8m';
 
     final now = DateTime.now();
     final difference = validUntil.difference(now);
@@ -550,295 +816,13 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     final minutes = difference.inMinutes % 60;
 
     if (days > 0) {
-      return '${days}d ${hours}h';
+      return 'Expires in ${days}d ${hours}h';
     } else if (hours > 0) {
-      return '${hours}h ${minutes}m';
+      return 'Expires in ${hours}h ${minutes}m';
     } else if (minutes > 0) {
-      return '${minutes}m';
+      return 'Expires in ${minutes}m';
     } else {
-      return 'Ending soon';
+      return 'Expiring soon';
     }
-  }
-
-  bool _isExpiringSoon(DateTime? validUntil) {
-    if (validUntil == null) return false;
-
-    final now = DateTime.now();
-    final difference = validUntil.difference(now);
-
-    return difference.inHours < 24 && difference.inHours >= 0;
-  }
-
-  Widget _buildEarningsDetail(String title, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(String title, String subtitle) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoalsProgress() {
-    final achievements = _dashboardData?.data?.achievements;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildGoalProgressIndicator(
-            'Daily',
-            achievements?.daily?.completed ?? 0,
-            achievements?.daily?.created ?? 1,
-            Colors.blue,
-          ),
-          _buildGoalProgressIndicator(
-            'Weekly',
-            achievements?.weekly?.completed ?? 0,
-            achievements?.weekly?.created ?? 1,
-            Colors.purple,
-          ),
-          _buildGoalProgressIndicator(
-            'Monthly',
-            achievements?.monthly?.completed ?? 0,
-            achievements?.monthly?.created ?? 1,
-            AppColors.accentOrange,
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0);
-  }
-
-  Widget _buildGoalProgressIndicator(
-      String title, int completed, int target, Color color) {
-    // Ensure target is never 0 to avoid division by zero
-    final safeTarget = target > 0 ? target : 1;
-    double percent = completed / safeTarget;
-    if (percent > 1) percent = 1.0;
-    if (percent < 0) percent = 0.0;
-
-    return Column(
-      children: [
-        CircularPercentIndicator(
-          radius: 35.0,
-          lineWidth: 8.0,
-          percent: percent,
-          center: Text(
-            '$completed/$target',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14.0,
-            ),
-          ),
-          progressColor: color,
-          backgroundColor: Colors.grey.withOpacity(0.2),
-          circularStrokeCap: CircularStrokeCap.round,
-          animation: true,
-          animationDuration: 1000,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecentRewards() {
-    final recentRewards = _dashboardData!.data!.recentRewards;
-
-    if (recentRewards == null || recentRewards.isEmpty) {
-      return Container(
-        height: 200,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.campaign_outlined,
-                size: 48,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'No recent rewards',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Start participating in campaigns to earn your first rewards and unlock exciting benefits!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ).animate().fadeIn(duration: 300.ms);
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: recentRewards.take(5).map<Widget>((reward) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.attach_money,
-                        color: Colors.green,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          reward.advertName?.isNotEmpty == true
-                              ? reward.advertName!
-                              : 'Campaign Reward',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          reward.createdAt != null
-                              ? DateFormat('dd MMM yyyy')
-                                  .format(reward.createdAt!)
-                              : 'N/A',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Ksh ${reward.amount?.toString() ?? '0'}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.green,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      reward.type?.isNotEmpty == true
-                          ? reward.type!.toUpperCase()
-                          : 'CREDITED',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
+import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
 import 'package:visible/screens/profile_page.dart';
@@ -21,6 +22,8 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   int _selectedCategory = 0;
   ProductController productController = Get.put(ProductController());
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
 
   // Add PageController for swipe functionality
   late PageController _pageController;
@@ -737,20 +740,22 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Jefferson',
-                          style: TextStyle(
+                          authenticationController.currentUser.value.username ??
+                              'User',
+                          style: const TextStyle(
                             fontSize: 18,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          'Inyanje',
-                          style: TextStyle(
+                          authenticationController.currentUser.value.fullname ??
+                              'Full Name',
+                          style: const TextStyle(
                             fontSize: 18,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
