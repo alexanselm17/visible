@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
@@ -36,6 +37,15 @@ class _ProductsPageState extends State<ProductsPage> {
     super.initState();
     _pageController = PageController(initialPage: _selectedCategory);
     productController.fetchProductsByFilter(filter: _categories[0]['key']);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Colors.black,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
   }
 
   @override
