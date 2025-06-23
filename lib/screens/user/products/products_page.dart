@@ -340,7 +340,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'The ${product.name} is a premium product that offers exceptional quality and value. It is designed to meet the highest standards of excellence and provide an unparalleled experience.',
+                    product.description ?? 'No description available',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,

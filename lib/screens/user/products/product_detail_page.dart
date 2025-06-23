@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
 
@@ -23,6 +24,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   final ImagePicker _picker = ImagePicker();
   File? _selectedScreenshot;
   ProductController productController = Get.put(ProductController());
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
 
   @override
   void initState() {
@@ -37,10 +40,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
+
+    // Initialize video player if video URL exists
+    _initializeVideo();
+  }
+
+  void _initializeVideo() {
+    if (widget.product.videoDownloadUrl != null &&
+        widget.product.videoDownloadUrl!.isNotEmpty) {
+      _videoController =
+          VideoPlayerController.network(widget.product.videoDownloadUrl!);
+      _videoController!.initialize().then((_) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+      }).catchError((error) {
+        print('Error initializing video: $error');
+      });
+    }
   }
 
   @override
   void dispose() {
+    _videoController?.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
     super.dispose();
@@ -148,6 +170,93 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
+  void _showVideoDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black,
+      builder: (BuildContext context) {
+        return Dialog.fullscreen(
+          backgroundColor: Colors.black,
+          child: Stack(
+            children: [
+              Center(
+                child: _isVideoInitialized
+                    ? AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: VideoPlayer(_videoController!),
+                      )
+                    : const CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+              ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              if (_isVideoInitialized)
+                Positioned(
+                  bottom: 50,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (_videoController!.value.isPlaying) {
+                            _videoController!.pause();
+                          } else {
+                            _videoController!.play();
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          _videoController!.value.isPlaying
+                              ? Icons.pause
+                              : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   String _getTimeRemaining() {
     if (widget.product.validUntil != null) {
       final now = DateTime.now();
@@ -168,6 +277,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return "No expiry";
   }
 
+  bool get _isVideoProduct =>
+      widget.product.videoDownloadUrl != null &&
+      widget.product.videoDownloadUrl!.isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +289,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         () => SingleChildScrollView(
           child: Column(
             children: [
-              // Product Image Card with rounded corners matching the screenshot
+              // Product Media Card (Image or Video)
               Container(
                 margin: const EdgeInsets.fromLTRB(16, 50, 16, 16),
                 child: Stack(
@@ -194,19 +307,63 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         borderRadius: BorderRadius.circular(17),
                         child: Stack(
                           children: [
-                            // Product image
+                            // Product media (image or video)
                             GestureDetector(
-                              onTap: _showImageDialog,
-                              child: Container(
+                              onTap: _isVideoProduct
+                                  ? _showVideoDialog
+                                  : _showImageDialog,
+                              child: SizedBox(
                                 width: double.infinity,
                                 height: 300,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image:
-                                        NetworkImage(widget.product.imageUrl!),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                                child: _isVideoProduct
+                                    ? _isVideoInitialized
+                                        ? Stack(
+                                            children: [
+                                              AspectRatio(
+                                                aspectRatio: _videoController!
+                                                    .value.aspectRatio,
+                                                child: VideoPlayer(
+                                                    _videoController!),
+                                              ),
+                                              // Video play overlay
+                                              Center(
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(16),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black
+                                                        .withOpacity(0.5),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    _videoController!
+                                                            .value.isPlaying
+                                                        ? Icons.pause
+                                                        : Icons.play_arrow,
+                                                    color: Colors.white,
+                                                    size: 40,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : Container(
+                                            color: Colors.grey[800],
+                                            child: const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          )
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                                widget.product.imageUrl!),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
                               ),
                             ),
 
@@ -218,7 +375,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 onTap: productController.isDownloading.value
                                     ? null
                                     : () => productController.downloadImage(
-                                        widget.product.downloadUrl!),
+                                        _isVideoProduct
+                                            ? widget.product.videoDownloadUrl!
+                                            : widget.product.downloadUrl!),
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
@@ -234,14 +393,50 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                             strokeWidth: 2,
                                           ),
                                         )
-                                      : const Icon(
-                                          Icons.download,
+                                      : Icon(
+                                          _isVideoProduct
+                                              ? Icons.video_file
+                                              : Icons.download,
                                           color: Colors.black,
                                           size: 20,
                                         ),
                                 ),
                               ),
                             ),
+
+                            // Media type indicator (top left)
+                            if (_isVideoProduct)
+                              Positioned(
+                                top: 16,
+                                left: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.play_circle_outline,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'VIDEO',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -363,12 +558,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'The contents above in the Ad description should be posted as the corresponding WhatsApp Caption for the above media on your WhatsApp. If there is none, leave the Caption blank. Download the media above, post it on your WhatsApp Story, wait for it to load completely and part it on your WhatsApp Status. Copy the screenshot exactly as you have posted and upload below for verification.',
-                          style: TextStyle(
+                          widget.product.description ??
+                              'No description available',
+                          style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,
                             height: 1.4,

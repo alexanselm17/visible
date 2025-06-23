@@ -1081,6 +1081,29 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
+        appBar: AppBar(
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.black,
+          shadowColor: Colors.black,
+          title: const Text(
+            'Profile',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () {
+                _authenticationController.logOut();
+              },
+            ),
+          ],
+        ),
         body: Obx(
           () => SingleChildScrollView(
             child: Padding(

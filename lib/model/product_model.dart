@@ -113,16 +113,20 @@ class Datum {
   DateTime? createdAt;
   String? name;
   int? reward;
+  String? description;
   DateTime? updatedAt;
   DateTime? validUntil;
   String? imagePath;
   String? imageUrl;
   String? downloadUrl;
-  String? userScreenshot;
-  String? screenshotUrl;
-  String? screenshotId;
+  String? videoPath;
+  String? videoUrl;
+  String? videoDownloadUrl;
+  dynamic userScreenshot;
+  dynamic screenshotUrl;
+  dynamic screenshotId;
   int? screenshotCount;
-  List<AllScreenshot>? allScreenshots;
+  List<dynamic>? allScreenshots;
 
   Datum({
     this.id,
@@ -130,11 +134,15 @@ class Datum {
     this.createdAt,
     this.name,
     this.reward,
+    this.description,
     this.updatedAt,
     this.validUntil,
     this.imagePath,
     this.imageUrl,
     this.downloadUrl,
+    this.videoPath,
+    this.videoUrl,
+    this.videoDownloadUrl,
     this.userScreenshot,
     this.screenshotUrl,
     this.screenshotId,
@@ -150,6 +158,7 @@ class Datum {
             : DateTime.parse(json["created_at"]),
         name: json["name"],
         reward: json["reward"],
+        description: json["description"],
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
@@ -159,14 +168,16 @@ class Datum {
         imagePath: json["image_path"],
         imageUrl: json["image_url"],
         downloadUrl: json["download_url"],
+        videoPath: json["video_path"],
+        videoUrl: json["video_url"],
+        videoDownloadUrl: json["video_download_url"],
         userScreenshot: json["user_screenshot"],
         screenshotUrl: json["screenshot_url"],
         screenshotId: json["screenshot_id"],
         screenshotCount: json["screenshot_count"],
         allScreenshots: json["all_screenshots"] == null
             ? []
-            : List<AllScreenshot>.from(
-                json["all_screenshots"]!.map((x) => AllScreenshot.fromJson(x))),
+            : List<dynamic>.from(json["all_screenshots"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {
@@ -175,34 +186,22 @@ class Datum {
         "created_at": createdAt?.toIso8601String(),
         "name": name,
         "reward": reward,
+        "description": description,
         "updated_at": updatedAt?.toIso8601String(),
         "valid_until": validUntil?.toIso8601String(),
         "image_path": imagePath,
         "image_url": imageUrl,
         "download_url": downloadUrl,
+        "video_path": videoPath,
+        "video_url": videoUrl,
+        "video_download_url": videoDownloadUrl,
         "user_screenshot": userScreenshot,
         "screenshot_url": screenshotUrl,
         "screenshot_id": screenshotId,
         "screenshot_count": screenshotCount,
         "all_screenshots": allScreenshots == null
             ? []
-            : List<dynamic>.from(allScreenshots!.map((x) => x.toJson())),
-      };
-}
-
-class AllScreenshot {
-  int? views;
-
-  AllScreenshot({
-    this.views,
-  });
-
-  factory AllScreenshot.fromJson(Map<String, dynamic> json) => AllScreenshot(
-        views: json["views"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "views": views,
+            : List<dynamic>.from(allScreenshots!.map((x) => x)),
       };
 }
 

@@ -38,15 +38,51 @@ class ProductController extends GetxController {
     required File imageFile,
     required String campaignId,
     required String name,
+    required String description,
   }) async {
     try {
       isLoading(true);
       uploadStatus('Uploading...');
 
       final response = await _productRepository.uploadProductAdvert(
+        description: description,
         campaignId: campaignId,
         imageFile: imageFile,
         name: name,
+      );
+
+      if (response != null && response.statusCode == 200) {
+        await campaignController.fetchCampaignProducts(
+            campaignId: campaignId, isRefresh: true);
+
+        Get.back();
+        return CommonUtils.showToast('Product advert uploaded successfully');
+      }
+    } catch (e) {
+      uploadStatus('Upload failed');
+      CommonUtils.showErrorToast(e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> uploadVideoProductAdvert({
+    required File videoFile,
+    required File imageFile,
+    required String campaignId,
+    required String name,
+    required String description,
+  }) async {
+    try {
+      isLoading(true);
+      uploadStatus('Uploading...');
+
+      final response = await _productRepository.uploadVideoProductAdvert(
+        description: description,
+        campaignId: campaignId,
+        imageFile: imageFile,
+        name: name,
+        videoFile: videoFile,
       );
 
       if (response != null && response.statusCode == 200) {

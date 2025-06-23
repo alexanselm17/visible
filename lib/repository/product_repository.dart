@@ -13,6 +13,7 @@ class ProductRepository {
     required File imageFile,
     required String campaignId,
     required String name,
+    required String description,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -20,12 +21,50 @@ class ProductRepository {
           imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
+        "description": description,
         "name": name,
       });
 
       final Response? response = await dioClient.postHTTP(
           "${ApiEndpoints.baseUrl}/campaign/upload_product_advert/$campaignId",
           formData);
+      Logger().i(response!.data);
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      CommonUtils.showErrorToast(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<Response?> uploadVideoProductAdvert({
+    required File imageFile,
+    required String campaignId,
+    required String name,
+    required String description,
+    required File videoFile,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        "image": await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+        "video": await MultipartFile.fromFile(
+          videoFile.path,
+          filename: videoFile.path.split('/').last, // ✅ Fix here
+        ),
+        "description": description,
+        "name": name,
+      });
+
+      final response = await dioClient.postHTTP(
+        "${ApiEndpoints.baseUrl}/campaign/upload_product_advert/$campaignId",
+        formData,
+      );
+
       Logger().i(response!.data);
       return response;
     } on DioException catch (e) {
