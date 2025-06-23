@@ -26,6 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   int totalPages = 10;
   bool isLoading = false;
   List<Map<String, dynamic>> campaignData = [];
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -611,10 +613,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.white, width: 1),
               ),
-              child: const TextField(
+              child: TextField(
+                controller: passwordController,
                 obscureText: true,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
                 ),
@@ -644,10 +647,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.white, width: 1),
               ),
-              child: const TextField(
+              child: TextField(
+                controller: confirmPasswordController,
                 obscureText: true,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
                 ),
@@ -658,31 +662,45 @@ class _ProfilePageState extends State<ProfilePage> {
 
         const SizedBox(height: 30),
 
-        // Update Password Button
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              // Handle password update
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'UPDATE PASSWORD',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
+        _authenticationController.isLoggingIn.value
+            ? const CircularProgressIndicator(
+                color: Colors.white,
+              ).animate().fadeIn(duration: 400.ms, delay: 900.ms)
+            : SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final user = _authenticationController.currentUser.value;
+                    final email = user.email;
+                    final phone = user.phone;
+                    final nationalId = user.nationalId;
+                    _authenticationController.resetPassword(
+                        isLoggedIn: true,
+                        username: user.username!,
+                        email: email!,
+                        phone: phone!,
+                        nationalId: nationalId.toString(),
+                        password: passwordController.text,
+                        passwordConfirmation: confirmPasswordController.text);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'UPDATE PASSWORD',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
       ],
     );
   }
@@ -691,8 +709,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: [
         const SizedBox(height: 40),
-
-        // Profile Picture (smaller in report view)
         Container(
           width: 80,
           height: 80,

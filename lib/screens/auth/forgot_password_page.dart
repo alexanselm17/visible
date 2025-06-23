@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -72,6 +71,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     try {
       await authenticationController.resetPassword(
+        isLoggedIn: false,
         username: _usernameController.text,
         phone: _phoneController.text,
         nationalId: _nationalIdController.text,

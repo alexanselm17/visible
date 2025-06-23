@@ -202,6 +202,7 @@ class AuthenticationController extends GetxController {
   }
 
   Future<void> resetPassword({
+    required bool isLoggedIn,
     required String username,
     required String email,
     required String phone,
@@ -233,7 +234,7 @@ class AuthenticationController extends GetxController {
       if (userSignInResponse.data['ok'] == true) {
         isPasswordReset.value = true;
         CommonUtils.showToast(userSignInResponse.data['message']);
-        Get.off(const LoginPage());
+        isLoggedIn ? null : Get.off(const LoginPage());
       } else {
         isPasswordReset.value = false;
         CommonUtils.showErrorToast(userSignInResponse.data['message']);
