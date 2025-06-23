@@ -63,6 +63,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ),
         ),
         const PopupMenuItem(
+          value: '4',
+          child: Row(
+            children: [
+              Text('Download Payroll'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
           value: '2',
           child: Row(
             children: [
@@ -95,6 +103,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         break;
       case '3':
         Get.to(const UsersScreen());
+      case '4':
+        Get.put<AuthenticationController>(AuthenticationController())
+            .downloadPayRoll();
+
         break;
 
       case 'delete':

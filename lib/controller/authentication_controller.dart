@@ -7,6 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/roles_constants.dart';
 import 'package:visible/model/auth/sign_in_model.dart';
+import 'package:visible/model/users/report.dart' as report;
 import 'package:visible/repository/auth_repository.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -278,5 +279,46 @@ class AuthenticationController extends GetxController {
       CommonUtils.showErrorToast("Failed to fetch user dashboard: $e");
     }
     return null;
+  }
+
+  Future<void> downloadPayRoll() async {
+    try {
+      final file = await authRepository.downloadPayRoll();
+
+      if (file != null) {
+        CommonUtils.showToast("Payroll saved to Downloads: ${file.path}");
+      } else {
+        CommonUtils.showErrorToast("Payroll not downloaded.");
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Failed to download payroll: $e");
+    }
+  }
+
+  Future getProfileData({
+    required String userId,
+    required String fromDate,
+    required String toDate,
+    required String status,
+    required int page,
+  }) async {
+    try {
+      final response = await authRepository.getProfileData(
+        userId: userId,
+        fromDate: fromDate,
+        toDate: toDate,
+        status: status,
+        page: page,
+      );
+      Logger().i("Profile data fetched successfully: ${response!.data}");
+      if (response.statusCode == 200) {
+        final userReport = report.UserReport.fromJson(response.data);
+        return userReport.data!.data;
+      } else {
+        CommonUtils.showErrorToast("Payroll not downloaded.");
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Failed to download payroll: $e");
+    }
   }
 }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/model/users/report.dart';
 import 'package:visible/screens/reports/customer_report.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -42,18 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
-    _loadDummyData();
-  }
-
-  void _loadDummyData() {
-    campaignData = List.generate(
-        10,
-        (index) => {
-              'id': index + 1,
-              'name': 'Johnny Walker',
-              'activity': '2/5',
-              'status': selectedTab.toLowerCase(),
-            });
+    _fetchReportData();
   }
 
   Future<void> _selectDate(BuildContext context, bool isFromDate) async {
@@ -155,37 +146,49 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       isLoading = true;
     });
-
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
+      List<Datum> data = await _authenticationController.getProfileData(
+        fromDate: DateFormat('yyyy-MM-dd HH:mm:ss').format(fromDate!),
+        toDate: DateFormat('yyyy-MM-dd HH:mm:ss').format(toDate!),
+        status: selectedTab == "Ongoing"
+            ? 'ongoing'
+            : selectedTab == "Incomplete"
+                ? 'available'
+                : selectedTab == "Completed"
+                    ? 'completed'
+                    : 'account_activity',
+        page: currentPage,
+        userId: '${_authenticationController.currentUser.value.id}',
+      );
 
-      // This is where you would make your actual API call
-      // Example:
-      // final response = await ApiService.getReportData(
-      //   fromDate: fromDate!,
-      //   toDate: toDate!,
-      //   status: selectedTab,
-      //   page: currentPage,
-      // );
-
-      // For now, using dummy data
       setState(() {
-        campaignData = List.generate(
-            10,
-            (index) => {
-                  'id': (currentPage - 1) * 10 + index + 1,
-                  'name': 'Johnny Walker',
-                  'activity': '2/5',
-                  'status': selectedTab.toLowerCase(),
-                });
+        totalPages = (data.length / 10).ceil();
+        final int startIndex = (currentPage - 1) * 10;
+        campaignData = data.asMap().entries.map((entry) {
+          final index = entry.key;
+          final datum = entry.value;
+
+          return {
+            'id': startIndex + index + 1,
+            'name': datum.name ?? 'Unknown',
+            'activity': '${datum.screenshotCount}/5',
+            'status': selectedTab.toLowerCase(),
+          };
+        }).toList();
+        // campaignData = List.generate(
+        //     10,
+        //     (index) => {
+        //           'id': (currentPage - 1) * 10 + index + 1,
+        //           'name': 'Johnny Walker',
+        //           'activity': '2/5',
+        //           'status': selectedTab.toLowerCase(),
+        //         });
         isLoading = false;
       });
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      // Handle error
       print('Error fetching report data: $e');
     }
   }

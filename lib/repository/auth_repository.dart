@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/app_constants.dart';
 import 'package:visible/service/network/dio_client.dart';
@@ -169,5 +172,60 @@ class AuthRepository {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future getProfileData({
+    required String userId,
+    required String fromDate,
+    required String toDate,
+    required String status,
+    required int page,
+  }) async {
+    try {
+      final Response? response = await dioClient.getHTTP(
+        '${ApiEndpoints.baseUrl}/campaign/report/timely_response?user_id=$userId&from_date=$fromDate&to_date=$toDate&status=$status',
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<File?> downloadPayRoll() async {
+    try {
+      final response = await dioClient.getHTTPDownload(
+        "${ApiEndpoints.baseUrl}/campaign/report/excell_payment",
+      );
+
+      if (response != null && response.statusCode == 200) {
+        // 🔐 Ask for permission
+        final status = await Permission.storage.request();
+        if (!status.isGranted) {
+          CommonUtils.showErrorToast("Storage permission denied");
+          return null;
+        }
+
+        // 📂 Path to real Downloads folder (works on most Android devices)
+        final downloadsDir = Directory("/storage/emulated/0/Download");
+        final filePath = "${downloadsDir.path}/payroll.xlsx";
+        final file = File(filePath);
+
+        // 💾 Save the file
+        await file.writeAsBytes(response.data, flush: true);
+
+        CommonUtils.showToast("Payroll downloaded to Downloads folder.");
+        return file;
+      } else {
+        CommonUtils.showErrorToast(
+            response?.statusMessage ?? "Download failed");
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast("Download error: $e");
+    }
+
+    return null;
   }
 }

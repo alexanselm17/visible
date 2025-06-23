@@ -93,6 +93,27 @@ class ApiBaseHelper {
     }
   }
 
+  getHTTPDownload(String url, {Map<String, dynamic>? queryParameters}) async {
+    try {
+      Response response = await baseAPI.get(
+        url,
+        queryParameters: queryParameters,
+        options: Options(
+          responseType: ResponseType.bytes,
+        ),
+      );
+      return response;
+    } on DioException catch (e) {
+      print(e);
+      return Response(
+        requestOptions: e.requestOptions,
+        data: e.response?.data,
+        statusCode: e.response?.statusCode,
+        statusMessage: e.response?.statusMessage,
+      );
+    }
+  }
+
   getHTTPBody(String url, dynamic data) async {
     try {
       Response response = await baseAPI.get(
