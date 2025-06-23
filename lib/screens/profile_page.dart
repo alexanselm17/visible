@@ -175,14 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
             'status': selectedTab.toLowerCase(),
           };
         }).toList();
-        // campaignData = List.generate(
-        //     10,
-        //     (index) => {
-        //           'id': (currentPage - 1) * 10 + index + 1,
-        //           'name': 'Johnny Walker',
-        //           'activity': '2/5',
-        //           'status': selectedTab.toLowerCase(),
-        //         });
+
         isLoading = false;
       });
     } catch (e) {
@@ -219,14 +212,14 @@ class _ProfilePageState extends State<ProfilePage> {
     if (fromDate != null && toDate != null) {
       return '${_formatDate(fromDate)} - ${_formatDate(toDate)}';
     }
-    return '13/6/25 - 14/6/25'; // Default display
+    return '13/6/25 - 14/6/25';
   }
 
-  Widget _buildDatePicker(String label, DateTime? date, bool isFromDate) {
+  Widget _buildDatePicker(String label, bool isFromDate) {
     return GestureDetector(
       onTap: () => _selectDate(context, isFromDate),
       child: Container(
-        width: 120,
+        width: 60,
         height: 40,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -234,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: Center(
           child: Text(
-            date != null ? _formatDate(date) : label,
+            label,
             style: const TextStyle(
               color: Colors.black,
               fontSize: 14,
@@ -252,14 +245,15 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          border: isSelected ? null : Border.all(color: Colors.grey.shade600),
+          color: Colors.transparent,
+          border: isSelected
+              ? const Border(bottom: BorderSide(color: Colors.white, width: 2))
+              : null,
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white,
+          style: const TextStyle(
+            color: Colors.white,
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
@@ -877,6 +871,14 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 65),
+          child: Divider(
+            color: Colors.white,
+            thickness: 2,
+            height: 20,
+          ),
+        ),
 
         const SizedBox(height: 12),
 
@@ -896,16 +898,14 @@ class _ProfilePageState extends State<ProfilePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildDatePicker('FROM', fromDate, true),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Column(
-                children: [
-                  const Text(
+            _buildDatePicker('FROM', true),
+            Column(
+              children: [
+                Container(
+                  color: const Color.fromARGB(255, 78, 2, 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: const Text(
                     'SHOWING FOR',
                     style: TextStyle(
                       color: Colors.white,
@@ -913,25 +913,26 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
-                    _getDateRangeDisplay(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _getDateRangeDisplay(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const Text(
-                    '12:00 AM - 12:00 AM',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                    ),
+                ),
+                const Text(
+                  '12:00 AM - 12:00 AM',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            _buildDatePicker('TO', toDate, false),
+            _buildDatePicker('TO', false),
           ],
         ),
 
@@ -944,8 +945,6 @@ class _ProfilePageState extends State<ProfilePage> {
             _buildTabButton('Ongoing', selectedTab == 'Ongoing'),
             _buildTabButton('Incomplete', selectedTab == 'Incomplete'),
             _buildTabButton('Completed', selectedTab == 'Completed'),
-            _buildTabButton(
-                'Account activity', selectedTab == 'Account activity'),
           ],
         ),
 
@@ -956,9 +955,9 @@ class _ProfilePageState extends State<ProfilePage> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey[900],
+            color: Colors.black,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[700]!, width: 1),
+            border: Border.all(color: Colors.white, width: 3),
           ),
           child: Column(
             children: [
@@ -997,7 +996,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: CircularProgressIndicator(color: Colors.white),
                 )
               else
-                ...campaignData.map((campaign) => _buildCampaignRow(campaign)),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: campaignData.length,
+                  itemBuilder: (context, index) =>
+                      _buildCampaignRow(campaignData[index]),
+                  separatorBuilder: (context, index) => const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Divider(
+                      color: Colors.grey,
+                      thickness: 2,
+                      height: 2,
+                    ),
+                  ),
+                )
             ],
           ),
         ),

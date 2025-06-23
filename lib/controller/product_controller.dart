@@ -252,6 +252,95 @@ class ProductController extends GetxController {
     }
   }
 
+  String _getVideoExtension(String url) {
+    final uri = Uri.parse(url);
+    final path = uri.path.toLowerCase();
+
+    if (path.endsWith('.mp4')) return 'mp4';
+    if (path.endsWith('.mov')) return 'mov';
+    if (path.endsWith('.avi')) return 'avi';
+    if (path.endsWith('.mkv')) return 'mkv';
+    if (path.endsWith('.webm')) return 'webm';
+    if (path.endsWith('.3gp')) return '3gp';
+
+    // Default to mp4 if extension can't be determined
+    return 'mp4';
+  }
+
+  Future downloadVideo(String videoUrl) async {
+    isDownloading.value = true;
+    final hasPermission = await _requestPermission();
+    if (!hasPermission) {
+      isDownloading.value = false;
+      Get.snackbar(
+        'Permission Denied',
+        'Storage or photo permission is required to download videos',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      // Show progress indicator for large video files
+      var downloadProgress = 0.0.obs;
+
+      final response = await http.get(
+        Uri.parse(videoUrl),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final tempDir = await getTemporaryDirectory();
+
+        // Get video file extension from URL or default to mp4
+        String extension = _getVideoExtension(videoUrl);
+
+        final file = File(
+            '${tempDir.path}/video_${DateTime.now().millisecondsSinceEpoch}.$extension');
+
+        await file.writeAsBytes(response.bodyBytes);
+
+        // Save video to gallery
+        final saved = await GallerySaver.saveVideo(
+          file.path,
+          albumName: "Downloaded Videos", // Optional: create custom album
+        );
+
+        isDownloading.value = false;
+
+        if (saved == true) {
+          Get.snackbar(
+            'Download Complete',
+            'Video saved to your gallery',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: const Duration(seconds: 3),
+          );
+        } else {
+          throw Exception('GallerySaver returned false.');
+        }
+      } else {
+        throw Exception('Failed to download video: ${response.statusCode}');
+      }
+    } catch (e) {
+      isDownloading.value = false;
+      Get.snackbar(
+        'Download Failed',
+        'Could not download the video. Please try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      print('Video download error: $e');
+    }
+  }
+
   Future downloadImage(String imageUrl) async {
     isDownloading.value = true;
     final hasPermission = await _requestPermission();

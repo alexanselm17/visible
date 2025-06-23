@@ -374,10 +374,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               child: GestureDetector(
                                 onTap: productController.isDownloading.value
                                     ? null
-                                    : () => productController.downloadImage(
-                                        _isVideoProduct
-                                            ? widget.product.videoDownloadUrl!
-                                            : widget.product.downloadUrl!),
+                                    : () => _isVideoProduct
+                                        ? productController.downloadVideo(
+                                            widget.product.videoDownloadUrl!)
+                                        : productController.downloadImage(
+                                            widget.product.downloadUrl!),
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(

@@ -13,7 +13,7 @@ import 'package:visible/shared_preferences/user_pref.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  // await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
   await Firebase.initializeApp();
   try {
     setupLocator();

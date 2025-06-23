@@ -18,7 +18,6 @@ class ProductAnalyticsPage extends StatefulWidget {
 }
 
 class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
-  // Generate sample data for 1 day (24 hours)
   List<FlSpot> generateViewsData() {
     List<FlSpot> spots = [];
 
@@ -27,7 +26,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
     if (screenshots == null || screenshots.isEmpty) return spots;
 
     for (int i = 0; i < screenshots.length; i++) {
-      final views = screenshots[i].views ?? 0;
+      final views = screenshots[i]['views'] ?? 0;
       spots.add(FlSpot(i.toDouble(), views.toDouble()));
     }
 
@@ -190,7 +189,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
   }
 
   Widget _buildStatsCards() {
-    int totalViews = widget.product.allScreenshots!.last.views ?? 0;
+    int totalViews = widget.product.allScreenshots!.last['views'] ?? 0;
     int totalScreenshots = widget.product.screenshotCount ?? 0;
     double avgViewsPerScreenshot =
         totalScreenshots > 0 ? totalViews / totalScreenshots : 0;
