@@ -723,7 +723,7 @@ class _ProductsPageState extends State<ProductsPage> {
           elevation: 0,
           automaticallyImplyLeading: false,
           title: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -735,12 +735,11 @@ class _ProductsPageState extends State<ProductsPage> {
                 GestureDetector(
                   onTap: () => Get.to(const ProfilePage()),
                   child: const CircleAvatar(
-                    radius: 16,
+                    radius: 20,
                     backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, color: Colors.white, size: 20),
+                    child: Icon(Icons.person, color: Colors.white, size: 23),
                   ),
                 ),
-                const SizedBox(width: 12),
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,7 +754,7 @@ class _ProductsPageState extends State<ProductsPage> {
                               : '',
                           style: const TextStyle(
                             color: Colors.black,
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
                             height: 1.1,
                           ),
@@ -771,7 +770,7 @@ class _ProductsPageState extends State<ProductsPage> {
                               : '',
                           style: const TextStyle(
                             color: Colors.black,
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
                             height: 1.1,
                           ),

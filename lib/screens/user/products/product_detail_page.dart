@@ -34,7 +34,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: Colors.black,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: Colors.black,
         systemNavigationBarIconBrightness: Brightness.light,
@@ -319,11 +319,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     ? _isVideoInitialized
                                         ? Stack(
                                             children: [
-                                              AspectRatio(
-                                                aspectRatio: _videoController!
-                                                    .value.aspectRatio,
-                                                child: VideoPlayer(
-                                                    _videoController!),
+                                              SizedBox.expand(
+                                                child: FittedBox(
+                                                  fit: BoxFit.cover,
+                                                  child: SizedBox(
+                                                    width: _videoController!
+                                                        .value.size.width,
+                                                    height: _videoController!
+                                                        .value.size.height,
+                                                    child: VideoPlayer(
+                                                        _videoController!),
+                                                  ),
+                                                ),
                                               ),
                                               // Video play overlay
                                               Center(
