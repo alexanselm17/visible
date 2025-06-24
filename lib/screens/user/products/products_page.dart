@@ -718,66 +718,85 @@ class _ProductsPageState extends State<ProductsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                GestureDetector(
+                  onTap: () => Get.to(const ProfilePage()),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, color: Colors.white, size: 20),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Obx(
+                        () => Text(
+                          authenticationController
+                                      .currentUser.value.username?.isNotEmpty ==
+                                  true
+                              ? authenticationController
+                                  .currentUser.value.username!
+                              : '',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => Text(
+                          authenticationController
+                                      .currentUser.value.fullname?.isNotEmpty ==
+                                  true
+                              ? authenticationController
+                                  .currentUser.value.fullname!
+                              : '',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                const SizedBox(width: 12),
+                GestureDetector(
+                    onTap: () {},
+                    child: const Icon(Icons.refresh,
+                        color: Colors.black, size: 24)),
+                const SizedBox(width: 8),
+                const Icon(Icons.notifications_outlined,
+                    color: Colors.black, size: 24),
+              ],
+            ),
+          ),
+        ),
         backgroundColor: Colors.black,
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(0),
-                ),
-                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Get.to(const ProfilePage()),
-                      child: const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.grey,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          authenticationController.currentUser.value.username ??
-                              'User',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          authenticationController.currentUser.value.fullname ??
-                              'Full Name',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.refresh, color: Colors.white),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(

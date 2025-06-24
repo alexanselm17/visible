@@ -47,19 +47,19 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
   void initState() {
     super.initState();
 
-    // if (isEditing) {
-    //   _nameController.text = widget.product!.name ?? '';
-    //   _descriptionController.text = widget.product!.description ?? '';
+    if (isEditing) {
+      _nameController.text = widget.product!.name ?? '';
+      // _descriptionController.text = widget.product!.description ?? '';
 
-    //   if (widget.product!.imageUrl != null) {
-    //     _existingImageUrl = widget.product!.imageUrl;
-    //     _selectedMediaType = MediaType.image;
-    //   }
-    //   if (widget.product!.videoUrl != null) {
-    //     _existingVideoUrl = widget.product!.videoUrl;
-    //     _selectedMediaType = MediaType.video;
-    //   }
-    // }
+      if (widget.product!.imageUrl != null) {
+        _existingImageUrl = widget.product!.imageUrl;
+        _selectedMediaType = MediaType.image;
+      }
+      // if (widget.product!.videoUrl != null) {
+      //   _existingVideoUrl = widget.product!.videoUrl;
+      //   _selectedMediaType = MediaType.video;
+      // }
+    }
   }
 
   @override

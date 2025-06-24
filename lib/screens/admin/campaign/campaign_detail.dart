@@ -129,6 +129,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             _buildCampaignStats(),
             const SizedBox(height: 16),
             _buildCampaignProducts(),
+            const SizedBox(height: 136),
           ],
         ),
       ),
@@ -597,7 +598,6 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Row(
               children: [
                 Container(
@@ -637,7 +637,6 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
               ],
             ),
             const SizedBox(height: 24),
-
             ListTile(
               onTap: () {
                 Get.back();
@@ -666,70 +665,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
               trailing: Icon(Icons.arrow_forward_ios,
                   color: Colors.grey[400], size: 16),
             ),
-
             const SizedBox(height: 8),
-
-            // // Financial Report Option
-            // ListTile(
-            //   onTap: () {
-            //     Get.back();
-            //     _generateFinancialReport();
-            //   },
-            //   leading: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: Colors.green.withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //     child: Icon(
-            //       Icons.account_balance_wallet_rounded,
-            //       color: Colors.green[700],
-            //       size: 20,
-            //     ),
-            //   ),
-            //   title: const Text(
-            //     'Financial Report',
-            //     style: TextStyle(fontWeight: FontWeight.w600),
-            //   ),
-            //   subtitle: Text(
-            //     'Budget utilization, rewards distributed',
-            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            //   ),
-            //   trailing: Icon(Icons.arrow_forward_ios,
-            //       color: Colors.grey[400], size: 16),
-            // ),
-
-            // const SizedBox(height: 8),
-
-            // // Product Report Option
-            // ListTile(
-            //   onTap: () {
-            //     Get.back();
-            //     _generateProductReport();
-            //   },
-            //   leading: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: Colors.purple.withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //     child: Icon(
-            //       Icons.inventory_rounded,
-            //       color: Colors.purple[700],
-            //       size: 20,
-            //     ),
-            //   ),
-            //   title: const Text(
-            //     'Product Report',
-            //     style: TextStyle(fontWeight: FontWeight.w600),
-            //   ),
-            //   subtitle: Text(
-            //     'Product performance and engagement',
-            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            //   ),
-            //   trailing: Icon(Icons.arrow_forward_ios,
-            //       color: Colors.grey[400], size: 16),
-            // ),
           ],
         ),
       ),
@@ -738,28 +674,6 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
 
   void _generatePerformanceReport() {
     Get.to(() => CampaignReportPage(campaignId: widget.campaign.id!));
-  }
-
-  void _generateFinancialReport() {
-    // Navigate to financial report page or generate report
-    // Get.to(() => CampaignFinancialReport(campaign: widget.campaign));
-    Get.snackbar(
-      'Report',
-      'Generating financial report...',
-      backgroundColor: Colors.green[100],
-      colorText: Colors.green[800],
-    );
-  }
-
-  void _generateProductReport() {
-    // Navigate to product report page or generate report
-    // Get.to(() => CampaignProductReport(campaign: widget.campaign));
-    Get.snackbar(
-      'Report',
-      'Generating product report...',
-      backgroundColor: Colors.purple[100],
-      colorText: Colors.purple[800],
-    );
   }
 
   Widget _buildProductCard(prod.Datum product) {

@@ -82,6 +82,7 @@ class UsersController extends GetxController {
       isLoading.value = false;
 
       if (userResponse!.statusCode == 200) {
+        searchUser.clear();
         await getAllUsers(isRefresh: true);
         Get.back();
         return CommonUtils.showToast(userResponse.data['message']);

@@ -302,35 +302,54 @@ class _ProfilePageState extends State<ProfilePage> {
     final phone = user.phone ?? 'No phone provided';
     final from = user.createdAt;
 
-    String calculateTimeDifferenceAlternative(DateTime from) {
+    String calculateTimeDifferenceLong(DateTime from) {
       final DateTime now = DateTime.now();
       final int totalDays = now.difference(from).inDays;
 
       if (totalDays == 0) return 'Today';
-      if (totalDays == 1) return '1 Day.';
+      if (totalDays == 1) return '1 day';
 
-      final int years = totalDays ~/ 365;
-      final int remainingDaysAfterYears = totalDays % 365;
-      final int months = remainingDaysAfterYears ~/ 30;
-      final int remainingDaysAfterMonths = remainingDaysAfterYears % 30;
-      final int weeks = remainingDaysAfterMonths ~/ 7;
-      final int days = remainingDaysAfterMonths % 7;
+      // For very long periods, use your original logic
+      if (totalDays > 365) {
+        final int years = totalDays ~/ 365;
+        final int remainingDaysAfterYears = totalDays % 365;
+        final int months = remainingDaysAfterYears ~/ 30;
+        final int remainingDaysAfterMonths = remainingDaysAfterYears % 30;
+        final int weeks = remainingDaysAfterMonths ~/ 7;
+        final int days = remainingDaysAfterMonths % 7;
+
+        List<String> parts = [];
+
+        if (years > 0) parts.add('$years ${years == 1 ? 'year' : 'years'}');
+        if (months > 0) {
+          parts.add('$months ${months == 1 ? 'month' : 'months'}');
+        }
+        if (weeks > 0) parts.add('$weeks ${weeks == 1 ? 'week' : 'weeks'}');
+        if (days > 0) parts.add('$days ${days == 1 ? 'day' : 'days'}');
+
+        return parts.join(', ');
+      }
+
+      // For periods less than a year, show days, hours, minutes
+      final Duration difference = now.difference(from);
+      final int totalMinutes = difference.inMinutes;
+      final int days = totalMinutes ~/ (24 * 60);
+      final int hours = (totalMinutes % (24 * 60)) ~/ 60;
+      final int minutes = totalMinutes % 60;
 
       List<String> parts = [];
 
-      if (years > 0) parts.add('$years ${years == 1 ? 'Year' : 'Years'}');
-      if (months > 0) parts.add('$months ${months == 1 ? 'Month' : 'Months'}');
-      if (weeks > 0) parts.add('$weeks ${weeks == 1 ? 'Week' : 'Weeks'}');
-      if (days > 0) parts.add('$days ${days == 1 ? 'Day' : 'Days'}');
+      if (days > 0) parts.add('$days ${days == 1 ? 'day' : 'days'}');
+      if (hours > 0) parts.add('$hours ${hours == 1 ? 'hour' : 'hours'}');
+      if (minutes > 0) {
+        parts.add('$minutes ${minutes == 1 ? 'minute' : 'minutes'}');
+      }
 
-      return '${parts.join(', ')}.';
+      return parts.join(' ');
     }
 
     return Column(
       children: [
-        const SizedBox(height: 40),
-
-        // Profile Picture
         Container(
           width: 100,
           height: 100,
@@ -412,55 +431,58 @@ class _ProfilePageState extends State<ProfilePage> {
         ).animate().fadeIn(duration: 400.ms, delay: 450.ms),
 
         const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.white, width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                calculateTimeDifferenceAlternative(from!),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Text(
-                  'ACTIVE',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  calculateTimeDifferenceLong(from!),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
-
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'ACTIVE',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
+        ),
         const SizedBox(height: 40),
 
         // Earnings Section
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Piggy bank icon
             Container(
-              width: 60,
-              height: 60,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: Colors.orange.shade300,
                 borderRadius: BorderRadius.circular(30),
@@ -468,12 +490,13 @@ class _ProfilePageState extends State<ProfilePage> {
               child: const Icon(
                 Icons.savings,
                 color: Colors.white,
-                size: 30,
+                size: 45,
               ),
             ),
             const SizedBox(width: 16),
             const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'You have earned a total of',
@@ -481,15 +504,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white,
                     fontSize: 14,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 4),
                 Text(
                   'KSH 13,450',
                   style: TextStyle(
                     color: Colors.orange,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 2),
                 Text(
@@ -498,12 +523,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white,
                     fontSize: 14,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ],
         ).animate().fadeIn(duration: 400.ms, delay: 550.ms),
-
         const SizedBox(height: 30),
 
         // My Report Button
@@ -522,7 +547,7 @@ class _ProfilePageState extends State<ProfilePage> {
               foregroundColor: Colors.black,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
             child: const Text(
@@ -535,16 +560,16 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
-        const SizedBox(height: 50),
+        const SizedBox(height: 20),
 
         // Divider
         Container(
-          height: 1,
+          height: 2,
           color: Colors.white,
           margin: const EdgeInsets.symmetric(horizontal: 20),
         ).animate().fadeIn(duration: 400.ms, delay: 650.ms),
 
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
 
         // Update Password Section
         const Text(
@@ -703,12 +728,66 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildReportView() {
+    final user = _authenticationController.currentUser.value;
+    final displayName = (user.fullname?.isNotEmpty == true)
+        ? user.fullname
+        : user.username ?? 'User';
+    final email = user.email ?? 'No email provided';
+    final phone = user.phone ?? 'No phone provided';
+    final from = user.createdAt;
+
+    String calculateTimeDifferenceLong(DateTime from) {
+      final DateTime now = DateTime.now();
+      final int totalDays = now.difference(from).inDays;
+
+      if (totalDays == 0) return 'Today';
+      if (totalDays == 1) return '1 day';
+
+      // For very long periods, use your original logic
+      if (totalDays > 365) {
+        final int years = totalDays ~/ 365;
+        final int remainingDaysAfterYears = totalDays % 365;
+        final int months = remainingDaysAfterYears ~/ 30;
+        final int remainingDaysAfterMonths = remainingDaysAfterYears % 30;
+        final int weeks = remainingDaysAfterMonths ~/ 7;
+        final int days = remainingDaysAfterMonths % 7;
+
+        List<String> parts = [];
+
+        if (years > 0) parts.add('$years ${years == 1 ? 'year' : 'years'}');
+        if (months > 0) {
+          parts.add('$months ${months == 1 ? 'month' : 'months'}');
+        }
+        if (weeks > 0) parts.add('$weeks ${weeks == 1 ? 'week' : 'weeks'}');
+        if (days > 0) parts.add('$days ${days == 1 ? 'day' : 'days'}');
+
+        return parts.join(', ');
+      }
+
+      // For periods less than a year, show days, hours, minutes
+      final Duration difference = now.difference(from);
+      final int totalMinutes = difference.inMinutes;
+      final int days = totalMinutes ~/ (24 * 60);
+      final int hours = (totalMinutes % (24 * 60)) ~/ 60;
+      final int minutes = totalMinutes % 60;
+
+      List<String> parts = [];
+
+      if (days > 0) parts.add('$days ${days == 1 ? 'day' : 'days'}');
+      if (hours > 0) parts.add('$hours ${hours == 1 ? 'hour' : 'hours'}');
+      if (minutes > 0) {
+        parts.add('$minutes ${minutes == 1 ? 'minute' : 'minutes'}');
+      }
+
+      return parts.join(' ');
+    }
+
     return Column(
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
         Container(
-          width: 80,
-          height: 80,
+          width: 100,
+          height: 100,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -720,28 +799,24 @@ class _ProfilePageState extends State<ProfilePage> {
           child: const ClipOval(
             child: Icon(
               Icons.person,
-              size: 40,
+              size: 50,
               color: Colors.black,
             ),
           ),
         ),
 
-        const SizedBox(height: 16),
-
-        // Name
+        const SizedBox(height: 20),
         Text(
-          _authenticationController.currentUser.value.fullname ?? 'User',
+          displayName!,
           style: const TextStyle(
             fontFamily: 'Leotaro',
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
 
         const SizedBox(height: 8),
-
-        // Status Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
@@ -758,108 +833,125 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
 
-        const SizedBox(height: 12),
-
-        // Email and Phone
-        Text(
-          _authenticationController.currentUser.value.email ?? 'No email',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          _authenticationController.currentUser.value.phone ?? 'No phone',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-        ),
-
         const SizedBox(height: 16),
-
-        // Duration Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white, width: 1),
+        Text(
+          email,
+          style: const TextStyle(
+            fontFamily: 'TT Hoves Pro Trial',
+            color: Colors.white,
+            fontSize: 16,
           ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '1 Month, 3 Weeks, 4 Days.',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-              SizedBox(width: 8),
-              Text(
-                'ACTIVE',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+        ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
+
+        const SizedBox(height: 8),
+        Text(
+          phone,
+          style: const TextStyle(
+            fontFamily: 'TT Hoves Pro Trial',
+            color: Colors.white,
+            fontSize: 16,
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white, width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  calculateTimeDifferenceLong(from!),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'ACTIVE',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
 
-        // Earnings Section (smaller)
+        // Earnings Section
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: Colors.orange.shade300,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: const Icon(
                 Icons.savings,
                 color: Colors.white,
-                size: 20,
+                size: 45,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'You have earned a total of',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                   ),
+                  textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 4),
                 Text(
                   'KSH 13,450',
                   style: TextStyle(
                     color: Colors.orange,
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 2),
                 Text(
                   'so far.',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ],
         ),
-
         const SizedBox(height: 30),
 
         // My Performance Report Section
@@ -902,14 +994,17 @@ class _ProfilePageState extends State<ProfilePage> {
             Column(
               children: [
                 Container(
-                  color: const Color.fromARGB(255, 78, 2, 2),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 119, 71, 7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: const Text(
                     'SHOWING FOR',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 8,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
