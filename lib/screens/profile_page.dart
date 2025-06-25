@@ -556,7 +556,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ),
+          ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
         ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 20),
@@ -802,7 +802,11 @@ class _ProfilePageState extends State<ProfilePage> {
               color: Colors.black,
             ),
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 200.ms).scale(
+            begin: const Offset(0.8, 0.8),
+            end: const Offset(1, 1),
+            duration: 400.ms,
+            curve: Curves.easeOut),
 
         const SizedBox(height: 20),
         Text(
@@ -830,7 +834,7 @@ class _ProfilePageState extends State<ProfilePage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
 
         const SizedBox(height: 16),
         Text(
@@ -850,7 +854,7 @@ class _ProfilePageState extends State<ProfilePage> {
             color: Colors.white,
             fontSize: 16,
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 450.ms),
 
         const SizedBox(height: 24),
         Padding(
@@ -895,7 +899,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
         const SizedBox(height: 40),
 
         // Earnings Section
@@ -950,7 +954,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ],
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
         const SizedBox(height: 30),
 
         // My Performance Report Section
@@ -961,15 +965,15 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 65),
-          child: Divider(
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 65),
+          child: const Divider(
             color: Colors.white,
             thickness: 2,
             height: 20,
-          ),
-        ),
+          ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 12),
 
@@ -981,7 +985,7 @@ class _ProfilePageState extends State<ProfilePage> {
             fontSize: 12,
           ),
           textAlign: TextAlign.center,
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 16),
 
@@ -989,7 +993,9 @@ class _ProfilePageState extends State<ProfilePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildDatePicker('FROM', true),
+            _buildDatePicker('FROM', true)
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 600.ms),
             Column(
               children: [
                 Container(
@@ -1007,7 +1013,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
                 const SizedBox(height: 4),
                 Text(
                   _getDateRangeDisplay(),
@@ -1016,7 +1022,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
+                ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
                 const Text(
                   '12:00 AM - 12:00 AM',
                   style: TextStyle(
@@ -1028,7 +1034,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             _buildDatePicker('TO', false),
           ],
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 16),
 
@@ -1040,7 +1046,7 @@ class _ProfilePageState extends State<ProfilePage> {
             _buildTabButton('Incomplete', selectedTab == 'Incomplete'),
             _buildTabButton('Completed', selectedTab == 'Completed'),
           ],
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 16),
 
@@ -1107,7 +1113,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
             ],
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 16),
 
@@ -1169,7 +1175,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ],
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
 
         const SizedBox(height: 20),
 
@@ -1197,7 +1203,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
       ],
     );
   }
