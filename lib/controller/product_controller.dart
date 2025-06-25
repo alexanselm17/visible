@@ -39,6 +39,8 @@ class ProductController extends GetxController {
     required String campaignId,
     required String name,
     required String description,
+    required List badge,
+    required String category,
   }) async {
     try {
       isLoading(true);
@@ -49,6 +51,8 @@ class ProductController extends GetxController {
         campaignId: campaignId,
         imageFile: imageFile,
         name: name,
+        badge: badge,
+        category: category,
       );
 
       if (response != null && response.statusCode == 200) {
@@ -72,6 +76,8 @@ class ProductController extends GetxController {
     required String campaignId,
     required String name,
     required String description,
+    required List badge,
+    required String category,
   }) async {
     try {
       isLoading(true);
@@ -83,6 +89,8 @@ class ProductController extends GetxController {
         imageFile: imageFile,
         name: name,
         videoFile: videoFile,
+        badge: badge,
+        category: category,
       );
 
       if (response != null && response.statusCode == 200) {

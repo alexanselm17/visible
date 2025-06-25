@@ -22,6 +22,9 @@ class AuthRepository {
     required String cpassword,
     required String location,
     required String gender,
+    required String county,
+    required String town,
+    required String estate,
   }) async {
     try {
       var body = {
@@ -34,6 +37,9 @@ class AuthRepository {
         "occupation": occupation,
         "location": location,
         "password_confirmation": cpassword,
+        "county": county,
+        "town": town,
+        "estate": estate,
         "gender": gender
       };
       Logger().d(body);

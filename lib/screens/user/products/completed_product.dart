@@ -261,32 +261,41 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: MediaQuery.of(context).size.width - 40,
-          height: 200,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white, width: 2),
-            image: DecorationImage(
-              image: NetworkImage(widget.product.imageUrl!),
-              fit: BoxFit.cover,
+        Expanded(
+          flex: 1,
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Container(
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: NetworkImage(widget.product.imageUrl!),
+                  fit: BoxFit.cover,
+                  onError: (exception, stackTrace) =>
+                      const Icon(Icons.image_not_supported),
+                ),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
-
-        // Completed Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(7),
             border: Border.all(color: Colors.green, width: 1),
           ),
           child: const Text(
             'COMPLETED',
             style: TextStyle(
-              color: Colors.green,
+              color: Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
@@ -294,15 +303,35 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
           ),
         ),
         const SizedBox(height: 12),
-
-        // Reward Amount
-        Text(
-          'Ksh ${widget.product.reward} was added to your wallet.',
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
-          textAlign: TextAlign.center,
+        Row(
+          children: [
+            Text(
+              'Ksh ${widget.product.reward}',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              child: const Text(
+                'EARNED',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

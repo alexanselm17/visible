@@ -67,28 +67,48 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
         backgroundColor: Colors.black,
         elevation: 0,
         automaticallyImplyLeading: false,
+        toolbarHeight: 80,
         title: Container(
-          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(top: 8, bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.max,
             children: [
               GestureDetector(
                 onTap: () => Get.to(const ProfilePage()),
-                child: const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, color: Colors.white, size: 24),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
-              Flexible(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(
                       () => Text(
@@ -97,19 +117,39 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                                 true
                             ? authenticationController
                                 .currentUser.value.username!
-                            : 'Jefferson\nInyanje',
+                            : 'Username',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: Colors.black87,
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 1.1,
+                          fontWeight: FontWeight.w700,
+                          height: 1.2,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Obx(
+                      () => Text(
+                        authenticationController
+                                    .currentUser.value.fullname?.isNotEmpty ==
+                                true
+                            ? authenticationController
+                                .currentUser.value.fullname!
+                            : 'Full Name',
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Spacer(),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -127,13 +167,42 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              GestureDetector(
-                  onTap: _loadDashboardData,
-                  child:
-                      const Icon(Icons.refresh, color: Colors.black, size: 24)),
-              const SizedBox(width: 8),
-              const Icon(Icons.notifications_outlined,
-                  color: Colors.black, size: 24),
+              const SizedBox(width: 12),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _loadDashboardData();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.refresh,
+                        color: Colors.black87,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.notifications_outlined,
+                      color: Colors.black87,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -477,22 +546,33 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   Widget _buildProgressCircle(String label, int completed, int total) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 80,
           height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 3),
-          ),
-          child: Center(
-            child: Text(
-              '$completed/$total',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: CircularProgressIndicator(
+                  value: total > 0 ? completed / total : 0,
+                  strokeWidth: 3,
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
-            ),
+              Text(
+                '$completed/$total',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -520,7 +600,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
       children: [
         // Campaign card with sliding functionality
         SizedBox(
-          height: 280,
+          height: 200, // Reduced height to match image
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -547,7 +627,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _currentPage == index ? Colors.white : Colors.grey,
+                color: _currentPage == index
+                    ? Colors.white
+                    : Colors.grey.withOpacity(0.5),
               ),
             ),
           ),
@@ -558,129 +640,142 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
   Widget _buildCampaignCard(Datum campaign) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[700]!, width: 1),
+      decoration: const BoxDecoration(
+        color: Colors.black,
       ),
-      child: Column(
-        children: [
-          // Campaign image
-          Container(
-            height: 120,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: campaign.imageUrl != null && campaign.imageUrl!.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(campaign.imageUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : const DecorationImage(
-                      image: AssetImage(
-                          'assets/johnnie_walker.png'), // You'll need to add this asset
-                      fit: BoxFit.cover,
-                    ),
-              color: Colors.grey[800],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            // Product Image
+            Container(
+              height: 200,
+              width: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 2),
+                image:
+                    campaign.imageUrl != null && campaign.imageUrl!.isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(campaign.imageUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : const DecorationImage(
+                            image: AssetImage('assets/johnnie_walker.png'),
+                            fit: BoxFit.cover,
+                          ),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
 
-          // Campaign details
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      campaign.name ?? 'JOHNNY WALKER',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+            const SizedBox(width: 20),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    campaign.name?.toUpperCase() ?? 'JOHNNY WALKER',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
                     ),
-                    const SizedBox(height: 8),
-                    const Row(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Icon(Icons.attach_money, color: Colors.white, size: 16),
-                        SizedBox(width: 4),
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: CircularProgressIndicator(
+                            value: (campaign.screenshotCount ?? 2) / 5.0,
+                            strokeWidth: 3,
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.white),
+                          ),
+                        ),
                         Text(
-                          'Ksh 50',
-                          style: TextStyle(
+                          '${campaign.screenshotCount ?? 2}/5',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            height: 1.0,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time,
-                            color: Colors.white, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
+                  ),
+
+                  // Price
+                  const Text(
+                    'reward',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        color: Colors.orange,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
                           _getTimeRemaining(campaign.validUntil),
                           style: const TextStyle(
                             color: Colors.orange,
-                            fontSize: 14,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                children: [
-                  // Progress circle
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '2/5',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'VERIFICATION PENDING',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ],
+            ),
+
+            const SizedBox(width: 12),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'VERIFICATION\nPENDING',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -760,14 +855,12 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: Text(
-                  earning.advertName!,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+              Text(
+                earning.advertName!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(width: 12),

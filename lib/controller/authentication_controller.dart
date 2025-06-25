@@ -80,6 +80,9 @@ class AuthenticationController extends GetxController {
     required String occupation,
     required String location,
     required String gender,
+    required String county,
+    required String town,
+    required String estate,
   }) async {
     try {
       isLoading.value = true;
@@ -88,16 +91,20 @@ class AuthenticationController extends GetxController {
       final generatedNationalId = 10000000 + random.nextInt(90000000);
 
       final res = await authRepository.userSignUp(
-          fullname: fullname,
-          username: username,
-          phone: "+254${phone.replaceAll(' ', '')}",
-          nationalId: generatedNationalId,
-          password: password,
-          cpassword: cpassword,
-          email: email,
-          occupation: occupation,
-          location: location,
-          gender: gender);
+        fullname: fullname,
+        username: username,
+        phone: "+254${phone.replaceAll(' ', '')}",
+        nationalId: generatedNationalId,
+        password: password,
+        cpassword: cpassword,
+        email: email,
+        occupation: occupation,
+        location: location,
+        gender: gender,
+        county: county,
+        town: town,
+        estate: estate,
+      );
 
       isLoading.value = false;
 

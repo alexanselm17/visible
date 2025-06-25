@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/model/users/report.dart';
-import 'package:visible/screens/reports/customer_report.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

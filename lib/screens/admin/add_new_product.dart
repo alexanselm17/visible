@@ -32,6 +32,8 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
   String? _existingVideoUrl;
   bool _mediaChanged = false;
   MediaType _selectedMediaType = MediaType.image;
+  final List<String> _badges = [];
+  String _currentText = '';
 
   // Video player
   VideoPlayerController? _videoController;
@@ -39,6 +41,9 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
   // Controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
+
+  final TextEditingController _controller = TextEditingController();
 
   bool get isEditing => widget.product != null;
   ProductController productController = Get.put(ProductController());
@@ -46,6 +51,7 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
   @override
   void initState() {
     super.initState();
+    _controller.addListener(_onTextChanged);
 
     if (isEditing) {
       _nameController.text = widget.product!.name ?? '';
@@ -59,6 +65,27 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
       //   _existingVideoUrl = widget.product!.videoUrl;
       //   _selectedMediaType = MediaType.video;
       // }
+    }
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _currentText = _controller.text;
+    });
+  }
+
+  void _removeBadge(int index) {
+    setState(() {
+      _badges.removeAt(index);
+    });
+  }
+
+  void _addBadge(String text) {
+    if (text.isNotEmpty && !_badges.contains(text)) {
+      setState(() {
+        _badges.add(text);
+        _controller.text = _badges.join(' ');
+      });
     }
   }
 
@@ -779,6 +806,8 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
           imageFile: _selectedImageFile!,
           name: _nameController.text,
           description: _descriptionController.text,
+          badge: _badges,
+          category: _categoryController.text,
         );
       } else {
         await productController.uploadVideoProductAdvert(
@@ -787,6 +816,8 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
           imageFile: _videoThumbnailFile!,
           name: _nameController.text,
           description: _descriptionController.text,
+          badge: _badges,
+          category: _categoryController.text,
         );
       }
     }
@@ -894,7 +925,6 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
             ),
             const SizedBox(height: 16),
 
-            // Product Description
             TextField(
               controller: _descriptionController,
               maxLines: 4,
@@ -913,7 +943,116 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: _categoryController,
+              maxLines: 1,
+              decoration: InputDecoration(
+                labelText: 'Category',
+                hintText: 'Enter product category...',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            if (_badges.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                child: Wrap(
+                  spacing: 8,
+                  children: _badges.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    String badge = entry.value;
+
+                    return Chip(
+                      label: Text(badge),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                      onDeleted: () => _removeBadge(index),
+                      labelStyle: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+            // Text input field
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Type to create badges',
+                hintText: 'Enter text separated by spaces',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                prefixIcon: const Icon(Icons.label),
+                suffixIcon: _currentText.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _controller.clear();
+                        },
+                      )
+                    : null,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            SizedBox(
+              width: double.infinity,
+              child: _currentText.trim().isNotEmpty
+                  ? ElevatedButton.icon(
+                      onPressed: () {
+                        String textToAdd = _currentText.trim();
+                        if (textToAdd.isNotEmpty) {
+                          _addBadge(textToAdd);
+                          _controller.clear();
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                      label: Text('Add "${_currentText.trim()}"'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    )
+                  : SizedBox(
+                      height: 48,
+                      child: Center(
+                        child: Text(
+                          'Type something to add a badge',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+
+            const SizedBox(height: 24),
 
             Obx(
               () => productController.isLoading.value

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -281,6 +282,24 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       widget.product.videoDownloadUrl != null &&
       widget.product.videoDownloadUrl!.isNotEmpty;
 
+  Widget _buildBadge(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -403,7 +422,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                         )
                                       : Icon(
                                           _isVideoProduct
-                                              ? Icons.video_file
+                                              ? Icons.download
                                               : Icons.download,
                                           color: Colors.black,
                                           size: 20,
@@ -489,38 +508,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         const Spacer(),
                         // Status badges
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'EXECUTIVE',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.purple,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'LUXURY',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: widget.product.badge!.map((badge) {
+                            Color badgeColor = Color(
+                                    (Random().nextDouble() * 0xFFFFFF).toInt())
+                                .withOpacity(1.0);
+                            return _buildBadge(badge, badgeColor);
+                          }).toList(),
                         ),
                       ],
                     ),
@@ -544,13 +541,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ),
                         ),
                         const Spacer(),
-                        const Text(
-                          "NSFW",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
-                        ),
                       ],
                     ),
 
@@ -569,7 +559,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
+                        SelectableText(
                           widget.product.description ??
                               'No description available',
                           style: const TextStyle(

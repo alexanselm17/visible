@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:visible/common/toast.dart';
-import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/auth/login_page.dart';
-import 'package:visible/widgets/custom_input_decoration.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -31,16 +28,15 @@ class _SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _locationController = TextEditingController();
+  final _countyController = TextEditingController();
+  final _townController = TextEditingController();
+  final _estateController = TextEditingController();
 
   AuthenticationController authenticationController =
       Get.put(AuthenticationController());
 
   String? _selectedGender;
   String? _selectedOccupation;
-
-  bool _validateEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
 
   @override
   void dispose() {
@@ -51,6 +47,9 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _locationController.dispose();
+    _countyController.dispose();
+    _townController.dispose();
+    _estateController.dispose();
     super.dispose();
   }
 
@@ -337,6 +336,24 @@ class _SignUpPageState extends State<SignUpPage> {
                 ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.3),
 
                 const SizedBox(height: 32),
+                _buildInputField(
+                  label: 'County',
+                  controller: _countyController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 32),
+                _buildInputField(
+                  label: 'Town',
+                  controller: _townController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 32),
+                _buildInputField(
+                  label: 'Estate',
+                  controller: _estateController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 32),
 
                 // Gender
                 Column(
@@ -569,7 +586,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (!_acceptTerms) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -580,8 +597,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         );
                         return;
                       }
-
-                      authenticationController.handleSignUp(
+                      await authenticationController.handleSignUp(
                         gender: _selectedGender ?? '',
                         fullname: _nameController.text,
                         username: _userNameController.text,
@@ -591,6 +607,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         email: _emailController.text,
                         occupation: _selectedOccupation ?? '',
                         location: _locationController.text,
+                        county: _countyController.text,
+                        town: _townController.text,
+                        estate: _estateController.text,
                       );
                     },
                     style: ElevatedButton.styleFrom(

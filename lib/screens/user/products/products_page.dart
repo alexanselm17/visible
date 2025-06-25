@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -177,19 +179,6 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildProductCard(Datum product, int index) {
-    switch (_selectedCategory) {
-      case 0: // Available
-        return _buildAvailableProductCard(product, index);
-      case 1: // Ongoing
-        return _buildOngoingProductCard(product, index);
-      case 2: // Completed
-        return _buildCompletedProductCard(product, index);
-      default:
-        return _buildAvailableProductCard(product, index);
-    }
-  }
-
   // Build the content for each tab
   Widget _buildTabContent(int tabIndex) {
     String filterKey = _categories[tabIndex]['key'];
@@ -223,8 +212,8 @@ class _ProductsPageState extends State<ProductsPage> {
                         tabIndex == 0
                             ? 'No available products'
                             : tabIndex == 1
-                                ? 'No products in progress'
-                                : 'No completed products',
+                                ? 'No campaign in progress'
+                                : 'No completed campaigns',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white,
@@ -281,7 +270,6 @@ class _ProductsPageState extends State<ProductsPage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image
             Container(
               width: 120,
               height: 120,
@@ -296,8 +284,6 @@ class _ProductsPageState extends State<ProductsPage> {
               ),
             ),
             const SizedBox(width: 16),
-
-            // Product Details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,17 +303,12 @@ class _ProductsPageState extends State<ProductsPage> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 4,
-                    children: [
-                      _buildBadge('EXECUTIVE', Colors.green),
-                      if (product.category?.contains('luxury') == true ||
-                          product.name!.toLowerCase().contains('cognac') ||
-                          product.name!.toLowerCase().contains('walker'))
-                        _buildBadge('LUXURY', Colors.purple),
-                      if (product.name!.toLowerCase().contains('cognac') ||
-                          product.name!.toLowerCase().contains('walker'))
-                        _buildBadge('NSFW', Colors.red),
-                      if (index == 0) _buildBadge('BADGE 2', Colors.red),
-                    ],
+                    children: product.badge!.map((badge) {
+                      Color badgeColor =
+                          Color((Random().nextDouble() * 0xFFFFFF).toInt())
+                              .withOpacity(1.0);
+                      return _buildBadge(badge, badgeColor);
+                    }).toList(),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -559,135 +540,85 @@ class _ProductsPageState extends State<ProductsPage> {
         Get.to(() => ProductAnalyticsPage(product: product));
       },
       child: Container(
-        height: 250,
+        height: 120,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.pureWhite,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green.shade200, width: 2),
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.3),
               spreadRadius: 1,
-              blurRadius: 10,
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      image: DecorationImage(
-                        image: NetworkImage(product.imageUrl!),
-                        fit: BoxFit.cover,
-                        onError: (exception, stackTrace) =>
-                            const Icon(Icons.image_not_supported),
-                      ),
-                    ),
+              flex: 1,
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                  image: DecorationImage(
+                    image: NetworkImage(product.imageUrl!),
+                    fit: BoxFit.cover,
+                    onError: (exception, stackTrace) =>
+                        const Icon(Icons.image_not_supported),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'Completed',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Leotaro',
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Product Name
+                    Text(
+                      product.name!.toUpperCase(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: 'Leotaro',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.0,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildRewardAndTimeInfo(product, true),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 16,
-                        color: Colors.green[600],
+
+                    const SizedBox(height: 12),
+
+                    // Completed Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Reward Earned',
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00C851), // Bright green
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'COMPLETED',
                         style: TextStyle(
+                          color: Colors.white,
                           fontSize: 12,
-                          color: Colors.green[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: null, // Disabled for completed items
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        disabledBackgroundColor: Colors.grey[300],
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Completed',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -722,27 +653,48 @@ class _ProductsPageState extends State<ProductsPage> {
           backgroundColor: Colors.black,
           elevation: 0,
           automaticallyImplyLeading: false,
+          toolbarHeight: 80,
           title: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
               children: [
                 GestureDetector(
                   onTap: () => Get.to(const ProfilePage()),
-                  child: const CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, color: Colors.white, size: 23),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.grey,
+                      child: Icon(Icons.person, color: Colors.white, size: 24),
+                    ),
                   ),
                 ),
-                Flexible(
+                const SizedBox(width: 12),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Obx(
                         () => Text(
@@ -751,15 +703,18 @@ class _ProductsPageState extends State<ProductsPage> {
                                   true
                               ? authenticationController
                                   .currentUser.value.username!
-                              : '',
+                              : 'Username',
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            height: 1.1,
+                            color: Colors.black87,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Obx(
                         () => Text(
                           authenticationController
@@ -767,27 +722,71 @@ class _ProductsPageState extends State<ProductsPage> {
                                   true
                               ? authenticationController
                                   .currentUser.value.fullname!
-                              : '',
+                              : 'Full Name',
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            height: 1.1,
+                            color: Colors.black54,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            height: 1.2,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Text(
+                    'APPROVED',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
-                GestureDetector(
-                    onTap: () {},
-                    child: const Icon(Icons.refresh,
-                        color: Colors.black, size: 24)),
-                const SizedBox(width: 8),
-                const Icon(Icons.notifications_outlined,
-                    color: Colors.black, size: 24),
+                const SizedBox(width: 12),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.refresh,
+                          color: Colors.black87,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.black87,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

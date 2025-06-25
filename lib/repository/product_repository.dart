@@ -14,6 +14,8 @@ class ProductRepository {
     required String campaignId,
     required String name,
     required String description,
+    required List badge,
+    required String category,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -23,6 +25,8 @@ class ProductRepository {
         ),
         "description": description,
         "name": name,
+        "badge": [badge],
+        "category": category,
       });
 
       final Response? response = await dioClient.postHTTP(
@@ -45,6 +49,8 @@ class ProductRepository {
     required String name,
     required String description,
     required File videoFile,
+    required List badge,
+    required String category,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -58,6 +64,8 @@ class ProductRepository {
         ),
         "description": description,
         "name": name,
+        "badge": [badge],
+        "category": category,
       });
 
       final response = await dioClient.postHTTP(
