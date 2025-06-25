@@ -353,7 +353,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(
-                icon: Icons.emoji_events,
+                icon: 'assets/images/Gold Medal.png',
                 color: Colors.amber,
                 title: 'Completion Master',
                 subtitle:
@@ -361,7 +361,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(
-                icon: Icons.emoji_events,
+                icon: 'assets/images/trophies.png',
                 color: Colors.amber,
                 title: 'Here\'s a trophy',
                 subtitle:
@@ -369,7 +369,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(
-                icon: Icons.account_balance_wallet,
+                icon: 'assets/images/piggy 2.png',
                 color: Colors.pink,
                 title: 'Money in the bank',
                 subtitle:
@@ -473,21 +473,19 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
   }
 
   Widget _buildAchievementItem({
-    required IconData icon,
+    required String icon,
     required Color color,
     required String title,
     required String subtitle,
   }) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: Colors.white, size: 14),
+        Image.asset(
+          icon,
+          width: 40,
+          height: 40,
         ),
         const SizedBox(width: 8),
         Expanded(

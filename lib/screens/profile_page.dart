@@ -479,20 +479,12 @@ class _ProfilePageState extends State<ProfilePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.orange.shade300,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.savings,
-                color: Colors.white,
-                size: 45,
-              ),
+            Image.asset(
+              'assets/images/piggy 2.png',
+              width: 140,
+              height: 140,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 5),
             const Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -901,25 +893,15 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
         const SizedBox(height: 40),
-
-        // Earnings Section
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.orange.shade300,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.savings,
-                color: Colors.white,
-                size: 45,
-              ),
+            Image.asset(
+              'assets/images/piggy 2.png',
+              width: 140,
+              height: 140,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 5),
             const Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
