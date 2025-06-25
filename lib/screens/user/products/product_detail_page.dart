@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visible/controller/product_controller.dart';
@@ -394,44 +395,44 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             ),
 
                             // Download icon overlay (bottom right)
-                            Positioned(
-                              bottom: 16,
-                              right: 16,
-                              child: GestureDetector(
-                                onTap: productController.isDownloading.value
-                                    ? null
-                                    : () => _isVideoProduct
-                                        ? productController.downloadVideo(
-                                            widget.product.videoDownloadUrl!)
-                                        : productController.downloadImage(
-                                            widget.product.downloadUrl!),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: productController.isDownloading.value
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
+                            if (widget.product.screenshotCount == 0)
+                              Positioned(
+                                bottom: 16,
+                                right: 16,
+                                child: GestureDetector(
+                                  onTap: productController.isDownloading.value
+                                      ? null
+                                      : () => _isVideoProduct
+                                          ? productController.downloadVideo(
+                                              widget.product.videoDownloadUrl!)
+                                          : productController.downloadImage(
+                                              widget.product.downloadUrl!),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: productController.isDownloading.value
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Icon(
+                                            _isVideoProduct
+                                                ? Icons.download
+                                                : Icons.download,
                                             color: Colors.black,
-                                            strokeWidth: 2,
+                                            size: 20,
                                           ),
-                                        )
-                                      : Icon(
-                                          _isVideoProduct
-                                              ? Icons.download
-                                              : Icons.download,
-                                          color: Colors.black,
-                                          size: 20,
-                                        ),
+                                  ),
                                 ),
                               ),
-                            ),
 
-                            // Media type indicator (top left)
                             if (_isVideoProduct)
                               Positioned(
                                 top: 16,
@@ -523,8 +524,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
 
                     const SizedBox(height: 8),
-
-                    // Timer row
                     Row(
                       children: [
                         const Icon(
@@ -545,8 +544,44 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
 
                     const SizedBox(height: 24),
+                    if (widget.product.screenshotCount != 0)
+                      Center(
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: CircularProgressIndicator(
+                                  value: (widget.product.screenshotCount ?? 2) /
+                                      5.0,
+                                  strokeWidth: 6,
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.3),
+                                  valueColor:
+                                      const AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                ),
+                              ),
+                              Text(
+                                '${widget.product.screenshotCount}/5',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.0,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 24),
 
-                    // Ad Description section
                     const Text(
                       'Ad Description:',
                       style: TextStyle(
@@ -561,12 +596,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       children: [
                         SelectableText(
                           widget.product.description ??
-                              'No description available',
+                              'No description available ',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,
                             height: 1.4,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ).animate().fadeIn(duration: 400.ms, delay: 200.ms),

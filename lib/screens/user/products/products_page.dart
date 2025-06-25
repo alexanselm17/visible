@@ -318,6 +318,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -360,9 +361,14 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Expires in ${_getRemainingTime(product.validUntil)}',
-                        style: const TextStyle(
-                          color: Colors.orange,
+                        _getRemainingTime(product.validUntil) == 'Expired'
+                            ? 'Expired'
+                            : 'Expires in ${_getRemainingTime(product.validUntil)}',
+                        style: TextStyle(
+                          color:
+                              _getRemainingTime(product.validUntil) == 'Expired'
+                                  ? Colors.red
+                                  : Colors.orange,
                           fontSize: 12,
                         ),
                       ),
@@ -470,9 +476,14 @@ class _ProductsPageState extends State<ProductsPage> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Expires in ${_getRemainingTime(product.validUntil)}',
-                      style: const TextStyle(
-                        color: Colors.orange,
+                      _getRemainingTime(product.validUntil) == 'Expired'
+                          ? 'Expired'
+                          : 'Expires in ${_getRemainingTime(product.validUntil)}',
+                      style: TextStyle(
+                        color:
+                            _getRemainingTime(product.validUntil) == 'Expired'
+                                ? Colors.red
+                                : Colors.orange,
                         fontSize: 12,
                       ),
                     ),
@@ -483,54 +494,6 @@ class _ProductsPageState extends State<ProductsPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildRewardAndTimeInfo(Datum product, bool isCompleted) {
-    final remainingTime = _getRemainingTime(product.validUntil);
-    final timeColor = _getTimeColor(product.validUntil);
-
-    return Column(
-      children: [
-        // Reward Info
-        Row(
-          children: [
-            const Icon(
-              Icons.monetization_on,
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              'Reward KSH ${product.reward ?? 0}',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.accentOrange,
-              ),
-            ),
-            // Time Info
-          ],
-        ),
-        if (!isCompleted)
-          Row(
-            children: [
-              const Icon(
-                Icons.timer,
-                size: 14,
-                color: Colors.grey,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "Expires in $remainingTime",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: timeColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-      ],
     );
   }
 

@@ -261,30 +261,30 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 1,
+        Container(
+          height: 250,
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
           child: Container(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: NetworkImage(widget.product.imageUrl!),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) =>
-                      const Icon(Icons.image_not_supported),
-                ),
+              borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(
+                image: NetworkImage(widget.product.imageUrl!),
+                fit: BoxFit.cover,
+                onError: (exception, stackTrace) =>
+                    const Icon(Icons.image_not_supported),
               ),
             ),
           ),
         ),
         const SizedBox(height: 16),
+
+        // Completed Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
