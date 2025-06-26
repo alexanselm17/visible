@@ -61,4 +61,42 @@ class UserRepository {
       throw errorMessage;
     }
   }
+
+  Future<Response> getUserNotifications({
+    required String userId,
+    int? perPage,
+  }) async {
+    try {
+      final response = await dioClient.getHTTP(
+        "${ApiEndpoints.baseUrl}/notifications/user",
+        queryParameters: {
+          'user_id': userId,
+          if (perPage != null) 'per_page': perPage,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<Response> markNotificationAsRead({
+    required String notificationId,
+    required String userId,
+  }) async {
+    try {
+      final response = await dioClient.postHTTP(
+        "${ApiEndpoints.baseUrl}/notifications/mark-read",
+        {
+          'notification_id': notificationId,
+          'user_id': userId,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw Exception(errorMessage);
+    }
+  }
 }

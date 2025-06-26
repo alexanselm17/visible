@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:visible/common/notif_icon.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/controller/product_controller.dart';
@@ -807,21 +808,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () => Get.to(const NotificationPage()),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          color: Colors.black87,
-                          size: 20,
-                        ),
-                      ),
-                    ),
+                    buildNotificationIconAlt(),
                   ],
                 ),
               ],

@@ -1,82 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:visible/controller/user_controller.dart';
+import 'package:visible/model/users/notification.dart';
 
-class NotificationPage extends StatefulWidget {
+class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
 
   @override
-  State<NotificationPage> createState() => _NotificationPageState();
-}
-
-class _NotificationPageState extends State<NotificationPage> {
-  // Sample notification data
-  final List<NotificationItem> notifications = [
-    NotificationItem(
-      id: '1',
-      title: 'System Update Available',
-      message:
-          'A new system update is ready to install. Please update at your earliest convenience.',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      type: NotificationType.system,
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '2',
-      title: 'Security Alert',
-      message:
-          'New login detected from Chrome on Windows. If this wasn\'t you, please secure your account.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-      type: NotificationType.security,
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '3',
-      title: 'Welcome Message',
-      message:
-          'Welcome to our notification center! You\'ll receive important updates here.',
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      type: NotificationType.info,
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '4',
-      title: 'Maintenance Scheduled',
-      message:
-          'System maintenance is scheduled for tonight from 11 PM to 2 AM. Services may be temporarily unavailable.',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      type: NotificationType.warning,
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '5',
-      title: 'Feature Update',
-      message:
-          'New features have been added to enhance your experience. Check out the latest improvements!',
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-      type: NotificationType.info,
-      isRead: true,
-    ),
-  ];
-
-  void _markAsRead(String notificationId) {
-    setState(() {
-      final index = notifications.indexWhere((n) => n.id == notificationId);
-      if (index != -1) {
-        notifications[index].isRead = true;
-      }
-    });
-  }
-
-  void _markAllAsRead() {
-    setState(() {
-      for (var notification in notifications) {
-        notification.isRead = true;
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final unreadCount = notifications.where((n) => !n.isRead).length;
+    final UsersController controller = Get.put(UsersController());
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -95,94 +27,177 @@ class _NotificationPageState extends State<NotificationPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
-          if (unreadCount > 0)
-            TextButton(
-              onPressed: _markAllAsRead,
-              child: const Text(
-                'Mark all read',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          const SizedBox(width: 8),
+        actions: const [
+          // Obx(() {
+          //   if (controller.unreadCount.value > 0) {
+          //     return TextButton(
+          //       onPressed: (),
+          //       child: const Text(
+          //         'Mark all read',
+          //         style: TextStyle(
+          //           color: Colors.white70,
+          //           fontSize: 14,
+          //         ),
+          //       ),
+          //     );
+          //   }
+          //   return const SizedBox.shrink();
+          // }),
+          SizedBox(width: 8),
         ],
       ),
-      body: Column(
-        children: [
-          // Header with unread count
-          if (unreadCount > 0)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1A1A1A),
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF333333), width: 0.5),
-                ),
-              ),
-              child: Text(
-                '$unreadCount unread notifications',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+      body: Obx(() {
+        if (controller.isLoading.value && controller.notifications.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
+          );
+        }
 
-          // Notifications list
-          Expanded(
-            child: notifications.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_none,
-                          size: 64,
-                          color: Colors.white30,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'No notifications',
-                          style: TextStyle(
-                            color: Colors.white30,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'You\'re all caught up!',
-                          style: TextStyle(
-                            color: Colors.white30,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      final notification = notifications[index];
-                      return NotificationCard(
-                        notification: notification,
-                        onTap: () => _markAsRead(notification.id),
-                      );
-                    },
+        if (controller.hasError.value && controller.notifications.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.red,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Error loading notifications',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
                   ),
-          ),
-        ],
-      ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    controller.errorMessage.value,
+                    style: const TextStyle(
+                      color: Colors.white54,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // ElevatedButton(
+                //   onPressed: controller.refreshNotifications,
+                //   child: const Text('Retry'),
+                // ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            // Header with unread count
+            if (controller.unreadCount.value > 0)
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1A1A1A),
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFF333333), width: 0.5),
+                  ),
+                ),
+                child: Text(
+                  '${controller.unreadCount.value} unread notifications',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+
+            // Notifications list
+            Expanded(
+              child: controller.notifications.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.notifications_none,
+                            size: 64,
+                            color: Colors.white30,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'No notifications',
+                            style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'You\'re all caught up!',
+                            style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: controller.refreshNotifications,
+                      color: Colors.white,
+                      backgroundColor: const Color(0xFF1A1A1A),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: controller.notifications.length +
+                            (controller.hasMore.value ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == controller.notifications.length) {
+                            // Load more indicator
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Center(
+                                child: controller.isLoading.value
+                                    ? const CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      )
+                                    : ElevatedButton(
+                                        onPressed:
+                                            controller.loadMoreNotifications,
+                                        child: const Text('Load More'),
+                                      ),
+                              ),
+                            );
+                          }
+
+                          final notification = controller.notifications[index];
+                          return NotificationCard(
+                            notification: notification,
+                            onTap: () => controller.markAsRead(notification.id),
+                          );
+                        },
+                      ),
+                    ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
 
+// notification_card.dart - Updated for new model
 class NotificationCard extends StatelessWidget {
   final NotificationItem notification;
   final VoidCallback onTap;
@@ -281,7 +296,7 @@ class NotificationCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            _formatTimestamp(notification.timestamp),
+                            _formatTimestamp(notification.createdAt),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 11,
@@ -301,28 +316,30 @@ class NotificationCard extends StatelessWidget {
     );
   }
 
-  Color _getTypeColor(NotificationType type) {
-    switch (type) {
-      case NotificationType.system:
+  Color _getTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'system':
         return Colors.blue;
-      case NotificationType.security:
+      case 'security':
         return Colors.red;
-      case NotificationType.warning:
+      case 'warning':
         return Colors.orange;
-      case NotificationType.info:
+      case 'info':
+      default:
         return Colors.green;
     }
   }
 
-  IconData _getTypeIcon(NotificationType type) {
-    switch (type) {
-      case NotificationType.system:
+  IconData _getTypeIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'system':
         return Icons.system_update;
-      case NotificationType.security:
+      case 'security':
         return Icons.security;
-      case NotificationType.warning:
+      case 'warning':
         return Icons.warning;
-      case NotificationType.info:
+      case 'info':
+      default:
         return Icons.info;
     }
   }
@@ -343,29 +360,4 @@ class NotificationCard extends StatelessWidget {
       return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
     }
   }
-}
-
-class NotificationItem {
-  final String id;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  final NotificationType type;
-  bool isRead;
-
-  NotificationItem({
-    required this.id,
-    required this.title,
-    required this.message,
-    required this.timestamp,
-    required this.type,
-    this.isRead = false,
-  });
-}
-
-enum NotificationType {
-  system,
-  security,
-  warning,
-  info,
 }

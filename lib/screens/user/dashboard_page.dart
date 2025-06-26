@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:visible/common/notif_icon.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_dashboard.dart';
 import 'package:visible/screens/profile_page.dart';
 import 'package:visible/screens/user/notification/notification_page.dart';
@@ -17,6 +19,7 @@ class UserDashboardPage extends StatefulWidget {
 class _UserDashboardPageState extends State<UserDashboardPage> {
   AuthenticationController authenticationController =
       Get.put(AuthenticationController());
+  UsersController usersController = Get.put(UsersController());
   bool _isLoading = true;
   UserDashboardModel? _dashboardData;
   final PageController _pageController = PageController();
@@ -27,6 +30,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     super.initState();
     authenticationController.loadUserData();
     _loadDashboardData();
+    usersController.fetchNotifications();
   }
 
   @override
@@ -42,6 +46,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
     try {
       final data = await authenticationController.getUserDashboard();
+      usersController.fetchNotifications();
+
       if (data != null) {
         setState(() {
           _dashboardData = UserDashboardModel.fromJson(data);
@@ -259,21 +265,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => Get.to(const NotificationPage()),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.black87,
-                        size: 20,
-                      ),
-                    ),
-                  ),
+                  buildNotificationIconAlt(),
                 ],
               ),
             ],
