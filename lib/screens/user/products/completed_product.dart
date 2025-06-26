@@ -263,14 +263,12 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
       children: [
         Container(
           height: 250,
-          margin: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 0.5),
             color: Colors.white,
-            border: Border.all(color: Colors.white, width: 2),
           ),
           child: Container(
-            margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               image: DecorationImage(
@@ -283,14 +281,11 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
           ),
         ),
         const SizedBox(height: 16),
-
-        // Completed Badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.green,
-            borderRadius: BorderRadius.circular(7),
-            border: Border.all(color: Colors.green, width: 1),
+            borderRadius: BorderRadius.circular(5),
           ),
           child: const Text(
             'COMPLETED',
@@ -318,7 +313,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(7),
+                borderRadius: BorderRadius.circular(5),
                 border: Border.all(color: Colors.white, width: 1),
               ),
               child: const Text(

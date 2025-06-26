@@ -124,13 +124,16 @@ class UserPreferences with ChangeNotifier {
   }
 
   Future<void> setIntroScreenShown(bool isShown) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(INTRO_SCREEN_KEY, isShown);
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(INTRO_SCREEN_KEY, isShown);
+    print('Intro screen shown set to: $isShown');
   }
 
   Future<bool> isIntroScreenShown() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(INTRO_SCREEN_KEY) ?? false;
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    final result = preferences.getBool(INTRO_SCREEN_KEY) ?? false;
+    print('Intro screen shown: $result');
+    return result;
   }
 
   Future<void> storePetroStationType(String type) async {

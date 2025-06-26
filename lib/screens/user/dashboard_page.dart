@@ -4,6 +4,7 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/model/users/user_dashboard.dart';
 import 'package:visible/screens/profile_page.dart';
+import 'package:visible/screens/user/notification/notification_page.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
 class UserDashboardPage extends StatefulWidget {
@@ -86,21 +87,90 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             children: [
               GestureDetector(
                 onTap: () => Get.to(const ProfilePage()),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+                child: Obx(
+                  () => Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.blue.shade400,
+                          Colors.purple.shade400,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: const CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, color: Colors.white, size: 24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Stack(
+                            children: [
+                              Image.asset(
+                                authenticationController
+                                            .currentUser.value.gender ==
+                                        'Male'
+                                    ? 'assets/images/boy.png'
+                                    : 'assets/images/girl.jpg',
+                                height: 42,
+                                width: 42,
+                                fit: BoxFit.cover,
+                              ),
+                              // Subtle overlay for better visual depth
+                              Container(
+                                height: 42,
+                                width: 42,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.05),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  ),
+                                ),
+                              ),
+                              // Tap indicator - subtle ripple effect area
+                              Positioned.fill(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(60),
+                                    onTap: () => Get.to(const ProfilePage()),
+                                    splashColor: Colors.white.withOpacity(0.3),
+                                    highlightColor:
+                                        Colors.white.withOpacity(0.1),
+                                    child: Container(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -120,7 +190,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                             : 'Username',
                         style: const TextStyle(
                           color: Colors.black87,
-                          fontSize: 16,
+                          fontSize: 20,
                           fontWeight: FontWeight.w700,
                           height: 1.2,
                         ),
@@ -189,16 +259,19 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.black87,
-                      size: 20,
+                  GestureDetector(
+                    onTap: () => Get.to(const NotificationPage()),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.black87,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],

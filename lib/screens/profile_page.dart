@@ -349,22 +349,87 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Column(
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white,
-              width: 3,
+        Obx(
+          () => Container(
+            height: 120,
+            width: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade400,
+                  Colors.purple.shade400,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ),
-          child: const ClipOval(
-            child: Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.black,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        _authenticationController.currentUser.value.gender ==
+                                'Male'
+                            ? 'assets/images/boy.png'
+                            : 'assets/images/girl.jpg',
+                        height: 112,
+                        width: 112,
+                        fit: BoxFit.cover,
+                      ),
+                      // Subtle overlay for better visual depth
+                      Container(
+                        height: 112,
+                        width: 112,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                      // Tap indicator - subtle ripple effect area
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(60),
+                            onTap: () => Get.to(const ProfilePage()),
+                            splashColor: Colors.white.withOpacity(0.3),
+                            highlightColor: Colors.white.withOpacity(0.1),
+                            child: Container(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ).animate().fadeIn(duration: 400.ms, delay: 200.ms).scale(
@@ -776,22 +841,85 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: [
         const SizedBox(height: 20),
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white,
-              width: 3,
+        Obx(
+          () => Container(
+            height: 120,
+            width: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade400,
+                  Colors.purple.shade400,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ),
-          child: const ClipOval(
-            child: Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.black,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        _authenticationController.currentUser.value.gender ==
+                                'Male'
+                            ? 'assets/images/boy.png'
+                            : 'assets/images/girl.jpg',
+                        height: 112,
+                        width: 112,
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        height: 112,
+                        width: 112,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(60),
+                            onTap: () => Get.to(const ProfilePage()),
+                            splashColor: Colors.white.withOpacity(0.3),
+                            highlightColor: Colors.white.withOpacity(0.1),
+                            child: Container(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ).animate().fadeIn(duration: 400.ms, delay: 200.ms).scale(
