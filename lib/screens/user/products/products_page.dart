@@ -173,7 +173,7 @@ class _ProductsPageState extends State<ProductsPage> {
           style: TextStyle(
             color: isSelected ? AppColors.accentOrange : Colors.white,
             fontWeight: FontWeight.w600,
-            fontSize: 16,
+            fontSize: 14,
           ),
         ),
       ),

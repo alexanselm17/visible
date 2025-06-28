@@ -113,7 +113,7 @@ class Datum {
   DateTime? createdAt;
   String? name;
   String? description;
-  int? reward;
+  String? reward;
   DateTime? updatedAt;
   DateTime? validUntil;
   String? imagePath;

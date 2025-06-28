@@ -49,21 +49,26 @@ flutter:
     - assets/icons/
 
   fonts:
-    - family: TT Hoves Pro Trial
+    - family: Poppins
       fonts:
-        - asset: assets/fonts/TT Hoves Pro Trial Black.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Bold.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Light.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Medium.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Regular.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Thin.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial ExtraBold.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial ExtraLight.ttf
-        - asset: assets/fonts/TT Hoves Pro Trial Hairline.ttf
-
-    - family: Leotaro
-      fonts:
-        - asset: assets/fonts/Leotaro-Free.otf
+        - asset: assets/fonts/Poppins/Poppins-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Poppins/Poppins-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Poppins/Poppins-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Poppins/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins/Poppins-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Poppins/Poppins-Black.ttf
+          weight: 900
 
 flutter_icons:
   android: true

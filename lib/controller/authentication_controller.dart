@@ -321,11 +321,7 @@ class AuthenticationController extends GetxController {
       if (response.statusCode == 200) {
         final userReport = report.UserReport.fromJson(response.data);
         return userReport.data!.data;
-      } else {
-        CommonUtils.showErrorToast("Payroll not downloaded.");
-      }
-    } catch (e) {
-      CommonUtils.showErrorToast("Failed to download payroll: $e");
-    }
+      } else {}
+    } catch (e) {}
   }
 }
