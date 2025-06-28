@@ -171,7 +171,6 @@ class _ProductsPageState extends State<ProductsPage> {
         child: Text(
           categoryName,
           style: TextStyle(
-            fontFamily: 'TT Hoves Pro Trial',
             color: isSelected ? AppColors.accentOrange : Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 16,
@@ -273,16 +272,20 @@ class _ProductsPageState extends State<ProductsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 120,
-              height: 120,
+              height: 200,
+              width: 100,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: NetworkImage(product.imageUrl!),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) =>
-                      const Icon(Icons.image_not_supported),
-                ),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 2),
+                image: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(product.imageUrl!),
+                        fit: BoxFit.fitWidth,
+                      )
+                    : const DecorationImage(
+                        image: AssetImage('assets/johnnie_walker.png'),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 16),
@@ -294,7 +297,6 @@ class _ProductsPageState extends State<ProductsPage> {
                   Text(
                     product.name!.toUpperCase(),
                     style: const TextStyle(
-                      fontFamily: 'Leotaro',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -396,16 +398,20 @@ class _ProductsPageState extends State<ProductsPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Container(
-              width: 150,
-              height: 170,
+              height: 200,
+              width: 125,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: NetworkImage(product.imageUrl!),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) =>
-                      const Icon(Icons.image_not_supported),
-                ),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white, width: 2),
+                image: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(product.imageUrl!),
+                        fit: BoxFit.fitWidth,
+                      )
+                    : const DecorationImage(
+                        image: AssetImage('assets/johnnie_walker.png'),
+                        fit: BoxFit.fitWidth,
+                      ),
               ),
             ),
 
@@ -416,7 +422,6 @@ class _ProductsPageState extends State<ProductsPage> {
                 Text(
                   product.name!.toUpperCase(),
                   style: const TextStyle(
-                    fontFamily: 'Leotaro',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -552,7 +557,6 @@ class _ProductsPageState extends State<ProductsPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontFamily: 'Leotaro',
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

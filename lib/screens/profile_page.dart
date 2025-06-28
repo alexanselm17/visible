@@ -444,7 +444,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           displayName!,
           style: const TextStyle(
-            fontFamily: 'Leotaro',
             color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -476,7 +475,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           email,
           style: const TextStyle(
-            fontFamily: 'TT Hoves Pro Trial',
             color: Colors.white,
             fontSize: 16,
           ),
@@ -488,7 +486,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           phone,
           style: const TextStyle(
-            fontFamily: 'TT Hoves Pro Trial',
             color: Colors.white,
             fontSize: 16,
           ),
@@ -932,7 +929,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           displayName!,
           style: const TextStyle(
-            fontFamily: 'Leotaro',
             color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -960,7 +956,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           email,
           style: const TextStyle(
-            fontFamily: 'TT Hoves Pro Trial',
             color: Colors.white,
             fontSize: 16,
           ),
@@ -970,7 +965,6 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           phone,
           style: const TextStyle(
-            fontFamily: 'TT Hoves Pro Trial',
             color: Colors.white,
             fontSize: 16,
           ),

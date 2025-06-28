@@ -72,7 +72,6 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Leotaro',
               color: Colors.white,
             ),
           ),

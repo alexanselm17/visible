@@ -236,6 +236,8 @@ class Datum {
   DateTime? validUntil;
   String? imagePath;
   String? imageUrl;
+  String? reward;
+
   String? downloadUrl;
   String? userScreenshot;
   String? screenshotUrl;
@@ -258,6 +260,7 @@ class Datum {
     this.screenshotId,
     this.screenshotCount,
     this.allScreenshots,
+    this.reward,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -279,6 +282,7 @@ class Datum {
         userScreenshot: json["user_screenshot"],
         screenshotUrl: json["screenshot_url"],
         screenshotId: json["screenshot_id"],
+        reward: json["reward"],
         screenshotCount: json["screenshot_count"],
         allScreenshots: json["all_screenshots"] == null
             ? []

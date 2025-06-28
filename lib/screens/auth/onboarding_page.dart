@@ -107,7 +107,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         const Text(
                           'Welcome to',
                           style: TextStyle(
-                            fontFamily: 'TT Hoves Pro Trial',
                             color: AppColors.primaryBlack,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -116,7 +115,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         const Text(
                           'Visible',
                           style: TextStyle(
-                            fontFamily: 'Leotaro',
                             color: AppColors.primaryBlack,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -151,7 +149,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: const Text(
                           'Skip',
                           style: TextStyle(
-                            fontFamily: 'TT Hoves Pro Trial',
                             color: AppColors.primaryBlack,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -220,7 +217,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         page.title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontFamily: 'Leotaro',
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryBlack,
@@ -237,7 +233,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         page.description,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontFamily: 'TT Hoves Pro Trial',
                           fontSize: 16,
                           color: AppColors.primaryBlack,
                           height: 1.5,
@@ -296,7 +291,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     'Join thousands of users already earning with Visible',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'TT Hoves Pro Trial',
                       fontSize: 14,
                       color: AppColors.primaryBlack,
                       fontWeight: FontWeight.w500,

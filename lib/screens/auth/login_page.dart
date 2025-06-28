@@ -54,7 +54,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     'Visible.',
                     style: TextStyle(
-                      fontFamily: 'Leotaro',
                       color: Colors.white,
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -78,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Username Or Email',
                       style: TextStyle(
-                        fontFamily: 'TT Hoves Pro Trial',
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -115,7 +113,6 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Password',
                       style: TextStyle(
-                        fontFamily: 'TT Hoves Pro Trial',
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -189,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                             const Text(
                               'Remember me',
                               style: TextStyle(
-                                fontFamily: 'TT Hoves Pro Trial',
                                 fontSize: 14,
                                 color: Colors.white,
                               ),
@@ -204,7 +200,6 @@ class _LoginPageState extends State<LoginPage> {
                           child: const Text(
                             'Forgot Password',
                             style: TextStyle(
-                              fontFamily: 'TT Hoves Pro Trial',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: AppColors.accentOrange,
@@ -255,7 +250,6 @@ class _LoginPageState extends State<LoginPage> {
                                 child: const Text(
                                   'Sign In',
                                   style: TextStyle(
-                                    fontFamily: 'TT Hoves Pro Trial',
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -274,7 +268,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: RichText(
                         text: TextSpan(
                           style: const TextStyle(
-                            fontFamily: 'TT Hoves Pro Trial',
                             fontSize: 14,
                           ),
                           children: [

@@ -721,7 +721,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                     campaign.imageUrl != null && campaign.imageUrl!.isNotEmpty
                         ? DecorationImage(
                             image: NetworkImage(campaign.imageUrl!),
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fitWidth,
                           )
                         : const DecorationImage(
                             image: AssetImage('assets/johnnie_walker.png'),
@@ -782,9 +782,9 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                   ),
 
                   // Price
-                  const Text(
-                    'reward',
-                    style: TextStyle(
+                  Text(
+                    "Ksh ${campaign.reward!}",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

@@ -103,107 +103,99 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Widget _buildTextField({
     required TextEditingController controller,
+    required String label,
     required String hintText,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppColors.pureWhite,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.grey),
-          border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          suffixIcon: suffixIcon,
+        const SizedBox(height: 6),
+        Container(
+          margin: const EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(color: Colors.grey),
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              suffixIcon: suffixIcon,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.pureWhite,
+      backgroundColor: Colors.black,
       body: Obx(
-        () => Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.darkBlue,
-                      AppColors.accentOrange,
-                      AppColors.primaryBlack
-                    ],
-                    stops: [0, 0.5, 1],
-                    begin: AlignmentDirectional(-1, -1),
-                    end: AlignmentDirectional(1, 1),
-                  ),
-                ),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0x00FFFFFF), AppColors.pureWhite],
-                      stops: [0, 1],
-                      begin: AlignmentDirectional(0, -1),
-                      end: AlignmentDirectional(0, 1),
+        () => SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (!authenticationController.isPasswordReset.value) ...[
+                  // Logo Section
+                  Container(
+                    width: 120,
+                    height: 120,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: const BoxDecoration(
-                          color: Color(0xCCFFFFFF),
-                          shape: BoxShape.circle,
+                    child: const Center(
+                      child: Text(
+                        'Visible.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/logo_foreground.png',
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
-                          begin: const Offset(0.6, 0.6),
-                          end: const Offset(1, 1),
-                          duration: 300.ms,
-                          delay: 300.ms,
-                          curve: Curves.bounceOut),
-                      Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(0, 40, 0, 0),
-                        child: const Text(
+                      ),
+                    ),
+                  ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
+                      begin: const Offset(0.6, 0.6),
+                      end: const Offset(1, 1),
+                      duration: 300.ms,
+                      delay: 300.ms,
+                      curve: Curves.bounceOut),
+
+                  // Title Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      children: [
+                        const Text(
                           'Reset Password',
                           style: TextStyle(
-                            fontFamily: 'Leotaro',
-                            color: AppColors.primaryBlack,
-                            fontSize: 36,
+                            color: Colors.white,
+                            fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
                         )
@@ -214,16 +206,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 end: 0,
                                 duration: 400.ms,
                                 delay: 350.ms),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsetsDirectional.fromSTEB(44, 8, 44, 0),
-                        child: const Text(
+                        const SizedBox(height: 6),
+                        const Text(
                           'Enter your details to reset your password',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: 'TT Hoves Pro Trial',
-                            color: AppColors.primaryBlack,
+                            color: Colors.white70,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -235,85 +223,70 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 end: 0,
                                 duration: 400.ms,
                                 delay: 400.ms),
-                      ),
-                    ],
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                ),
-              ).animate().fadeIn(duration: 400.ms).scale(
-                  begin: const Offset(3, 3),
-                  end: const Offset(1, 1),
-                  duration: 400.ms),
-            ),
 
-            if (!authenticationController.isPasswordReset.value)
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  // Form Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       children: [
                         // Username field
                         _buildTextField(
                           controller: _usernameController,
-                          hintText: 'Username',
+                          label: 'Username',
+                          hintText: 'Enter your username',
                         )
                             .animate(delay: 300.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
+
+                        // Email field
                         _buildTextField(
                           controller: _emailController,
-                          hintText: 'Email',
+                          label: 'Email',
+                          hintText: 'Enter your email',
+                          keyboardType: TextInputType.emailAddress,
                         )
-                            .animate(delay: 300.ms)
+                            .animate(delay: 350.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // Phone field
                         _buildTextField(
                           controller: _phoneController,
-                          hintText: 'Phone Number',
+                          label: 'Phone Number',
+                          hintText: 'Enter your phone number',
                           keyboardType: TextInputType.phone,
                         )
-                            .animate(delay: 350.ms)
+                            .animate(delay: 400.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // National ID field
                         _buildTextField(
                           controller: _nationalIdController,
-                          hintText: 'National ID',
+                          label: 'National ID',
+                          hintText: 'Enter your national ID',
                         )
-                            .animate(delay: 400.ms)
+                            .animate(delay: 450.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // New Password field
                         _buildTextField(
                           controller: _passwordController,
-                          hintText: 'New Password',
+                          label: 'New Password',
+                          hintText: 'Enter new password',
                           obscureText: _obscurePassword,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Colors.grey,
+                              color: Colors.white70,
                             ),
                             onPressed: () {
                               setState(() {
@@ -322,25 +295,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             },
                           ),
                         )
-                            .animate(delay: 450.ms)
+                            .animate(delay: 500.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // Confirm Password field
                         _buildTextField(
                           controller: _passwordConfirmationController,
-                          hintText: 'Confirm New Password',
+                          label: 'Confirm New Password',
+                          hintText: 'Confirm new password',
                           obscureText: _obscureConfirmPassword,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscureConfirmPassword
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Colors.grey,
+                              color: Colors.white70,
                             ),
                             onPressed: () {
                               setState(() {
@@ -350,15 +320,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             },
                           ),
                         )
-                            .animate(delay: 500.ms)
+                            .animate(delay: 550.ms)
                             .fadeIn(duration: 600.ms)
-                            .slideX(
-                                begin: 0.2,
-                                end: 0,
-                                duration: 600.ms,
-                                curve: Curves.easeOutQuad),
-
-                        const SizedBox(height: 12),
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // Reset Password Button
                         SizedBox(
@@ -367,9 +331,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _resetPassword,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentOrange,
-                              foregroundColor: AppColors.pureWhite,
-                              elevation: 0,
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -379,7 +342,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     height: 20,
                                     width: 20,
                                     child: CircularProgressIndicator(
-                                      color: AppColors.pureWhite,
+                                      color: Colors.black,
                                       strokeWidth: 2,
                                     ),
                                   )
@@ -387,90 +350,125 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     'Reset Password',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                           ),
-                        ).animate(delay: 550.ms).fadeIn(duration: 600.ms).scale(
-                            begin: const Offset(0.95, 0.95),
-                            end: const Offset(1, 1),
-                            duration: 600.ms,
-                            curve: Curves.easeOut),
+                        )
+                            .animate(delay: 600.ms)
+                            .fadeIn(duration: 600.ms)
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
+
+                        const SizedBox(height: 20),
+
+                        // Return to login
+                        GestureDetector(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Return to Login',
+                            style: TextStyle(
+                              color: AppColors.accentOrange,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                            .animate(delay: 650.ms)
+                            .fadeIn(duration: 600.ms)
+                            .moveY(begin: 10, end: 0, duration: 400.ms),
+
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
-                ),
-              )
-            else
-              // Success message
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.green.shade200,
-                      width: 1,
+                ] else ...[
+                  // Success message section
+                  Container(
+                    width: 120,
+                    height: 120,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.green, width: 2),
                     ),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
+                    child: const Center(
+                      child: Icon(
                         Icons.check_circle_outline,
                         color: Colors.green,
-                        size: 48,
+                        size: 50,
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Password Reset Successfully!',
-                        style: TextStyle(
-                          fontFamily: 'Leotaro',
-                          color: Colors.green,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Your password has been reset successfully. You can now login with your new password.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'TT Hoves Pro Trial',
-                          color: Colors.black87,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                    ),
+                  ).animate().fadeIn(duration: 400.ms).scale(
+                      begin: const Offset(0.8, 0.8),
+                      end: const Offset(1, 1),
+                      duration: 400.ms),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Password Reset Successfully!',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
+
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          'Your password has been reset successfully. You can now login with your new password.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
+
+                        const SizedBox(height: 30),
+
+                        // Return to login button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Return to Login',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ).animate(delay: 400.ms).fadeIn(duration: 600.ms).moveY(
+                              begin: 10,
+                              end: 0,
+                              duration: 400.ms,
+                            ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-              ).animate().fadeIn(duration: 400.ms).scale(
-                  begin: const Offset(0.8, 0.8),
-                  end: const Offset(1, 1),
-                  duration: 400.ms),
-
-            const SizedBox(height: 20),
-
-            // Return to login
-            GestureDetector(
-              onTap: () {
-                Get.back();
-              },
-              child: const Text(
-                'Return to Login',
-                style: TextStyle(
-                  fontFamily: 'TT Hoves Pro Trial',
-                  color: AppColors.accentOrange,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ).animate(delay: 600.ms).fadeIn(duration: 600.ms).moveY(
-                begin: 10, end: 0, duration: 400.ms, curve: Curves.easeOut),
-
-            const SizedBox(height: 50),
-          ],
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );
