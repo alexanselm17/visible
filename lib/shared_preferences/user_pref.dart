@@ -16,8 +16,8 @@ class UserPreferences with ChangeNotifier {
   static const String STATION_TYPE = "STATION_TYPE";
   static const String _userKey = 'user_data';
   static const String _userDataKey = 'userData';
-
   static const String SLUG = "SLUG";
+  static const String WALLET = "WALLET";
 
   // Singleton pattern
   static final UserPreferences _instance = UserPreferences._internal();
@@ -55,6 +55,18 @@ class UserPreferences with ChangeNotifier {
   Future<String> getToken() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String token = preferences.getString(ApiEndpoints.TOKEN_KEY) ?? "";
+    return token;
+  }
+
+  Future<void> storeWallet(String wallet) async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setString(WALLET, wallet);
+    notifyListeners();
+  }
+
+  Future<String> getWallet() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    String token = preferences.getString(WALLET) ?? "0.00";
     return token;
   }
 

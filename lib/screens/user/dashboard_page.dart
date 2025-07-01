@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visible/common/notif_icon.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
@@ -7,6 +8,7 @@ import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_dashboard.dart';
 import 'package:visible/screens/profile_page.dart';
 import 'package:visible/screens/user/notification/notification_page.dart';
+import 'package:visible/shared_preferences/user_pref.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
 class UserDashboardPage extends StatefulWidget {
@@ -53,6 +55,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           _dashboardData = UserDashboardModel.fromJson(data);
           _isLoading = false;
         });
+        await UserPreferences()
+            .storeWallet(_dashboardData!.data!.totalRewards!.toString());
       } else {
         setState(() {
           _isLoading = false;
@@ -422,7 +426,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 color: Colors.amber,
                 title: 'Completion Master',
                 subtitle:
-                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#LetsGetGo30',
+                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#LetsGetGo50',
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(

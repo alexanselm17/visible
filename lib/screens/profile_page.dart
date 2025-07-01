@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/model/users/report.dart';
+import 'package:visible/shared_preferences/user_pref.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -271,6 +272,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Text(
               '${campaign['id']}. ${campaign['name']}',
               style: const TextStyle(
+                fontStyle: FontStyle.italic,
                 color: Colors.white,
                 fontSize: 14,
               ),
@@ -282,6 +284,7 @@ class _ProfilePageState extends State<ProfilePage> {
               campaign['activity'],
               style: const TextStyle(
                 color: Colors.white,
+                fontStyle: FontStyle.italic,
                 fontSize: 14,
               ),
               textAlign: TextAlign.right,
@@ -547,11 +550,11 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 140,
             ),
             const SizedBox(width: 5),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'You have earned a total of',
                   style: TextStyle(
                     color: Colors.white,
@@ -559,18 +562,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'KSH 13,450',
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 4),
+                FutureBuilder<String>(
+                  future: UserPreferences().getWallet(),
+                  builder: (context, snapshot) {
+                    return Text(
+                      'KSH ${snapshot.data}',
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
-                SizedBox(height: 2),
-                Text(
+                const SizedBox(height: 2),
+                const Text(
                   'so far.',
                   style: TextStyle(
                     color: Colors.white,
@@ -1024,11 +1032,11 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 140,
             ),
             const SizedBox(width: 5),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'You have earned a total of',
                   style: TextStyle(
                     color: Colors.white,
@@ -1036,18 +1044,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'KSH 13,450',
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 4),
+                FutureBuilder<String>(
+                  future: UserPreferences().getWallet(),
+                  builder: (context, snapshot) {
+                    return Text(
+                      'KSH ${snapshot.data}' ?? 'KSH 0',
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
-                SizedBox(height: 2),
-                Text(
+                const SizedBox(height: 2),
+                const Text(
                   'so far.',
                   style: TextStyle(
                     color: Colors.white,
@@ -1104,7 +1117,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 119, 71, 7),
+                    color: Colors.orange,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   padding:
@@ -1288,9 +1301,7 @@ class _ProfilePageState extends State<ProfilePage> {
           width: double.infinity,
           height: 45,
           child: ElevatedButton(
-            onPressed: () {
-              // Handle PDF download
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
@@ -1331,14 +1342,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           centerTitle: true,
           elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () {
-                _authenticationController.logOut();
-              },
-            ),
-          ],
         ),
         body: Obx(
           () => SingleChildScrollView(
@@ -1369,6 +1372,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   showReport ? _buildReportView() : _buildProfileView(),
 
+                  const SizedBox(height: 70),
+
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _authenticationController.logOut();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'LOG OUT ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
                   const SizedBox(height: 30),
 
                   // Footer
@@ -1404,8 +1429,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
