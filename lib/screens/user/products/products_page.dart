@@ -9,7 +9,6 @@ import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
 import 'package:visible/screens/profile_page.dart';
-import 'package:visible/screens/user/notification/notification_page.dart';
 import 'package:visible/screens/user/products/completed_product.dart';
 import 'package:visible/screens/user/products/product_detail_page.dart';
 import 'package:visible/widgets/loading_indicator.dart';
@@ -163,15 +162,15 @@ class _ProductsPageState extends State<ProductsPage> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isSelected ? AppColors.accentOrange : Colors.transparent,
+              color: isSelected ? AppColors.pureWhite : Colors.transparent,
               width: 2,
             ),
           ),
         ),
         child: Text(
           categoryName,
-          style: TextStyle(
-            color: isSelected ? AppColors.accentOrange : Colors.white,
+          style: const TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -180,7 +179,6 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  // Build the content for each tab
   Widget _buildTabContent(int tabIndex) {
     String filterKey = _categories[tabIndex]['key'];
     RxList<Datum> productsList = productController.getCurrentList(filterKey);
@@ -542,24 +540,45 @@ class _ProductsPageState extends State<ProductsPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.white,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 3, // White border width
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(9),
                 child: Image.network(
                   product.imageUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.image_not_supported, color: Colors.grey),
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey,
+                        size: 30,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
 
-            // Product Details - Right aligned content
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Product Name
                 Text(
                   product.name!.toUpperCase(),
                   maxLines: 2,
@@ -572,14 +591,13 @@ class _ProductsPageState extends State<ProductsPage> {
                     height: 1.1,
                   ),
                 ),
-
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 4,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00C851), // Bright green
+                    color: const Color(0xFF00C851),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
@@ -694,7 +712,6 @@ class _ProductsPageState extends State<ProductsPage> {
                                   width: 42,
                                   fit: BoxFit.cover,
                                 ),
-                                // Subtle overlay for better visual depth
                                 Container(
                                   height: 42,
                                   width: 42,
@@ -710,7 +727,6 @@ class _ProductsPageState extends State<ProductsPage> {
                                     ),
                                   ),
                                 ),
-                                // Tap indicator - subtle ripple effect area
                                 Positioned.fill(
                                   child: Material(
                                     color: Colors.transparent,

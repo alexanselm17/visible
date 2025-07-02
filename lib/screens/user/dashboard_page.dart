@@ -426,7 +426,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 color: Colors.amber,
                 title: 'Completion Master',
                 subtitle:
-                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#Let\'sGetGo50',
+                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#Let\'sGetto50',
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(

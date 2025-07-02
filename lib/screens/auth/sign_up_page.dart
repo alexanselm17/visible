@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +7,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/screens/auth/login_page.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -16,7 +21,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  // Form controllers and state variables
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -37,6 +41,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String? _selectedGender;
   String? _selectedOccupation;
+  bool _isLoadingLocation = false;
 
   @override
   void dispose() {
@@ -55,6 +60,234 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    Future<bool> handleLocationPermission() async {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Location services are disabled. Please enable them.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return false;
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permissions are denied'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return false;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'Location permissions are permanently denied. Please enable them in settings.'),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Settings',
+              onPressed: () => openAppSettings(),
+            ),
+          ),
+        );
+        return false;
+      }
+
+      return true;
+    }
+
+    // Method to get current location and reverse geocode
+    Future<void> getCurrentLocation() async {
+      final hasPermission = await handleLocationPermission();
+      if (!hasPermission) return;
+
+      setState(() {
+        _isLoadingLocation = true;
+      });
+
+      try {
+        // Get current position
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 10),
+        );
+
+        // Reverse geocode to get address
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks[0];
+
+          // Auto-fill the location fields
+          setState(() {
+            // Main location field - combine street and locality
+            _locationController.text =
+                '${place.street ?? ''}, ${place.locality ?? ''}'
+                    .replaceAll(', ,', ',')
+                    .trim();
+
+            // County field
+            _countyController.text = place.administrativeArea ?? '';
+
+            // Town field - use locality or subLocality
+            _townController.text = place.locality ?? place.subLocality ?? '';
+
+            // Estate field - use subLocality or thoroughfare
+            _estateController.text =
+                place.subLocality ?? place.thoroughfare ?? '';
+          });
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location auto-filled successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          throw Exception('No address found for current location');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to get location: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoadingLocation = false;
+        });
+      }
+    }
+
+    // Alternative method using a more detailed approach
+    Future<void> getCurrentLocationDetailed() async {
+      final hasPermission = await handleLocationPermission();
+      if (!hasPermission) return;
+
+      setState(() {
+        _isLoadingLocation = true;
+      });
+
+      try {
+        // Get current position with high accuracy
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best,
+          timeLimit: const Duration(seconds: 15),
+        );
+
+        // Get multiple placemarks for better accuracy
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+          // localeIdentifier: 'en_KE', // For Kenya locale
+        );
+
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks[0];
+
+          // Build comprehensive location string
+          List<String> locationParts = [];
+
+          if (place.name != null && place.name!.isNotEmpty) {
+            locationParts.add(place.name!);
+          }
+          if (place.street != null &&
+              place.street!.isNotEmpty &&
+              place.street != place.name) {
+            locationParts.add(place.street!);
+          }
+          if (place.subLocality != null && place.subLocality!.isNotEmpty) {
+            locationParts.add(place.subLocality!);
+          }
+          if (place.locality != null && place.locality!.isNotEmpty) {
+            locationParts.add(place.locality!);
+          }
+
+          setState(() {
+            // Main location - comprehensive address
+            _locationController.text = locationParts.join(', ');
+
+            // County - administrative area (for Kenya, this would be the county)
+            _countyController.text =
+                place.administrativeArea ?? place.subAdministrativeArea ?? '';
+
+            // Town - locality or sub-administrative area
+            _townController.text =
+                place.locality ?? place.subAdministrativeArea ?? '';
+
+            // Estate - subLocality or name of the area
+            _estateController.text = place.subLocality ?? place.name ?? '';
+          });
+
+          // Optional: Store coordinates for future use
+          // You might want to add these fields to your form data
+          final latitude = position.latitude;
+          final longitude = position.longitude;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Location auto-filled: ${place.locality}, ${place.administrativeArea}'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } on LocationServiceDisabledException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Location services are disabled. Please enable location services.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      } on PermissionDeniedException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Location permission denied. Please grant location access.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } on TimeoutException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location request timed out. Please try again.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error getting location: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoadingLocation = false;
+        });
+      }
+
+      // Updated ElevatedButton in your build method
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -299,9 +532,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () {
-                        // Auto-fill location logic
-                      },
+                      onPressed: _isLoadingLocation ? null : getCurrentLocation,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
@@ -311,10 +542,34 @@ class _SignUpPageState extends State<SignUpPage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                       ),
-                      child: const Text(
-                        'Autofill Location',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      child: _isLoadingLocation
+                          ? const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text('Getting Location...')
+                              ],
+                            )
+                          : const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.location_on, size: 18),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Autofill Location',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
                     ),
                     const SizedBox(height: 12),
                     Container(
