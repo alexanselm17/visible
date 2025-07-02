@@ -1081,6 +1081,7 @@ class _AdminProductEditPageState extends State<AdminProductEditPage> {
                       ),
                     ),
             ),
+            const SizedBox(height: 106),
           ],
         ),
       ),

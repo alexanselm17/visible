@@ -426,7 +426,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 color: Colors.amber,
                 title: 'Completion Master',
                 subtitle:
-                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#LetsGetGo50',
+                    'You have just completed\nyour first Ad Campaign. The engine is now hot.\n#Let\'sGetGo50',
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(
@@ -434,7 +434,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 color: Colors.amber,
                 title: 'Here\'s a trophy',
                 subtitle:
-                    'Thanks for Signing up to Visible.\nWe have more trophies like these for you in store.\nYou are awesome.',
+                    'Thanks for signing up to Visible.\nWe have more trophies like these for you in store.\nYou are awesome.',
               ),
               const SizedBox(height: 16),
               _buildAchievementItem(

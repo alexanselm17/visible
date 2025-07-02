@@ -345,7 +345,7 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 106),
               ],
             ),
           ),

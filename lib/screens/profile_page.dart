@@ -1401,7 +1401,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'ALL RIGHTS RESERVED',
+                        '© 2025 Visible. All rights reserved',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,

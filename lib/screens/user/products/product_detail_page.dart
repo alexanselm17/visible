@@ -309,168 +309,196 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         () => SingleChildScrollView(
           child: Column(
             children: [
-              // Product Media Card (Image or Video)
-              Container(
-                margin: const EdgeInsets.fromLTRB(16, 50, 16, 16),
-                child: Stack(
-                  children: [
-                    // Main product card
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
+              Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(17),
-                        child: Stack(
-                          children: [
-                            // Product media (image or video)
-                            GestureDetector(
-                              onTap: _isVideoProduct
-                                  ? _showVideoDialog
-                                  : _showImageDialog,
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 300,
-                                child: _isVideoProduct
-                                    ? _isVideoInitialized
-                                        ? Stack(
-                                            children: [
-                                              SizedBox.expand(
-                                                child: FittedBox(
-                                                  fit: BoxFit.cover,
-                                                  child: SizedBox(
-                                                    width: _videoController!
-                                                        .value.size.width,
-                                                    height: _videoController!
-                                                        .value.size.height,
-                                                    child: VideoPlayer(
-                                                        _videoController!),
-                                                  ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Stack(
+                        children: [
+                          // Product media (image or video)
+                          GestureDetector(
+                            onTap: _isVideoProduct
+                                ? _showVideoDialog
+                                : _showImageDialog,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 300,
+                              child: _isVideoProduct
+                                  ? _isVideoInitialized
+                                      ? Stack(
+                                          children: [
+                                            SizedBox.expand(
+                                              child: FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: SizedBox(
+                                                  width: _videoController!
+                                                      .value.size.width,
+                                                  height: _videoController!
+                                                      .value.size.height,
+                                                  child: VideoPlayer(
+                                                      _videoController!),
                                                 ),
-                                              ),
-                                              // Video play overlay
-                                              Center(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(16),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Icon(
-                                                    _videoController!
-                                                            .value.isPlaying
-                                                        ? Icons.pause
-                                                        : Icons.play_arrow,
-                                                    color: Colors.white,
-                                                    size: 40,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        : Container(
-                                            color: Colors.grey[800],
-                                            child: const Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
                                               ),
                                             ),
-                                          )
-                                    : Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                                widget.product.imageUrl!),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                              ),
-                            ),
-
-                            // Download icon overlay (bottom right)
-                            if (widget.product.screenshotCount == 0)
-                              Positioned(
-                                bottom: 16,
-                                right: 16,
-                                child: GestureDetector(
-                                  onTap: productController.isDownloading.value
-                                      ? null
-                                      : () => _isVideoProduct
-                                          ? productController.downloadVideo(
-                                              widget.product.videoDownloadUrl!)
-                                          : productController.downloadImage(
-                                              widget.product.downloadUrl!),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: productController.isDownloading.value
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
+                                            // Video play overlay
+                                            Center(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(16),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  _videoController!
+                                                          .value.isPlaying
+                                                      ? Icons.pause
+                                                      : Icons.play_arrow,
+                                                  color: Colors.white,
+                                                  size: 40,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Container(
+                                          color: Colors.grey[800],
+                                          child: const Center(
                                             child: CircularProgressIndicator(
-                                              color: Colors.black,
-                                              strokeWidth: 2,
+                                              color: Colors.white,
                                             ),
-                                          )
-                                        : Icon(
-                                            _isVideoProduct
-                                                ? Icons.download
-                                                : Icons.download,
-                                            color: Colors.black,
-                                            size: 20,
                                           ),
-                                  ),
-                                ),
-                              ),
-
-                            if (_isVideoProduct)
-                              Positioned(
-                                top: 16,
-                                left: 16,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.play_circle_outline,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'VIDEO',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                                        )
+                                  : Image.network(
+                                      widget.product.imageUrl!,
+                                      width: double.infinity,
+                                      height: 300,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.image_not_supported,
+                                            color: Colors.grey,
+                                            size: 50,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+
+                          // Download button
+                          if (widget.product.screenshotCount == 0)
+                            Positioned(
+                              bottom: 16,
+                              right: 16,
+                              child: GestureDetector(
+                                onTap: productController.isDownloading.value
+                                    ? null
+                                    : () => _isVideoProduct
+                                        ? productController.downloadVideo(
+                                            widget.product.videoDownloadUrl!)
+                                        : productController.downloadImage(
+                                            widget.product.downloadUrl!),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
+                                  child: productController.isDownloading.value
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.black,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.download,
+                                          color: Colors.black,
+                                          size: 20,
+                                        ),
                                 ),
                               ),
-                          ],
-                        ),
+                            ),
+
+                          // Video indicator
+                          if (_isVideoProduct)
+                            Positioned(
+                              top: 16,
+                              left: 16,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.play_circle_outline,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'VIDEO',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ).animate().fadeIn(duration: 400.ms),
 
               // Price and details section

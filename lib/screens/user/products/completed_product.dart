@@ -309,19 +309,17 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
             ),
             const SizedBox(width: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.white, width: 1),
+                borderRadius: BorderRadius.circular(4),
               ),
               child: const Text(
                 'EARNED',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
                 ),
               ),
             ),

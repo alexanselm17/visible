@@ -442,10 +442,11 @@ class _ProductsPageState extends State<ProductsPage> {
                             width: 80,
                             height: 80,
                             child: CircularProgressIndicator(
-                              value: double.parse(
-                                  product.screenshotCount.toString()),
+                              value: (double.parse(
+                                      product.screenshotCount.toString()) /
+                                  5.0),
                               strokeWidth: 3,
-                              backgroundColor: Colors.white.withOpacity(0.3),
+                              backgroundColor: Colors.black.withOpacity(0.3),
                               valueColor: const AlwaysStoppedAnimation<Color>(
                                   Colors.white),
                             ),
@@ -523,85 +524,75 @@ class _ProductsPageState extends State<ProductsPage> {
         Get.to(() => ProductAnalyticsPage(product: product));
       },
       child: Container(
-        height: 120,
+        height: 160,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: const Color(0xFF000000), // Pure black background
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white,
-                  image: DecorationImage(
-                    image: NetworkImage(product.imageUrl!),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) =>
-                        const Icon(Icons.image_not_supported),
-                  ),
+            // Product Image Container
+            Container(
+              height: 140,
+              width: 140,
+              margin: const EdgeInsets.only(
+                  left: 16, top: 10, bottom: 10, right: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  product.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.image_not_supported, color: Colors.grey),
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Product Name
-                    Text(
-                      product.name!.toUpperCase(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
 
-                    const SizedBox(height: 12),
-
-                    // Completed Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00C851), // Bright green
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'COMPLETED',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
+            // Product Details - Right aligned content
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Product Name
+                Text(
+                  product.name!.toUpperCase(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                    height: 1.1,
+                  ),
                 ),
-              ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00C851), // Bright green
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'COMPLETED',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

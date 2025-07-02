@@ -665,7 +665,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
               trailing: Icon(Icons.arrow_forward_ios,
                   color: Colors.grey[400], size: 16),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 18),
           ],
         ),
       ),

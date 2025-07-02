@@ -495,7 +495,7 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 106),
               ],
             ),
           ),
