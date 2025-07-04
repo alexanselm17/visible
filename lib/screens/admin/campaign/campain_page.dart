@@ -167,70 +167,7 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
               trailing: Icon(Icons.arrow_forward_ios,
                   color: Colors.grey[400], size: 16),
             ),
-
-            const SizedBox(height: 8),
-
-            // // Financial Report Option
-            // ListTile(
-            //   onTap: () {
-            //     Get.back();
-            //     _generateFinancialReport();
-            //   },
-            //   leading: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: Colors.green.withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //     child: Icon(
-            //       Icons.account_balance_wallet_rounded,
-            //       color: Colors.green[700],
-            //       size: 20,
-            //     ),
-            //   ),
-            //   title: const Text(
-            //     'Financial Report',
-            //     style: TextStyle(fontWeight: FontWeight.w600),
-            //   ),
-            //   subtitle: Text(
-            //     'Budget utilization, rewards distributed',
-            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            //   ),
-            //   trailing: Icon(Icons.arrow_forward_ios,
-            //       color: Colors.grey[400], size: 16),
-            // ),
-
-            // const SizedBox(height: 8),
-
-            // // Product Report Option
-            // ListTile(
-            //   onTap: () {
-            //     Get.back();
-            //     _generateProductReport();
-            //   },
-            //   leading: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: Colors.purple.withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //     child: Icon(
-            //       Icons.inventory_rounded,
-            //       color: Colors.purple[700],
-            //       size: 20,
-            //     ),
-            //   ),
-            //   title: const Text(
-            //     'Product Report',
-            //     style: TextStyle(fontWeight: FontWeight.w600),
-            //   ),
-            //   subtitle: Text(
-            //     'Product performance and engagement',
-            //     style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            //   ),
-            //   trailing: Icon(Icons.arrow_forward_ios,
-            //       color: Colors.grey[400], size: 16),
-            // ),
+            const SizedBox(height: 70),
           ],
         ),
       ),

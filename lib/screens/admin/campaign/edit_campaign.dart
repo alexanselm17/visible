@@ -96,23 +96,24 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
     if (_formKey.currentState!.validate()) {
       campaignController
           .updateCampaign(
-        campaignId: widget.campaign.id!,
-        name: _nameController.text.trim(),
-        capitalInvested: int.parse(_capitalController.text.replaceAll(',', '')),
-        validUntil: _validUntilController.text.trim(),
-        reward: int.parse(_rewardController.text),
-        capacity: int.parse(_capacityController.text.replaceAll(',', '')),
-      )
-          .then((_) {
-        Get.back();
-        Get.snackbar(
-          'Success',
-          'Campaign updated successfully',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }).catchError((error) {
+            campaignId: widget.campaign.id!,
+            name: _nameController.text.trim(),
+            capitalInvested: int.tryParse(
+                  _capitalController.text.replaceAll(',', '').trim(),
+                ) ??
+                0, // fallback to 0 if invalid
+            validUntil: _validUntilController.text.trim(),
+            reward: int.tryParse(
+                  _rewardController.text.trim(),
+                ) ??
+                0,
+            capacity: int.tryParse(
+                  _capacityController.text.replaceAll(',', '').trim(),
+                ) ??
+                0,
+          )
+          .then((_) {})
+          .catchError((error) {
         Get.snackbar(
           'Error',
           'Failed to update campaign: $error',

@@ -322,7 +322,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           const SizedBox(width: 16),
                           _buildStatCard(
                             'Rewards Assigned',
-                            (_dashboardData!.rewardsAssigned ?? 0).toString(),
+                            ("Ksh ${_dashboardData!.rewardsAssigned ?? 0}")
+                                .toString(),
                             Icons.card_giftcard,
                             Colors.orange,
                             'Total rewards',
