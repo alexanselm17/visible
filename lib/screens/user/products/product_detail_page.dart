@@ -312,7 +312,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               children: [
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                   child: Stack(
                     children: [
                       const SizedBox(height: 50),
@@ -402,8 +402,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                                   Container(
                                             decoration: BoxDecoration(
                                               color: Colors.grey.shade100,
-                                              borderRadius: BorderRadius.circular(
-                                                  17), // Adjusted for inner border radius
+                                              borderRadius:
+                                                  BorderRadius.circular(17),
                                             ),
                                             child: const Center(
                                               child: Icon(
@@ -417,7 +417,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 ),
                               ),
 
-                              // Download button
                               if (widget.product.screenshotCount == 0)
                                 Positioned(
                                   bottom: 16,

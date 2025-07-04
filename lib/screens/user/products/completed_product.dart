@@ -270,6 +270,9 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                  color: Colors.grey.shade300,
+                  width: 1.0), // Added border around image
               image: DecorationImage(
                 image: NetworkImage(widget.product.imageUrl!),
                 fit: BoxFit.cover,

@@ -70,18 +70,15 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<void> _determineInitialRoute() async {
     final userPrefs = UserPreferences();
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     final introShown = await userPrefs.isIntroScreenShown();
+    final token = await userPrefs.getToken();
 
-    print('Intro shown: $introShown');
     if (!introShown) {
       _navigateToPage(const OnboardingScreen());
       return;
     }
-
-    final token = await userPrefs.getToken();
-    print('Token: ${token.isNotEmpty ? "Present" : "Empty"}');
 
     if (token.isEmpty) {
       _navigateToPage(const LoginPage());

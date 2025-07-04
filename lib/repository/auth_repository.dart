@@ -94,7 +94,7 @@ class AuthRepository {
         "password": password,
         "password_confirmation": passwordConfirmation
       };
-      print(body);
+
       final Response? response = await dioClient.noTokenPut(
         '${ApiEndpoints.baseUrl}/user/reset_password',
         body,

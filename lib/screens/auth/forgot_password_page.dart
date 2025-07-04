@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
@@ -72,12 +73,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     try {
       await authenticationController.resetPassword(
         isLoggedIn: false,
-        username: _usernameController.text,
-        phone: _phoneController.text,
-        nationalId: _nationalIdController.text,
-        password: _passwordController.text,
-        passwordConfirmation: _passwordConfirmationController.text,
-        email: _emailController.text,
+        username: _usernameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        nationalId: _nationalIdController.text.trim(),
+        password: _passwordController.text.trim(),
+        passwordConfirmation: _passwordConfirmationController.text.trim(),
+        email: _emailController.text.trim(),
       );
 
       setState(() {
@@ -160,33 +161,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (!authenticationController.isPasswordReset.value) ...[
-                  // Logo Section
-                  Container(
-                    width: 120,
-                    height: 120,
-                    margin: const EdgeInsets.only(bottom: 30),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Visible.',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                  SizedBox(
+                    child: Image.asset(
+                      'assets/images/logo_foreground.png',
+                    ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
+                          begin: const Offset(0.6, 0.6),
+                          end: const Offset(1, 1),
+                          duration: 300.ms,
+                          delay: 300.ms,
+                          curve: Curves.bounceOut,
                         ),
-                      ),
-                    ),
-                  ).animate().fadeIn(duration: 300.ms, delay: 300.ms).scale(
-                      begin: const Offset(0.6, 0.6),
-                      end: const Offset(1, 1),
-                      duration: 300.ms,
-                      delay: 300.ms,
-                      curve: Curves.bounceOut),
-
-                  // Title Section
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
@@ -255,15 +240,162 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // Phone field
-                        _buildTextField(
-                          controller: _phoneController,
-                          label: 'Phone Number',
-                          hintText: 'Enter your phone number',
-                          keyboardType: TextInputType.phone,
-                        )
-                            .animate(delay: 400.ms)
-                            .fadeIn(duration: 600.ms)
-                            .moveY(begin: 10, end: 0, duration: 400.ms),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Phone Number',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.grey[850]!,
+                                    Colors.grey[800]!
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.grey[600]!.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: TextFormField(
+                                controller: _phoneController,
+                                keyboardType: TextInputType.phone,
+                                maxLength: 11,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.5,
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(9),
+                                  TextInputFormatter.withFunction(
+                                      (oldValue, newValue) {
+                                    final text = newValue.text;
+                                    if (text.length <= 3) return newValue;
+
+                                    String newText = text.replaceAll(' ', '');
+                                    final buffer = StringBuffer();
+
+                                    for (int i = 0; i < newText.length; i++) {
+                                      if (i == 3 || i == 6) {
+                                        buffer.write(' ');
+                                      }
+                                      buffer.write(newText[i]);
+                                    }
+                                    return TextEditingValue(
+                                      text: buffer.toString(),
+                                      selection: TextSelection.collapsed(
+                                          offset: buffer.length),
+                                    );
+                                  }),
+                                ],
+                                decoration: InputDecoration(
+                                  prefixIcon: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    margin: const EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[700]!.withOpacity(0.5),
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[500]!
+                                              .withOpacity(0.4),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(16),
+                                        bottomLeft: Radius.circular(16),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 2,
+                                                offset: const Offset(0, 1),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            child: Image.asset(
+                                              'assets/images/Flag_of_Kenya.png',
+                                              width: 28,
+                                              height: 20,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        const Text(
+                                          "+254",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  hintText: "XXX XXX XXX",
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  counterText: "",
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                ),
+                                cursorColor: Colors.blue[400],
+                                cursorWidth: 2,
+                              ),
+                            )
+                                .animate(delay: 400.ms)
+                                .fadeIn(duration: 600.ms)
+                                .moveY(begin: 10, end: 0, duration: 400.ms),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
 
                         // National ID field
                         _buildTextField(

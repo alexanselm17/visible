@@ -182,9 +182,7 @@ class AuthenticationController extends GetxController {
 
       final response = await authRepository.logoutUserApi(userId: id);
       if (response!.statusCode == 200) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
         await UserPreferences().logout();
-        await prefs.clear();
         CommonUtils.showToast('Logged out sucessfully');
         Get.offAll(const LoginPage());
       }
@@ -251,10 +249,13 @@ class AuthenticationController extends GetxController {
       );
 
       isLoggingIn.value = false;
+      isPasswordReset.value = false;
 
       Logger().f(userSignInResponse!.data);
 
       if (userSignInResponse.data['ok'] == true) {
+        isPasswordReset.value = false;
+
         isPasswordReset.value = true;
         CommonUtils.showToast(userSignInResponse.data['message']);
         isLoggedIn ? null : Get.off(const LoginPage());
@@ -263,6 +264,7 @@ class AuthenticationController extends GetxController {
         CommonUtils.showErrorToast(userSignInResponse.data['message']);
       }
       isLoggingIn.value = false;
+      isPasswordReset.value = false;
     } catch (e) {
       isPasswordReset.value = false;
       usernameController.text = "";

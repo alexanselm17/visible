@@ -529,9 +529,8 @@ class _ProductsPageState extends State<ProductsPage> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Product Image Container
             Container(
               height: 140,
               width: 140,
@@ -574,10 +573,9 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
             ),
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   product.name!.toUpperCase(),
@@ -591,6 +589,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     height: 1.1,
                   ),
                 ),
+                const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 4,
@@ -598,15 +597,14 @@ class _ProductsPageState extends State<ProductsPage> {
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF00C851),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
                     'COMPLETED',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
