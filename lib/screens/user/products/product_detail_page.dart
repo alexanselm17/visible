@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/product_controller.dart';
 import 'package:visible/model/product_model.dart';
 
@@ -551,11 +552,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           Wrap(
                             spacing: 8,
                             runSpacing: 4,
-                            children: widget.product.badge!.map((badge) {
-                              Color badgeColor = Color(
-                                      (Random().nextDouble() * 0xFFFFFF)
-                                          .toInt())
-                                  .withOpacity(1.0);
+                            children: widget.product.badge!
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              final int index = entry.key;
+                              final String badge = entry.value;
+                              final Color badgeColor = AppColors.badgeColors[
+                                  index % AppColors.badgeColors.length];
+
                               return _buildBadge(badge, badgeColor);
                             }).toList(),
                           ),
@@ -671,7 +676,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               children: [
                                 const Expanded(
                                   child: Text(
-                                    'VERIFY YOUR POST',
+                                    'Verify your post',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,

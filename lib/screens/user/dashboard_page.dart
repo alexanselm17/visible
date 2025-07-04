@@ -660,14 +660,13 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     bool hasCampaigns = campaignsData != null && campaignsData.isNotEmpty;
 
     if (!hasCampaigns) {
-      return _buildNoCampaigns();
+      return Center(child: _buildNoCampaigns());
     }
 
     return Column(
       children: [
-        // Campaign card with sliding functionality
         SizedBox(
-          height: 200, // Reduced height to match image
+          height: 200,
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -683,7 +682,6 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
           ),
         ),
         const SizedBox(height: 16),
-        // Page indicators
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
@@ -851,6 +849,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 20),
           Icon(

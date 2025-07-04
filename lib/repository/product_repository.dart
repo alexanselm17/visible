@@ -18,16 +18,22 @@ class ProductRepository {
     required String category,
   }) async {
     try {
-      final formData = FormData.fromMap({
-        "image": await MultipartFile.fromFile(
+      final formData = FormData();
+
+      formData.files.add(MapEntry(
+        "image",
+        await MultipartFile.fromFile(
           imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
-        "description": description,
-        "name": name,
-        "badge": [badge],
-        "category": category,
-      });
+      ));
+
+      formData.fields.addAll([
+        MapEntry("description", description),
+        MapEntry("name", name),
+        MapEntry("category", category),
+        for (var b in badge) MapEntry("badge[]", b),
+      ]);
 
       final Response? response = await dioClient.postHTTP(
           "${ApiEndpoints.baseUrl}/campaign/upload_product_advert/$campaignId",

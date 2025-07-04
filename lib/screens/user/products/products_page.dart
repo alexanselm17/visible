@@ -305,13 +305,16 @@ class _ProductsPageState extends State<ProductsPage> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 4,
-                    children: product.badge!.map((badge) {
-                      Color badgeColor =
-                          Color((Random().nextDouble() * 0xFFFFFF).toInt())
-                              .withOpacity(1.0);
+                    children: product.badge!.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final String badge = entry.value;
+                      final Color badgeColor = AppColors
+                          .badgeColors[index % AppColors.badgeColors.length];
+
                       return _buildBadge(badge, badgeColor);
                     }).toList(),
                   ),
+
                   const SizedBox(height: 12),
                   Text(
                     'Description:',

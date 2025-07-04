@@ -40,4 +40,16 @@ class AppColors {
   // Shadow Colors
   static const Color lightShadow = Color(0x1A000000);
   static const Color darkShadow = Color(0x40000000);
+
+  static List<Color> badgeColors = [
+    const Color.fromARGB(255, 69, 14, 133),
+    const Color.fromARGB(255, 52, 133, 55), 
+    const Color.fromARGB(255, 33, 150, 243), 
+    const Color.fromARGB(255, 255, 152, 0), 
+    const Color.fromARGB(255, 156, 39, 176),  // Teal
+    const Color.fromARGB(255, 63, 81, 181), // Indigo
+    const Color.fromARGB(255, 121, 85, 72), // Brown
+    const Color.fromARGB(255, 255, 87, 34), // Deep Orange
+    const Color.fromARGB(255, 233, 30, 99), // Pink
+  ];
 }
