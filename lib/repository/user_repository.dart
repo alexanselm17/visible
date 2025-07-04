@@ -64,14 +64,14 @@ class UserRepository {
 
   Future<Response> getUserNotifications({
     required String userId,
-    int? perPage,
+    int? page,
   }) async {
     try {
       final response = await dioClient.getHTTP(
         "${ApiEndpoints.baseUrl}/notifications/user",
         queryParameters: {
           'user_id': userId,
-          if (perPage != null) 'per_page': perPage,
+          'page': page,
         },
       );
       return response;
@@ -99,4 +99,39 @@ class UserRepository {
       throw Exception(errorMessage);
     }
   }
+
+  Future<Response?> downloadReport({
+    required String fromDate,
+    required String toDate,
+    required String userId,
+  }) async {
+    try {
+      final response = await dioClient.getHTTPDownload(
+        "${ApiEndpoints.baseUrl}/campaign/report/timely_individual_campaign_report?from_date=$fromDate&to_date=$toDate&processed_by=$userId",
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
+
+  // Future<Response> markNotificationAsRead({
+  //   required String notificationId,
+  //   required String userId,
+  // }) async {
+  //   try {
+  //     final response = await dioClient.postHTTP(
+  //       "${ApiEndpoints.baseUrl}/notifications/mark-read",
+  //       {
+  //         'notification_id': notificationId,
+  //         'user_id': userId,
+  //       },
+  //     );
+  //     return response;
+  //   } on DioException catch (e) {
+  //     final errorMessage = DioExceptions.fromDioError(e).toString();
+  //     throw Exception(errorMessage);
+  //   }
+  // }
 }

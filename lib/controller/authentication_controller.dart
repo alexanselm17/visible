@@ -194,6 +194,21 @@ class AuthenticationController extends GetxController {
     }
   }
 
+  Future errorLogOut() async {
+    try {
+      String id = await UserPreferences().getUserId();
+
+      final response = await authRepository.logoutUserApi(userId: id);
+      if (response!.statusCode == 200) {
+        CommonUtils.showToast('Logged out sucessfully');
+        Get.offAll(const LoginPage());
+      }
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    }
+  }
+
   Future updateFcmToken(String token) async {
     try {
       String id = await UserPreferences().getUserId();

@@ -50,7 +50,7 @@ class ApiBaseHelper {
             // }
             if (e.response?.statusCode == 401 ||
                 e.response?.statusCode == 500 && redirected != true) {
-              getx.Get.put(AuthenticationController()).logOut();
+              getx.Get.put(AuthenticationController()).errorLogOut();
               return getx.Get.offAll(() => const LoginPage());
             }
             return handler.next(e);

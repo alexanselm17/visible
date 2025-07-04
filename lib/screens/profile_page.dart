@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:visible/common/toast.dart';
 import 'package:visible/controller/authentication_controller.dart';
+import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/report.dart';
 import 'package:visible/shared_preferences/user_pref.dart';
 
@@ -19,6 +21,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final AuthenticationController _authenticationController =
       Get.put(AuthenticationController());
+  UsersController usersController = Get.put(UsersController());
 
   bool showReport = false;
   DateTime? fromDate;
@@ -1297,28 +1300,47 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 20),
 
         // Download Full PDF Report Button
-        SizedBox(
-          width: double.infinity,
-          height: 45,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'DOWNLOAD FULL PDF REPORT',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
+
+        Obx(
+          () => usersController.isDownloading.value
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (fromDate == null || toDate == null) {
+                        CommonUtils.showErrorToast(
+                          'Please select both From and To dates.',
+                        );
+                        return;
+                      }
+
+                      await usersController.downloadCampaignReport(
+                        fromDate: fromDate.toString(),
+                        toDate: toDate.toString(),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'DOWNLOAD FULL PDF REPORT',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
+        ),
       ],
     );
   }
@@ -1408,7 +1430,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ],
-                  ),
+                  ).animate().fadeIn(duration: 400.ms, delay: 900.ms),
                 ],
               ),
             ),

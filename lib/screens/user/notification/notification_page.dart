@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:visible/controller/user_controller.dart';
-import 'package:visible/model/users/notification.dart';
+import 'package:visible/model/users/notification.dart' as notif;
 
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
@@ -28,21 +28,6 @@ class NotificationPage extends StatelessWidget {
           ),
         ),
         actions: const [
-          // Obx(() {
-          //   if (controller.unreadCount.value > 0) {
-          //     return TextButton(
-          //       onPressed: (),
-          //       child: const Text(
-          //         'Mark all read',
-          //         style: TextStyle(
-          //           color: Colors.white70,
-          //           fontSize: 14,
-          //         ),
-          //       ),
-          //     );
-          //   }
-          //   return const SizedBox.shrink();
-          // }),
           SizedBox(width: 8),
         ],
       ),
@@ -86,11 +71,6 @@ class NotificationPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 16),
-                // ElevatedButton(
-                //   onPressed: controller.refreshNotifications,
-                //   child: const Text('Retry'),
-                // ),
               ],
             ),
           );
@@ -98,7 +78,6 @@ class NotificationPage extends StatelessWidget {
 
         return Column(
           children: [
-            // Header with unread count
             if (controller.unreadCount.value > 0)
               Container(
                 width: double.infinity,
@@ -119,8 +98,6 @@ class NotificationPage extends StatelessWidget {
                   ),
                 ),
               ),
-
-            // Notifications list
             Expanded(
               child: controller.notifications.isEmpty
                   ? const Center(
@@ -152,41 +129,47 @@ class NotificationPage extends StatelessWidget {
                         ],
                       ),
                     )
-                  : RefreshIndicator(
-                      onRefresh: controller.refreshNotifications,
-                      color: Colors.white,
-                      backgroundColor: const Color(0xFF1A1A1A),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        itemCount: controller.notifications.length +
-                            (controller.hasMore.value ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index == controller.notifications.length) {
-                            // Load more indicator
-                            return Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Center(
-                                child: controller.isLoading.value
-                                    ? const CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                      )
-                                    : ElevatedButton(
-                                        onPressed:
-                                            controller.loadMoreNotifications,
-                                        child: const Text('Load More'),
-                                      ),
-                              ),
-                            );
-                          }
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (scrollInfo is ScrollEndNotification &&
+                            scrollInfo.metrics.pixels >=
+                                scrollInfo.metrics.maxScrollExtent - 100 &&
+                            controller.hasMore.value &&
+                            !controller.isLoading.value) {
+                          controller.loadMoreNotifications();
+                        }
+                        return false;
+                      },
+                      child: RefreshIndicator(
+                        onRefresh: controller.refreshNotifications,
+                        color: Colors.white,
+                        backgroundColor: const Color(0xFF1A1A1A),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: controller.notifications.length +
+                              (controller.hasMore.value ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == controller.notifications.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                ),
+                              );
+                            }
 
-                          final notification = controller.notifications[index];
-                          return NotificationCard(
-                            notification: notification,
-                            onTap: () => controller.markAsRead(notification.id),
-                          );
-                        },
+                            final notif.Notification notification =
+                                controller.notifications[index];
+                            return NotificationCard(
+                              notification: notification,
+                              onTap: () =>
+                                  controller.markAsRead(notification.id!),
+                            );
+                          },
+                        ),
                       ),
                     ),
             ),
@@ -197,9 +180,8 @@ class NotificationPage extends StatelessWidget {
   }
 }
 
-// notification_card.dart - Updated for new model
 class NotificationCard extends StatelessWidget {
-  final NotificationItem notification;
+  final notif.Notification notification;
   final VoidCallback onTap;
 
   const NotificationCard({
@@ -213,12 +195,12 @@ class NotificationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: notification.isRead
+        color: notification.isRead!
             ? const Color(0xFF1A1A1A)
             : const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: notification.isRead
+          color: notification.isRead!
               ? Colors.transparent
               : const Color(0xFF404040),
           width: 0.5,
@@ -228,29 +210,26 @@ class NotificationCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: notification.isRead ? null : onTap,
+          onTap: notification.isRead! ? null : onTap,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Notification icon and unread indicator
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getTypeColor(notification.type).withOpacity(0.2),
+                    color: _getTypeColor(notification.type!).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(
-                    _getTypeIcon(notification.type),
-                    color: _getTypeColor(notification.type),
+                    _getTypeIcon(notification.type!),
+                    color: _getTypeColor(notification.type!),
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // Notification content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,17 +238,17 @@ class NotificationCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              notification.title,
+                              notification.title!,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
-                                fontWeight: notification.isRead
+                                fontWeight: notification.isRead!
                                     ? FontWeight.w500
                                     : FontWeight.w600,
                               ),
                             ),
                           ),
-                          if (!notification.isRead)
+                          if (!notification.isRead!)
                             Container(
                               width: 8,
                               height: 8,
@@ -282,9 +261,9 @@ class NotificationCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        notification.message,
+                        notification.message!,
                         style: TextStyle(
-                          color: notification.isRead
+                          color: notification.isRead!
                               ? Colors.white54
                               : Colors.white70,
                           fontSize: 14,
@@ -296,7 +275,7 @@ class NotificationCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            _formatTimestamp(notification.createdAt),
+                            _formatTimestamp(notification.createdAt!),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 11,

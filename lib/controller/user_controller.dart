@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:visible/common/toast.dart';
-import 'package:visible/model/users/notification.dart';
+import 'package:visible/model/users/notification.dart' as notif;
 import 'package:visible/model/users/user_model.dart';
 import 'package:visible/repository/user_repository.dart';
 import 'package:visible/shared_preferences/user_pref.dart';
@@ -128,7 +131,7 @@ class UsersController extends GetxController {
   }
 
   // Observable lists and variables
-  final RxList<NotificationItem> notifications = <NotificationItem>[].obs;
+  final RxList<notif.Notification> notifications = <notif.Notification>[].obs;
   final RxInt unreadCount = 0.obs;
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
@@ -151,33 +154,30 @@ class UsersController extends GetxController {
 
       final response = await userRepository.getUserNotifications(
         userId: userId,
-        perPage: perPage,
+        page: currentPage.value,
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final notificationData =
+            notif.UserNotifications.fromJson(response.data);
 
-        // Parse notifications
-        final List<dynamic> notificationsList = data['notifications'] ?? [];
-        final List<NotificationItem> newNotifications = notificationsList
-            .map((json) => NotificationItem.fromJson(json))
-            .toList();
+        final newNotifications = notificationData.notifications ?? [];
 
         if (refresh || currentPage.value == 1) {
-          notifications.assignAll(newNotifications);
+          notifications.value = newNotifications;
         } else {
           notifications.addAll(newNotifications);
         }
 
-        // Update pagination info
-        final pagination = data['pagination'] ?? {};
-        currentPage.value = pagination['current_page'] ?? 1;
-        lastPage.value = pagination['last_page'] ?? 1;
-        totalNotifications.value = pagination['total'] ?? 0;
-        hasMore.value = pagination['has_more'] ?? false;
+        // ✅ Pagination
+        final pagination = notificationData.pagination;
+        currentPage.value = pagination?.currentPage ?? 1;
+        lastPage.value = pagination?.lastPage ?? 1;
+        totalNotifications.value = pagination?.total ?? 0;
+        hasMore.value = pagination?.hasMore ?? false;
 
-        // Update unread count
-        unreadCount.value = data['unread_count'] ?? 0;
+        // ✅ Unread count
+        unreadCount.value = notificationData.unreadCount ?? 0;
       } else {
         hasError.value = true;
         errorMessage.value =
@@ -207,9 +207,8 @@ class UsersController extends GetxController {
 
   void markAsRead(String notificationId) async {
     final index = notifications.indexWhere((n) => n.id == notificationId);
-    if (index != -1 && !notifications[index].isRead) {
-      // Create updated notification
-      final updatedNotification = NotificationItem(
+    if (index != -1 && !notifications[index].isRead!) {
+      final updatedNotification = notif.Notification(
         id: notifications[index].id,
         userId: notifications[index].userId,
         title: notifications[index].title,
@@ -221,11 +220,62 @@ class UsersController extends GetxController {
       );
 
       notifications[index] = updatedNotification;
-      unreadCount.value = notifications.where((n) => !n.isRead).length;
+      unreadCount.value = notifications.where((n) => !n.isRead!).length;
       final String userId = await UserPreferences().getUserId();
 
       userRepository.markNotificationAsRead(
           notificationId: notificationId, userId: userId);
+    }
+  }
+
+  final isDownloading = false.obs;
+  final downloadError = ''.obs;
+
+  Future<void> downloadCampaignReport({
+    required String fromDate,
+    required String toDate,
+  }) async {
+    isDownloading.value = true;
+    downloadError.value = '';
+
+    try {
+      final String userId = await UserPreferences().getUserId();
+      final status = await Permission.storage.request();
+      if (!status.isGranted) {
+        downloadError.value = 'Storage permission denied.';
+        isDownloading.value = false;
+        return;
+      }
+
+      final response = await userRepository.downloadReport(
+        fromDate: fromDate,
+        toDate: toDate,
+        userId: userId,
+      );
+
+      if (response != null && response.statusCode == 200) {
+        final downloadsDir = Directory('/storage/emulated/0/Download');
+        if (!await downloadsDir.exists()) {
+          await downloadsDir.create(recursive: true);
+        }
+
+        final filePath =
+            '${downloadsDir.path}/campaign_report_${DateTime.now().millisecondsSinceEpoch}.pdf';
+        final file = File(filePath);
+        await file.writeAsBytes(response.data, flush: true);
+        isDownloading.value = false;
+
+        CommonUtils.showToast(
+            'Download Complete ,File saved to Downloads folder.');
+      } else {
+        downloadError.value = 'Failed to download PDF.';
+      }
+    } catch (e) {
+      downloadError.value = e.toString();
+      print('Download error: $e');
+      isDownloading.value = false;
+    } finally {
+      isDownloading.value = false;
     }
   }
 }
