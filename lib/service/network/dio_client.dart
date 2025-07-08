@@ -3,6 +3,7 @@ import 'package:dio/io.dart';
 import 'package:get/get.dart' as getx;
 import 'package:get/route_manager.dart';
 import 'package:logger/logger.dart';
+import 'package:visible/common/toast.dart';
 import 'package:visible/constants/app_constants.dart';
 
 import 'dart:io';
@@ -44,10 +45,10 @@ class ApiBaseHelper {
           },
           onError: (DioException e, handler) async {
             Logger().e(e);
-            // if (e.response?.statusCode == 403) {
-            //   CommonUtils.showErrorToast(
-            //       "You do not have permission to perform this action");
-            // }
+            if (e.response?.statusCode == 400) {
+              final errorMessage = e.response?.data['message'] ?? 'Bad request';
+              CommonUtils.showErrorToast(errorMessage);
+            }
             if (e.response?.statusCode == 401 ||
                 e.response?.statusCode == 500 && redirected != true) {
               getx.Get.put(AuthenticationController()).errorLogOut();

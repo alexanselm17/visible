@@ -103,7 +103,8 @@ class CampaignController extends GetxController {
         Get.back();
         return CommonUtils.showToast("Campaign created successfully!");
       } else {
-        CommonUtils.showErrorToast(response?.data['message']);
+        CommonUtils.showErrorToast(
+            response?.data['message'] ?? 'Something went wrong');
       }
     } catch (e) {
       CommonUtils.showErrorToast(e.toString());
