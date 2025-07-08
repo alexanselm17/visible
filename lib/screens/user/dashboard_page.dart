@@ -886,29 +886,31 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
     bool hasEarnings = recentRewards != null && recentRewards.isNotEmpty;
 
     if (!hasEarnings) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            'No Recent Earnings.',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              'No Recent Earnings.',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Your Earnings from successfully completed\nAd Campaigns will appear here.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
+            const SizedBox(height: 8),
+            Text(
+              'Your Earnings from successfully completed\nAd Campaigns will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 

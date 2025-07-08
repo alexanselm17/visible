@@ -26,6 +26,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final _userNameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
+  final _nationalIdController = TextEditingController();
+
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _locationController = TextEditingController();
@@ -52,6 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
     _countyController.dispose();
     _townController.dispose();
     _estateController.dispose();
+    _nationalIdController.dispose();
     super.dispose();
   }
 
@@ -274,6 +277,13 @@ class _SignUpPageState extends State<SignUpPage> {
                 _buildInputField(
                   label: 'Email Address',
                   controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+
+                _buildInputField(
+                  label: 'National Identification Number',
+                  controller: _nationalIdController,
                   keyboardType: TextInputType.emailAddress,
                 ),
 
@@ -634,6 +644,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         county: _countyController.text,
                         town: _townController.text,
                         estate: _estateController.text,
+                        nationalId: _nationalIdController.text,
                       );
                     },
                     style: ElevatedButton.styleFrom(

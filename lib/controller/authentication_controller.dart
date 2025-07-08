@@ -83,18 +83,16 @@ class AuthenticationController extends GetxController {
     required String county,
     required String town,
     required String estate,
+    required String nationalId,
   }) async {
     try {
       isLoading.value = true;
-
-      final random = Random();
-      final generatedNationalId = 10000000 + random.nextInt(90000000);
 
       final res = await authRepository.userSignUp(
         fullname: fullname,
         username: username,
         phone: "+254${phone.replaceAll(' ', '')}",
-        nationalId: generatedNationalId,
+        nationalId: nationalId,
         password: password,
         cpassword: cpassword,
         email: email,

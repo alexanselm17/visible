@@ -15,7 +15,7 @@ class AuthRepository {
     required String fullname,
     required String username,
     required String phone,
-    required int nationalId,
+    required String nationalId,
     required String email,
     required String occupation,
     required String password,
