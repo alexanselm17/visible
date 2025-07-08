@@ -119,28 +119,28 @@ class CampaignController extends GetxController {
     required int reward,
     required int capacity,
   }) async {
-    try {
-      isLoading.value = true;
+    // try {
+    isLoading.value = true;
 
-      final response = await _campaignRepository.updateCampaign(
-        campaignId: campaignId,
-        name: name,
-        capitalInvested: capitalInvested,
-        validUntil: validUntil,
-        reward: reward,
-        capacity: capacity,
-      );
+    final response = await _campaignRepository.updateCampaign(
+      campaignId: campaignId,
+      name: name,
+      capitalInvested: capitalInvested,
+      validUntil: validUntil,
+      reward: reward,
+      capacity: capacity,
+    );
 
-      if (response?.statusCode == 200) {
-        CommonUtils.showToast("Campaign updated successfully!");
-        await fetchCampaigns();
-      } else {
-        CommonUtils.showErrorToast("Failed to update campaign.");
-      }
-    } catch (e) {
-      CommonUtils.showErrorToast(e.toString());
-    } finally {
-      isLoading.value = false;
+    if (response?.statusCode == 200) {
+      CommonUtils.showToast("Campaign updated successfully!");
+      await fetchCampaigns();
+    } else {
+      CommonUtils.showErrorToast(response!.data["message"]);
+      //   }
+      // } catch (e) {
+      //   CommonUtils.showErrorToast(e.toString());
+      // } finally {
+      //   isLoading.value = false;
     }
   }
 }
