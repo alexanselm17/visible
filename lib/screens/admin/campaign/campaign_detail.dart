@@ -89,7 +89,7 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
           onPressed: () => Get.back(),
@@ -101,12 +101,15 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
             onPressed: () => _showCampaignReportOptions(context),
             tooltip: 'Generate Report',
           ),
-          IconButton(
-            icon: const Icon(Icons.edit, color: AppColors.primaryBlack),
-            onPressed: () {
-              Get.to(() => AdminCampaignEditPage(campaign: widget.campaign));
-            },
-          ),
+          isActive
+              ? IconButton(
+                  icon: const Icon(Icons.edit, color: AppColors.primaryBlack),
+                  onPressed: () {
+                    Get.to(
+                        () => AdminCampaignEditPage(campaign: widget.campaign));
+                  },
+                )
+              : const SizedBox()
         ],
       ),
       floatingActionButton: FloatingActionButton(

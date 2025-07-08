@@ -887,6 +887,8 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
 
     if (!hasEarnings) {
       return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 20),
           Text(

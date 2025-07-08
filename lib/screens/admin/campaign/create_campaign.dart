@@ -217,7 +217,7 @@ class _AdminCampaignCreatePageState extends State<AdminCampaignCreatePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
           onPressed: () => Get.back(),

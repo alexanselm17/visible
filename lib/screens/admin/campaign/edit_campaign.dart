@@ -28,10 +28,80 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
   final CampaignController campaignController = Get.find<CampaignController>();
   final numberFormat = NumberFormat('#,###');
 
+  bool _isAutoCalculationEnabled = true;
+  int _calculatedCapacity = 0;
+
   @override
   void initState() {
     super.initState();
     _initializeControllers();
+    _setupBudgetListener();
+  }
+
+  void _setupBudgetListener() {
+    _capitalController.addListener(() {
+      if (_isAutoCalculationEnabled) {
+        _updateCapacityFromBudget();
+      }
+    });
+
+    // Also add listener to reward field for complete auto-calculation
+    _rewardController.addListener(() {
+      if (_isAutoCalculationEnabled) {
+        _updateCapacityFromBudget();
+      }
+    });
+  }
+
+  // Updated method to calculate capacity from budget
+  void _updateCapacityFromBudget() {
+    final budgetText = _capitalController.text.replaceAll(',', '');
+    final rewardText = _rewardController.text;
+
+    if (budgetText.isNotEmpty && rewardText.isNotEmpty) {
+      try {
+        final budget = int.parse(budgetText);
+        final reward = int.parse(rewardText);
+
+        if (reward > 0) {
+          final capacity = (budget / reward).floor();
+          setState(() {
+            _calculatedCapacity = capacity;
+            _capacityController.text =
+                NumberFormat('#,###', 'en_US').format(capacity);
+          });
+        } else {
+          _resetCapacity();
+        }
+      } catch (e) {
+        _resetCapacity();
+      }
+    } else {
+      _resetCapacity();
+    }
+  }
+
+  // Helper method to reset capacity
+  void _resetCapacity() {
+    setState(() {
+      _calculatedCapacity = 0;
+      _capacityController.text = '';
+    });
+  }
+
+  // Legacy method - keeping for backward compatibility
+  void _calculateCapacity() {
+    _updateCapacityFromBudget();
+  }
+
+  // Toggle auto-calculation with immediate update
+  void _toggleAutoCalculation(bool value) {
+    setState(() {
+      _isAutoCalculationEnabled = value;
+      if (value) {
+        _updateCapacityFromBudget(); // Immediately calculate when enabled
+      }
+    });
   }
 
   void _initializeControllers() {
@@ -56,6 +126,10 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
 
   @override
   void dispose() {
+    // Remove listeners before disposing
+    _capitalController.removeListener(_updateCapacityFromBudget);
+    _rewardController.removeListener(_updateCapacityFromBudget);
+
     _nameController.dispose();
     _capitalController.dispose();
     _rewardController.dispose();
@@ -101,7 +175,7 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
             capitalInvested: int.tryParse(
                   _capitalController.text.replaceAll(',', '').trim(),
                 ) ??
-                0, // fallback to 0 if invalid
+                0,
             validUntil: _validUntilController.text.trim(),
             reward: int.tryParse(
                   _rewardController.text.trim(),
@@ -141,7 +215,7 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primaryBlack),
           onPressed: () => Get.back(),
@@ -202,7 +276,7 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
                 _buildInfoCard(
                   child: Column(
                     children: [
-                      // Capital Invested Field
+                      // Capital Invested Field with enhanced listener
                       _buildTextField(
                         controller: _capitalController,
                         label: 'Budget (KSh)',
@@ -240,30 +314,6 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 8),
-
-                      // Current participant info
-                      // if (widget.campaign['participants'] != null)
-                      //   Padding(
-                      //     padding: const EdgeInsets.only(top: 8),
-                      //     child: Row(
-                      //       children: [
-                      //         Icon(Icons.info_outline,
-                      //             size: 16, color: Colors.blue[400]),
-                      //         const SizedBox(width: 8),
-                      //         Expanded(
-                      //           child: Text(
-                      //             'This campaign currently has ${widget.campaign['participants']} participants',
-                      //             style: TextStyle(
-                      //               fontSize: 12,
-                      //               fontStyle: FontStyle.italic,
-                      //               color: Colors.grey[700],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
                     ],
                   ),
                 ),
@@ -273,17 +323,44 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
                 _buildInfoCard(
                   child: Column(
                     children: [
-                      // Capacity Field
+                      // Auto-calculation toggle
+                      Row(
+                        children: [
+                          Switch(
+                            value: _isAutoCalculationEnabled,
+                            onChanged: _toggleAutoCalculation,
+                            activeColor: AppColors.accentOrange,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Auto-calculate from budget',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Capacity Field that updates automatically
                       _buildTextField(
                         controller: _capacityController,
                         label: 'Maximum Participants',
-                        hint: 'e.g. 10,000',
+                        hint: _isAutoCalculationEnabled
+                            ? 'Auto-calculated from budget'
+                            : 'e.g. 10,000',
                         prefixIcon: Icons.group,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          _ThousandsSeparatorInputFormatter(),
-                        ],
+                        inputFormatters: _isAutoCalculationEnabled
+                            ? null
+                            : [
+                                FilteringTextInputFormatter.digitsOnly,
+                                _ThousandsSeparatorInputFormatter(),
+                              ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter participant capacity';
@@ -297,10 +374,48 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
                           }
                           return null;
                         },
+                        readOnly: _isAutoCalculationEnabled,
                       ),
                       const SizedBox(height: 8),
+
+                      // Real-time calculation display
+                      if (_isAutoCalculationEnabled && _calculatedCapacity > 0)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.calculate,
+                                color: Colors.green,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Calculation: KSh ${_capitalController.text} ÷ KSh ${_rewardController.text} = ${NumberFormat('#,###', 'en_US').format(_calculatedCapacity)} participants',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+
                       Text(
-                        'This is the maximum number of participants who can join this campaign.',
+                        _isAutoCalculationEnabled
+                            ? 'Capacity updates automatically as you change the budget or reward amount.'
+                            : 'This is the maximum number of participants who can join this campaign.',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -395,24 +510,29 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
+    bool readOnly = false,
   }) {
     return TextFormField(
       controller: controller,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(prefixIcon, color: Colors.grey[600]),
+        prefixIcon: Icon(prefixIcon,
+            color: readOnly ? Colors.grey[400] : Colors.grey[600]),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: BorderSide(
+              color: readOnly ? Colors.grey[200]! : Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.accentOrange),
+          borderSide: BorderSide(
+              color: readOnly ? Colors.grey[200]! : AppColors.accentOrange),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -420,6 +540,8 @@ class _AdminCampaignEditPageState extends State<AdminCampaignEditPage> {
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        filled: readOnly,
+        fillColor: readOnly ? Colors.grey[50] : null,
       ),
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,

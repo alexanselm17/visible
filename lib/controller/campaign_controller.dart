@@ -99,8 +99,9 @@ class CampaignController extends GetxController {
       );
 
       if (response?.statusCode == 201 || response?.statusCode == 200) {
-        CommonUtils.showToast("Campaign created successfully!");
         await fetchCampaigns();
+        Get.back();
+        return CommonUtils.showToast("Campaign created successfully!");
       } else {
         CommonUtils.showErrorToast(response?.data['message']);
       }
@@ -119,28 +120,30 @@ class CampaignController extends GetxController {
     required int reward,
     required int capacity,
   }) async {
-    // try {
-    isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-    final response = await _campaignRepository.updateCampaign(
-      campaignId: campaignId,
-      name: name,
-      capitalInvested: capitalInvested,
-      validUntil: validUntil,
-      reward: reward,
-      capacity: capacity,
-    );
+      final response = await _campaignRepository.updateCampaign(
+        campaignId: campaignId,
+        name: name,
+        capitalInvested: capitalInvested,
+        validUntil: validUntil,
+        reward: reward,
+        capacity: capacity,
+      );
 
-    if (response?.statusCode == 200) {
-      CommonUtils.showToast("Campaign updated successfully!");
-      await fetchCampaigns();
-    } else {
-      CommonUtils.showErrorToast(response!.data["message"]);
-      //   }
-      // } catch (e) {
-      //   CommonUtils.showErrorToast(e.toString());
-      // } finally {
-      //   isLoading.value = false;
+      if (response?.statusCode == 200) {
+        await fetchCampaigns();
+        Get.back();
+        Get.back();
+        return CommonUtils.showToast("Campaign updated successfully!");
+      } else {
+        CommonUtils.showErrorToast(response!.data["message"]);
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast(e.toString());
+    } finally {
+      isLoading.value = false;
     }
   }
 }

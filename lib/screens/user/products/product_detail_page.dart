@@ -292,7 +292,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        text,
+        text.toUpperCase(),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 10,
