@@ -18,25 +18,47 @@ class ProductAnalyticsPage extends StatefulWidget {
 }
 
 class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
-  List<FlSpot> generateViewsData() {
-    List<FlSpot> spots = [];
+  List<BarChartGroupData> generateViewsData() {
+    List<BarChartGroupData> barGroups = [];
 
     final screenshots = widget.product.allScreenshots;
 
-    if (screenshots == null || screenshots.isEmpty) return spots;
+    if (screenshots == null || screenshots.isEmpty) return barGroups;
 
     for (int i = 0; i < screenshots.length; i++) {
       final views = screenshots[i]['views'] ?? 0;
-      spots.add(FlSpot(i.toDouble(), views.toDouble()));
+      barGroups.add(
+        BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: views.toDouble(),
+              gradient: const LinearGradient(
+                colors: [
+                  Colors.white,
+                  Colors.white70,
+                ],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ),
+              width: 16,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(4),
+                topRight: Radius.circular(4),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
-    return spots;
+    return barGroups;
   }
 
-  Widget _buildViewsLineChart() {
-    List<FlSpot> spots = generateViewsData();
+  Widget _buildViewsBarChart() {
+    List<BarChartGroupData> barGroups = generateViewsData();
 
-    if (spots.isEmpty) {
+    if (barGroups.isEmpty) {
       return Container(
         height: 250,
         padding: const EdgeInsets.all(16),
@@ -54,7 +76,9 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
       );
     }
 
-    double maxY = spots.map((e) => e.y).reduce((a, b) => a > b ? a : b);
+    double maxY = barGroups
+        .map((group) => group.barRods.first.toY)
+        .reduce((a, b) => a > b ? a : b);
 
     return Container(
       height: 280,
@@ -77,18 +101,24 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: maxY / 4,
-                  getDrawingHorizontalLine: (value) {
-                    return const FlLine(
-                      color: Color(0xFF374151),
-                      strokeWidth: 1,
-                    );
-                  },
+            child: BarChart(
+              BarChartData(
+                maxY: maxY * 1.2,
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipBgColor: const Color(0xFF374151),
+                    tooltipRoundedRadius: 8,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        '${rod.toY.round()} views',
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 titlesData: FlTitlesData(
                   show: true,
@@ -102,7 +132,6 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 30,
-                      interval: 1,
                       getTitlesWidget: (double value, TitleMeta meta) {
                         int index = value.toInt();
                         return Padding(
@@ -139,46 +168,18 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
                   show: true,
                   border: Border.all(color: const Color(0xFF374151), width: 1),
                 ),
-                minX: 0,
-                maxX: spots.length.toDouble() - 1,
-                minY: 0,
-                maxY: maxY * 1.2,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.white70,
-                      ],
-                    ),
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) {
-                        return FlDotCirclePainter(
-                          radius: 4,
-                          color: Colors.white,
-                          strokeWidth: 2,
-                          strokeColor: const Color(0xFF1F2937),
-                        );
-                      },
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.2),
-                          Colors.white.withOpacity(0.05),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ],
+                barGroups: barGroups,
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: maxY / 4,
+                  getDrawingHorizontalLine: (value) {
+                    return const FlLine(
+                      color: Color(0xFF374151),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -449,7 +450,7 @@ class _ProductAnalyticsPageState extends State<ProductAnalyticsPage> {
               const SizedBox(height: 20),
 
               // Views Chart
-              _buildViewsLineChart().animate().slideY(
+              _buildViewsBarChart().animate().slideY(
                     begin: 0.3,
                     duration: 500.ms,
                     delay: 400.ms,

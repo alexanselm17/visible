@@ -7,10 +7,12 @@ import 'package:visible/screens/admin/campaign/add_product.dart';
 
 class AdminCampaignDetailsPage extends StatefulWidget {
   final String campaignId;
+  final String? campaignName;
 
   const AdminCampaignDetailsPage({
     super.key,
     required this.campaignId,
+    required this.campaignName,
   });
 
   @override
@@ -94,9 +96,9 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          'Campaign Products',
-          style: TextStyle(
+        title: Text(
+          widget.campaignName!,
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -881,45 +883,32 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Product Video',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Tap to watch product demonstration',
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // const Expanded(
+                              //   child: Column(
+                              //     crossAxisAlignment: CrossAxisAlignment.start,
+                              //     children: [
+                              //       Text(
+                              //         'Product Video',
+                              //         style: TextStyle(
+                              //           fontWeight: FontWeight.w600,
+                              //           fontSize: 16,
+                              //         ),
+                              //       ),
+                              //       Text(
+                              //         'Tap to watch product demonstration',
+                              //         style: TextStyle(
+                              //           color: Colors.grey,
+                              //           fontSize: 12,
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
                       ],
 
-                      // Campaign ID (if needed for debugging/admin)
-                      if (product.campaignId != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Campaign ID: ${product.campaignId}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-
-                      // Bottom padding for scroll
                       const SizedBox(height: 32),
                     ],
                   ),

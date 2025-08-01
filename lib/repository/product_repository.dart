@@ -57,7 +57,10 @@ class ProductRepository {
         "county_id": countyId,
       };
 
-      // Add all fields
+      final targetAudience = targetAudienceJson.values.every((v) => v == "")
+          ? null
+          : targetAudienceJson;
+
       formData.fields.addAll([
         MapEntry("description", description),
         MapEntry("name", name),
@@ -67,7 +70,7 @@ class ProductRepository {
         MapEntry("valid_until", validUntil),
         const MapEntry("selling_price", '0'),
         MapEntry("capital_invested", capitalInvested),
-        MapEntry("target_audience", jsonEncode(targetAudienceJson)),
+        MapEntry("target_audience", jsonEncode(targetAudience)),
         for (var b in badge) MapEntry("badge[]", b),
       ]);
 

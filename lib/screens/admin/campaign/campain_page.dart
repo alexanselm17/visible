@@ -405,7 +405,10 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
       ),
       child: InkWell(
         onTap: () {
-          Get.to(() => AdminCampaignDetailsPage(campaignId: campaign.id!));
+          Get.to(() => AdminCampaignDetailsPage(
+                campaignId: campaign.id!,
+                campaignName: campaign.name,
+              ));
         },
         borderRadius: BorderRadius.circular(8),
         child: Padding(

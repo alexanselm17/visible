@@ -525,26 +525,24 @@ class _ProductsPageState extends State<ProductsPage> {
         Get.to(() => ProductAnalyticsPage(product: product));
       },
       child: Container(
-        height: 160,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF000000), // Pure black background
+          color: const Color(0xFF000000),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               height: 140,
               width: 140,
-              margin: const EdgeInsets.only(
-                  left: 16, top: 10, bottom: 10, right: 20),
+              margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.white,
                 border: Border.all(
                   color: Colors.white,
-                  width: 3, // White border width
+                  width: 3,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -558,13 +556,10 @@ class _ProductsPageState extends State<ProductsPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(9),
                 child: Image.network(
-                  product.imageUrl!,
+                  product.imageUrl ?? '',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(9),
-                    ),
+                    color: Colors.grey.shade100,
                     child: const Center(
                       child: Icon(
                         Icons.image_not_supported,
@@ -576,42 +571,46 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  product.name!.toUpperCase(),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 1.5,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00C851),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'COMPLETED',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name?.toUpperCase() ?? '',
+                      softWrap: true, // Wrap text
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                        height: 1.2,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00C851),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'COMPLETED',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),

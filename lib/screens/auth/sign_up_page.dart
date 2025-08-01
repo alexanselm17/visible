@@ -32,7 +32,6 @@ class _SignUpPageState extends State<SignUpPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _locationController = TextEditingController();
   final _countyController = TextEditingController();
   final _townController = TextEditingController();
   final _estateController = TextEditingController();
@@ -139,7 +138,6 @@ class _SignUpPageState extends State<SignUpPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _locationController.dispose();
     _countyController.dispose();
     _townController.dispose();
     _estateController.dispose();
@@ -227,15 +225,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
                   // SubCounty Selector
                   _buildSubCountySelector(),
-
-                  const SizedBox(height: 20),
-
-                  // Location
-                  _buildInputField(
-                    label: 'Location/Area',
-                    controller: _locationController,
-                    keyboardType: TextInputType.text,
-                  ),
 
                   const SizedBox(height: 20),
 
@@ -968,6 +957,45 @@ class _SignUpPageState extends State<SignUpPage> {
             return;
           }
 
+          if (_selectedSubCounty == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select your sub county'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          if (_townController.text == '') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select your town'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          if (_estateController.text == '') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select your estate'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+          if (_hasReferralCode == '' || !_hasReferralCode) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please input referral code'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
           await authenticationController.handleSignUp(
             gender: _selectedGender ?? '',
             fullname: _nameController.text,
@@ -977,7 +1005,6 @@ class _SignUpPageState extends State<SignUpPage> {
             cpassword: _confirmPasswordController.text,
             email: _emailController.text,
             occupation: _selectedOccupation ?? '',
-            location: _locationController.text,
             county: _selectedCounty?.id ?? '',
             town: _townController.text,
             estate: _estateController.text,

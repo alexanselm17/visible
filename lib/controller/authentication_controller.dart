@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,25 +48,25 @@ class AuthenticationController extends GetxController {
   }
 
   Future<void> loadUserData() async {
-    // try {
-    final signInModel = await UserPreferences().getSignInModel();
-    final token = await UserPreferences().getToken();
+    try {
+      final signInModel = await UserPreferences().getSignInModel();
+      final token = await UserPreferences().getToken();
 
-    if (signInModel != null && signInModel.data != null && token.isNotEmpty) {
-      currentUser.value = signInModel.data!;
-      currentUser.refresh();
-      refresh();
-      Logger().i("User data loaded from preferences");
-    } else {
+      if (signInModel != null && signInModel.data != null && token.isNotEmpty) {
+        currentUser.value = signInModel.data!;
+        currentUser.refresh();
+        refresh();
+        Logger().i("User data loaded from preferences");
+      } else {
+        currentUser.value = Data();
+        await UserPreferences().logout();
+        Logger().w("No valid stored user data found - cleared preferences");
+      }
+    } catch (e) {
+      Logger().e("Error loading user data: $e");
       currentUser.value = Data();
       await UserPreferences().logout();
-      Logger().w("No valid stored user data found - cleared preferences");
     }
-    // } catch (e) {
-    //   Logger().e("Error loading user data: $e");
-    //   currentUser.value = Data();
-    //   await UserPreferences().logout();
-    // }
   }
 
   Future<void> handleSignUp({
@@ -79,7 +77,6 @@ class AuthenticationController extends GetxController {
     required String cpassword,
     required String email,
     required String occupation,
-    required String location,
     required String gender,
     required String county,
     required String subCounty,
@@ -98,7 +95,6 @@ class AuthenticationController extends GetxController {
         cpassword: cpassword,
         email: email,
         occupation: occupation,
-        location: location,
         gender: gender,
         county: county,
         town: town,
@@ -108,11 +104,11 @@ class AuthenticationController extends GetxController {
       );
 
       isLoading.value = false;
-      if (res!.statusCode == 200) {
-        final fcmToken = await PushNotification().getDeviceToken();
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('fcm_token', fcmToken);
-        await updateFcmToken(fcmToken);
+      if (res!.statusCode == 200 || res.statusCode == 201) {
+        // final fcmToken = await PushNotification().getDeviceToken();
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('fcm_token', fcmToken);
+        // await updateFcmToken(fcmToken);
         Get.offUntil(
           MaterialPageRoute(builder: (_) => const LoginPage()),
           (route) => false,
@@ -167,7 +163,7 @@ class AuthenticationController extends GetxController {
           (route) => false,
         );
       } else {
-        CommonUtils.showErrorToast("Failed Pleace try again");
+        CommonUtils.showErrorToast(userSignInResponse.data['message']);
         usernameController.text = "";
         passwordController.text = "";
       }
