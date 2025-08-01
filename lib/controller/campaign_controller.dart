@@ -82,20 +82,12 @@ class CampaignController extends GetxController {
 
   Future<void> createCampaign({
     required String name,
-    required int capitalInvested,
-    required String validUntil,
-    required int reward,
-    required int capacity,
   }) async {
     try {
       isLoading.value = true;
 
       final response = await _campaignRepository.createCampaign(
         name: name,
-        capitalInvested: capitalInvested,
-        validUntil: validUntil,
-        reward: reward,
-        capacity: capacity,
       );
 
       if (response?.statusCode == 201 || response?.statusCode == 200) {

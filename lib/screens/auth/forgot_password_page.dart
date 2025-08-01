@@ -17,7 +17,6 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _nationalIdController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmationController = TextEditingController();
   final _emailController = TextEditingController();
@@ -33,7 +32,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void dispose() {
     _usernameController.dispose();
     _phoneController.dispose();
-    _nationalIdController.dispose();
     _passwordController.dispose();
     _passwordConfirmationController.dispose();
     _emailController.dispose();
@@ -43,7 +41,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Future<void> _resetPassword() async {
     if (_usernameController.text.isEmpty ||
         _phoneController.text.isEmpty ||
-        _nationalIdController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordConfirmationController.text.isEmpty) {
@@ -75,7 +72,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         isLoggedIn: false,
         username: _usernameController.text.trim(),
         phone: _phoneController.text.trim(),
-        nationalId: _nationalIdController.text.trim(),
         password: _passwordController.text.trim(),
         passwordConfirmation: _passwordConfirmationController.text.trim(),
         email: _emailController.text.trim(),
@@ -396,16 +392,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         const SizedBox(
                           height: 10,
                         ),
-
-                        // National ID field
-                        _buildTextField(
-                          controller: _nationalIdController,
-                          label: 'National ID',
-                          hintText: 'Enter your national ID',
-                        )
-                            .animate(delay: 450.ms)
-                            .fadeIn(duration: 600.ms)
-                            .moveY(begin: 10, end: 0, duration: 400.ms),
 
                         // New Password field
                         _buildTextField(

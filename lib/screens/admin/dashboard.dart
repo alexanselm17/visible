@@ -16,8 +16,11 @@ class AdminDashboardPage extends StatefulWidget {
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
+  static const Color accentOrange = Color(0xFFFF7F00);
+
   AuthenticationController authenticationController =
       Get.put(AuthenticationController());
+
   final List<String> _timeFilters = [
     'Today',
     'This Week',
@@ -26,116 +29,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   ];
   String _selectedTimeFilter = 'This Week';
   bool _isLoading = false;
-
-  // Data from API
   Data? _dashboardData;
 
-  void _showPopupMenu(BuildContext context) async {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    await showMenu<String>(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromPoints(
-          button.localToGlobal(Offset.zero, ancestor: overlay),
-          button.localToGlobal(button.size.bottomRight(Offset.zero),
-              ancestor: overlay),
-        ),
-        Offset.zero & overlay.size,
-      ),
-      items: [
-        const PopupMenuItem(
-          value: '1',
-          child: Row(
-            children: [
-              Text('Profile'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: '3',
-          child: Row(
-            children: [
-              Text('Employees'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: '4',
-          child: Row(
-            children: [
-              Text('Download Payroll'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: '2',
-          child: Row(
-            children: [
-              Text(
-                'Log Out',
-                style: TextStyle(color: Colors.red),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Icon(
-                Icons.logout_rounded,
-                color: Colors.red,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ).then((value) {
-      if (value != null) {
-        _handleAction(value);
-      }
-    });
-  }
-
-  void _handleAction(String value) {
-    switch (value) {
-      case '2':
-        Get.put<AuthenticationController>(AuthenticationController()).logOut();
-        break;
-      case '3':
-        Get.to(const UsersScreen());
-      case '4':
-        Get.put<AuthenticationController>(AuthenticationController())
-            .downloadPayRoll();
-
-        break;
-
-      case 'delete':
-        print('Delete selected');
-        break;
-    }
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
   }
 
   Future<void> _loadDashboardData() async {
     if (!mounted) return;
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       String query = _getQueryFromTimeFilter(_selectedTimeFilter);
-
       var res = await authenticationController.getAdminDashboard(query: query);
       setState(() {
         _dashboardData = AdminModel.fromJson(res).data;
       });
-
       if (!mounted) return;
     } catch (e) {
       if (mounted) {
         Get.snackbar(
           'Error',
-          'Failed to load dashboard data',
+          'Failed to load dashboard data: $e',
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -164,18 +82,91 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadDashboardData();
+  void _showProfileMenu(BuildContext context) {
+    showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        0, // Left
+        AppBar().preferredSize.height, // Top (below app bar)
+        MediaQuery.of(context).size.width, // Right
+        0, // Bottom
+      ),
+      items: [
+        PopupMenuItem<String>(
+          value: 'profile',
+          child: Row(
+            children: [
+              const Icon(Icons.person_outline, size: 20, color: Colors.black87),
+              const SizedBox(width: 10),
+              Text('Profile', style: TextStyle(color: Colors.grey[800])),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'employees',
+          child: Row(
+            children: [
+              const Icon(Icons.people_outline, size: 20, color: Colors.black87),
+              const SizedBox(width: 10),
+              Text('Employees', style: TextStyle(color: Colors.grey[800])),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'download_payroll',
+          child: Row(
+            children: [
+              const Icon(Icons.download_outlined,
+                  size: 20, color: Colors.black87),
+              const SizedBox(width: 10),
+              Text('Download Payroll',
+                  style: TextStyle(color: Colors.grey[800])),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        const PopupMenuItem<String>(
+          value: 'logout',
+          child: Row(
+            children: [
+              Icon(Icons.logout_rounded, size: 20, color: Colors.red),
+              SizedBox(width: 10),
+              Text('Log Out', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        _handleAction(value);
+      }
+    });
+  }
+
+  void _handleAction(String value) {
+    switch (value) {
+      case 'profile':
+        // Navigate to profile page
+        Get.snackbar('Info', 'Profile page coming soon!');
+        break;
+      case 'employees':
+        Get.to(() => const UsersScreen());
+        break;
+      case 'download_payroll':
+        authenticationController.downloadPayRoll();
+        break;
+      case 'logout':
+        authenticationController.logOut();
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: AppColors.pureWhite,
+        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         leadingWidth: 180,
@@ -185,12 +176,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             children: [
               GestureDetector(
                 onTap: () {
-                  _showPopupMenu(context);
+                  _showProfileMenu(context);
                 },
-                child: const CircleAvatar(
+                child: CircleAvatar(
                   radius: 18,
-                  backgroundImage: AssetImage(
-                    'assets/images/8ebb1801-6af2-4a3b-b0c4-ae4a7de2b09d_removalai_preview.png',
+                  backgroundColor: Colors.grey[200],
+                  child: Obx(
+                    () => Text(
+                      (authenticationController.currentUser.value.username ??
+                              'A')[0]
+                          .toUpperCase(),
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -200,10 +200,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   authenticationController.currentUser.value.username ??
                       'Admin',
                   style: const TextStyle(
-                    fontFamily: 'TT Hoves Pro Trial',
-                    color: AppColors.primaryBlack,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -213,45 +212,44 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         title: null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined,
-                color: AppColors.primaryBlack),
+            icon:
+                const Icon(Icons.notifications_outlined, color: Colors.black87),
             onPressed: () {
               // Show notifications
+              Get.snackbar('Info', 'No new notifications');
             },
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.primaryBlack),
+            icon: const Icon(Icons.refresh, color: Colors.black87),
             onPressed: _loadDashboardData,
+            tooltip: 'Refresh Data',
           ),
         ],
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.accentOrange))
+              child: CircularProgressIndicator(color: accentOrange),
+            )
           : _dashboardData == null
               ? const Center(
-                  child: Text('No data available'),
+                  child: Text(
+                    'No data available',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 )
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Time filter
+                      // Dashboard Header with Time Filter
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                            horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[200]!),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -260,13 +258,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               'Dashboard Overview',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                             DropdownButton<String>(
                               value: _selectedTimeFilter,
                               underline: Container(),
-                              icon: const Icon(Icons.keyboard_arrow_down),
+                              icon: const Icon(Icons.keyboard_arrow_down,
+                                  color: Colors.grey),
                               items: _timeFilters.map((String filter) {
                                 return DropdownMenuItem<String>(
                                   value: filter,
@@ -287,135 +286,65 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Stat cards row 1
-                      Row(
+                      // Stat cards
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.2, // Adjust as needed
                         children: [
                           _buildStatCard(
                             'Total Users',
                             (_dashboardData!.totalUsers ?? 0).toString(),
-                            Icons.people,
+                            Icons.people_outline,
                             Colors.blue,
                             'Registered users',
                           ),
-                          const SizedBox(width: 16),
                           _buildStatCard(
                             'Ongoing Campaigns',
                             (_dashboardData!.ongoing ?? 0).toString(),
-                            Icons.campaign,
-                            Colors.green,
+                            Icons.campaign_outlined,
+                            accentOrange,
                             'Out of ${_dashboardData!.campaignsCreated ?? 0}',
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Stat cards row 2
-                      Row(
-                        children: [
                           _buildStatCard(
-                            'Completed',
+                            'Completed Campaigns',
                             (_dashboardData!.completed ?? 0).toString(),
-                            Icons.done_all,
-                            Colors.purple,
+                            Icons.done_all_outlined,
+                            Colors.green,
                             'Campaigns completed',
                           ),
-                          const SizedBox(width: 16),
                           _buildStatCard(
                             'Rewards Assigned',
-                            ("Ksh ${_dashboardData!.rewardsAssigned ?? 0}")
-                                .toString(),
-                            Icons.card_giftcard,
-                            Colors.orange,
+                            "Ksh ${NumberFormat('#,###').format(_dashboardData!.rewardsAssigned ?? 0)}",
+                            Icons.card_giftcard_outlined,
+                            Colors.purple,
                             'Total rewards',
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Stat cards row 3
-                      Row(
-                        children: [
                           _buildStatCard(
                             'Payment Done',
                             'Ksh ${NumberFormat('#,###').format(_dashboardData!.paymentDone ?? 0)}',
-                            Icons.payment,
+                            Icons.payment_outlined,
                             Colors.green,
                             'Payments completed',
                           ),
-                          const SizedBox(width: 16),
                           _buildStatCard(
                             'Pending Payment',
                             'Ksh ${NumberFormat('#,###').format(_dashboardData!.pendingPayment ?? 0)}',
-                            Icons.pending,
+                            Icons.pending_actions_outlined,
                             Colors.red,
                             'Awaiting payment',
                           ),
+                          _buildStatCard(
+                            'Unused Slots',
+                            (_dashboardData!.unusedSlots ?? 0).toString(),
+                            Icons.inventory_2_outlined,
+                            Colors.amber,
+                            'Available slots for new campaigns',
+                          ),
                         ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Unused Slots Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.withOpacity(0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.inventory,
-                                    color: Colors.amber,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Unused Campaign Slots',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              (_dashboardData!.unusedSlots ?? 0).toString(),
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.amber,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Available slots for new campaigns',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                       const SizedBox(height: 24),
 
@@ -424,7 +353,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           _dashboardData!.topCampaigns!.isNotEmpty) ...[
                         _buildSectionTitle(
                             'Top Campaigns', 'Highest completion rates'),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         _buildTopCampaignsList(),
                         const SizedBox(height: 24),
                       ],
@@ -435,97 +364,97 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   Widget _buildStatCard(
-      String title, String value, IconData icon, Color color, String subtitle) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    shape: BoxShape.circle,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+    String subtitle,
+  ) {
+    return IntrinsicWidth(
+      child: IntrinsicHeight(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: color, size: 24),
+                ],
+              ),
+              const SizedBox(height: 16),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  child: Icon(
-                    icon,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Flexible(
+                child: Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
                     color: color,
-                    size: 20,
+                    fontWeight: FontWeight.w500,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const Spacer(),
-                const Icon(
-                  Icons.more_horiz,
-                  color: Colors.grey,
-                  size: 20,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title, String subtitle) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -536,21 +465,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         if (campaign.capacity != null && campaign.capacity! > 0) {
           completionRate = (campaign.completed ?? 0) / campaign.capacity! * 100;
         }
-
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[200]!),
           ),
           child: Column(
             children: [
@@ -561,7 +482,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     child: Text(
                       campaign.name ?? 'Unknown Campaign',
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         fontSize: 16,
                       ),
                     ),
@@ -617,6 +538,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 4),

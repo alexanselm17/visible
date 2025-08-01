@@ -548,26 +548,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ),
                           const Spacer(),
                           // Status badges
-
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: widget.product.badge!
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                              final int index = entry.key;
-                              final String badge = entry.value;
-                              final Color badgeColor = AppColors.badgeColors[
-                                  index % AppColors.badgeColors.length];
-
-                              return _buildBadge(badge, badgeColor);
-                            }).toList(),
-                          ),
                         ],
                       ),
+                      const SizedBox(height: 18),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children:
+                            widget.product.badge!.asMap().entries.map((entry) {
+                          final int index = entry.key;
+                          final String badge = entry.value;
+                          final Color badgeColor = AppColors.badgeColors[
+                              index % AppColors.badgeColors.length];
 
-                      const SizedBox(height: 8),
+                          return _buildBadge(badge, badgeColor);
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 18),
                       Row(
                         children: [
                           const Icon(
@@ -605,7 +602,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   child: CircularProgressIndicator(
                                     value:
                                         (widget.product.screenshotCount ?? 2) /
-                                            5.0,
+                                            2.0,
                                     strokeWidth: 6,
                                     backgroundColor:
                                         Colors.white.withOpacity(0.3),
@@ -615,7 +612,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   ),
                                 ),
                                 Text(
-                                  '${widget.product.screenshotCount}/5',
+                                  '${widget.product.screenshotCount}/2',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -685,7 +682,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     ),
                                   ),
                                 ),
-                                if (widget.product.screenshotCount == 5)
+                                if (widget.product.screenshotCount == 2)
                                   const Icon(
                                     Icons.check_circle,
                                     color: Colors.green,
@@ -759,7 +756,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             const SizedBox(height: 16),
 
                             // Choose Screenshot button
-                            if (widget.product.screenshotCount != 5)
+                            if (widget.product.screenshotCount != 2)
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(

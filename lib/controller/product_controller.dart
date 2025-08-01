@@ -35,12 +35,20 @@ class ProductController extends GetxController {
   RxBool isLoadingCompleted = false.obs;
 
   Future<void> uploadProductAdvert({
-    required File imageFile,
+    File? imageFile,
+    File? videoFile,
+    File? thumbnailFile,
     required String campaignId,
     required String name,
     required String description,
-    required List badge,
+    required List<String> badge,
     required String category,
+    required String reward,
+    required String capacity,
+    required String validUntil,
+    required String capitalInvested,
+    required String gender,
+    required String countyId,
   }) async {
     try {
       isLoading(true);
@@ -50,9 +58,17 @@ class ProductController extends GetxController {
         description: description,
         campaignId: campaignId,
         imageFile: imageFile,
+        videoFile: videoFile,
+        thumbnailFile: thumbnailFile,
         name: name,
         badge: badge,
         category: category,
+        reward: reward,
+        capacity: capacity,
+        validUntil: validUntil,
+        capitalInvested: capitalInvested,
+        gender: gender,
+        countyId: countyId,
       );
 
       if (response != null && response.statusCode == 200) {
@@ -61,6 +77,9 @@ class ProductController extends GetxController {
 
         Get.back();
         return CommonUtils.showToast('Product advert uploaded successfully');
+      } else {
+        return CommonUtils.showErrorToast(
+            response!.data['message'] ?? 'Failed to upload product advert');
       }
     } catch (e) {
       uploadStatus('Upload failed');
@@ -70,27 +89,42 @@ class ProductController extends GetxController {
     }
   }
 
-  Future<void> uploadVideoProductAdvert({
-    required File videoFile,
-    required File imageFile,
-    required String campaignId,
+  Future<void> updateProductAdvert({
+    File? imageFile,
+    File? videoFile,
+    File? thumbnailFile,
+    required String productId,
     required String name,
     required String description,
-    required List badge,
+    required List<String> badge,
     required String category,
+    required String reward,
+    required String capacity,
+    required String validUntil,
+    required String capitalInvested,
+    required String gender,
+    required String countyId,
+    required String campaignId,
   }) async {
     try {
       isLoading(true);
       uploadStatus('Uploading...');
 
-      final response = await _productRepository.uploadVideoProductAdvert(
+      final response = await _productRepository.updateProductAdvert(
         description: description,
-        campaignId: campaignId,
+        productId: productId,
         imageFile: imageFile,
-        name: name,
         videoFile: videoFile,
+        thumbnailFile: thumbnailFile,
+        name: name,
         badge: badge,
         category: category,
+        reward: reward,
+        capacity: capacity,
+        validUntil: validUntil,
+        capitalInvested: capitalInvested,
+        gender: gender,
+        countyId: countyId,
       );
 
       if (response != null && response.statusCode == 200) {

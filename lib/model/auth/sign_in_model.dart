@@ -56,17 +56,19 @@ class Data {
   int? isActive;
   String? roleId;
   dynamic isVerified;
-  int? nationalId;
   int? isLoggedIn;
   dynamic cardNumber;
   String? occupation;
-  String? location;
+  dynamic location;
   String? gender;
   dynamic emailVerifiedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
   dynamic deletedAt;
+  String? myCode;
   Role? role;
+  County? county;
+  SubCounty? subCounty;
 
   Data({
     this.id,
@@ -77,7 +79,6 @@ class Data {
     this.isActive,
     this.roleId,
     this.isVerified,
-    this.nationalId,
     this.isLoggedIn,
     this.cardNumber,
     this.occupation,
@@ -87,7 +88,10 @@ class Data {
     this.createdAt,
     this.updatedAt,
     this.deletedAt,
+    this.myCode,
     this.role,
+    this.county,
+    this.subCounty,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
@@ -99,7 +103,6 @@ class Data {
         isActive: json["is_active"],
         roleId: json["role_id"],
         isVerified: json["is_verified"],
-        nationalId: json["national_id"],
         isLoggedIn: json["is_logged_in"],
         cardNumber: json["card_number"],
         occupation: json["occupation"],
@@ -113,7 +116,12 @@ class Data {
             ? null
             : DateTime.parse(json["updated_at"]),
         deletedAt: json["deleted_at"],
+        myCode: json["my_code"],
         role: json["role"] == null ? null : Role.fromJson(json["role"]),
+        county: json["county"] == null ? null : County.fromJson(json["county"]),
+        subCounty: json["sub_county"] == null
+            ? null
+            : SubCounty.fromJson(json["sub_county"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -125,7 +133,6 @@ class Data {
         "is_active": isActive,
         "role_id": roleId,
         "is_verified": isVerified,
-        "national_id": nationalId,
         "is_logged_in": isLoggedIn,
         "card_number": cardNumber,
         "occupation": occupation,
@@ -135,7 +142,38 @@ class Data {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
         "deleted_at": deletedAt,
+        "my_code": myCode,
         "role": role?.toJson(),
+        "county": county?.toJson(),
+        "sub_county": subCounty?.toJson(),
+      };
+}
+
+class County {
+  String? id;
+  String? name;
+  dynamic capital;
+  int? code;
+
+  County({
+    this.id,
+    this.name,
+    this.capital,
+    this.code,
+  });
+
+  factory County.fromJson(Map<String, dynamic> json) => County(
+        id: json["id"],
+        name: json["name"],
+        capital: json["capital"],
+        code: json["code"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "capital": capital,
+        "code": code,
       };
 }
 
@@ -160,5 +198,29 @@ class Role {
         "id": id,
         "name": name,
         "slug": slug,
+      };
+}
+
+class SubCounty {
+  String? id;
+  String? name;
+  String? countyId;
+
+  SubCounty({
+    this.id,
+    this.name,
+    this.countyId,
+  });
+
+  factory SubCounty.fromJson(Map<String, dynamic> json) => SubCounty(
+        id: json["id"],
+        name: json["name"],
+        countyId: json["county_id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "county_id": countyId,
       };
 }

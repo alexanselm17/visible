@@ -1,9 +1,10 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  static const String baseUrl =
-      "https://lightslategrey-whale-350840.hostingersite.com/api/v1";
-  // static const String baseUrl = "http://192.168.8.150:8000/api/v1";
+  // static const String baseUrl =
+  // "https://lightslategrey-whale-350840.hostingersite.com/api/v1";
+  // static const String baseUrl = "http://192.168.8.125:8000/api/v1";
+  static const String baseUrl = "https://visibledm.com/api/v1";
 
   static const int receiveTimeout = 10000;
   static const int connectionTimeout = 10000;

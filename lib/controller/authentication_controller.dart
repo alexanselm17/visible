@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/roles_constants.dart';
+import 'package:visible/model/auth/location_search.dart';
 import 'package:visible/model/auth/sign_in_model.dart';
 import 'package:visible/model/users/report.dart' as report;
 import 'package:visible/repository/auth_repository.dart';
@@ -49,25 +50,25 @@ class AuthenticationController extends GetxController {
   }
 
   Future<void> loadUserData() async {
-    try {
-      final signInModel = await UserPreferences().getSignInModel();
-      final token = await UserPreferences().getToken();
+    // try {
+    final signInModel = await UserPreferences().getSignInModel();
+    final token = await UserPreferences().getToken();
 
-      if (signInModel != null && signInModel.data != null && token.isNotEmpty) {
-        currentUser.value = signInModel.data!;
-        currentUser.refresh();
-        refresh();
-        Logger().i("User data loaded from preferences");
-      } else {
-        currentUser.value = Data();
-        await UserPreferences().logout();
-        Logger().w("No valid stored user data found - cleared preferences");
-      }
-    } catch (e) {
-      Logger().e("Error loading user data: $e");
+    if (signInModel != null && signInModel.data != null && token.isNotEmpty) {
+      currentUser.value = signInModel.data!;
+      currentUser.refresh();
+      refresh();
+      Logger().i("User data loaded from preferences");
+    } else {
       currentUser.value = Data();
       await UserPreferences().logout();
+      Logger().w("No valid stored user data found - cleared preferences");
     }
+    // } catch (e) {
+    //   Logger().e("Error loading user data: $e");
+    //   currentUser.value = Data();
+    //   await UserPreferences().logout();
+    // }
   }
 
   Future<void> handleSignUp({
@@ -81,9 +82,10 @@ class AuthenticationController extends GetxController {
     required String location,
     required String gender,
     required String county,
+    required String subCounty,
+    required String code,
     required String town,
     required String estate,
-    required String nationalId,
   }) async {
     try {
       isLoading.value = true;
@@ -92,7 +94,6 @@ class AuthenticationController extends GetxController {
         fullname: fullname,
         username: username,
         phone: "+254${phone.replaceAll(' ', '')}",
-        nationalId: nationalId,
         password: password,
         cpassword: cpassword,
         email: email,
@@ -102,11 +103,16 @@ class AuthenticationController extends GetxController {
         county: county,
         town: town,
         estate: estate,
+        subCounty: subCounty,
+        code: code,
       );
 
       isLoading.value = false;
-
       if (res!.statusCode == 200) {
+        final fcmToken = await PushNotification().getDeviceToken();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('fcm_token', fcmToken);
+        await updateFcmToken(fcmToken);
         Get.offUntil(
           MaterialPageRoute(builder: (_) => const LoginPage()),
           (route) => false,
@@ -161,7 +167,7 @@ class AuthenticationController extends GetxController {
           (route) => false,
         );
       } else {
-        CommonUtils.showErrorToast(userSignInResponse.data['message']);
+        CommonUtils.showErrorToast("Failed Pleace try again");
         usernameController.text = "";
         passwordController.text = "";
       }
@@ -225,7 +231,6 @@ class AuthenticationController extends GetxController {
     required String username,
     required String email,
     required String phone,
-    required String nationalId,
     required String password,
     required String passwordConfirmation,
   }) async {
@@ -242,7 +247,6 @@ class AuthenticationController extends GetxController {
         username: username,
         password: password,
         phone: formattedPhone,
-        nationalId: nationalId,
         passwordConfirmation: passwordConfirmation,
       );
 
@@ -273,19 +277,19 @@ class AuthenticationController extends GetxController {
   }
 
   Future getUserDashboard() async {
-    try {
-      String id = await UserPreferences().getUserId();
-      final response = await authRepository.getUserDashboard(userId: id);
-      if (response!.statusCode == 200) {
-        Logger().i("User dashboard data fetched successfully");
-        return response.data;
-      } else {
-        CommonUtils.showErrorToast(response.data['message']);
-      }
-    } catch (e) {
-      CommonUtils.showErrorToast("Failed to fetch user dashboard: $e");
+    // try {
+    String id = await UserPreferences().getUserId();
+    final response = await authRepository.getUserDashboard(userId: id);
+    if (response!.statusCode == 200) {
+      Logger().i("User dashboard data fetched successfully");
+      return response.data;
+    } else {
+      CommonUtils.showErrorToast(response.data['message']);
     }
-    return null;
+    // } catch (e) {
+    //   CommonUtils.showErrorToast("Failed to fetch user dashboard: $e");
+    // }
+    // return null;
   }
 
   Future getAdminDashboard({required String query}) async {
@@ -337,6 +341,20 @@ class AuthenticationController extends GetxController {
       if (response.statusCode == 200) {
         final userReport = report.UserReport.fromJson(response.data);
         return userReport.data!.data;
+      } else {}
+    } catch (e) {}
+  }
+
+  Future getUserLocation({
+    required String search,
+  }) async {
+    try {
+      final response = await authRepository.getUserLocation(
+        search: search,
+      );
+      if (response.statusCode == 200) {
+        final userReport = LocationSearch.fromJson(response.data);
+        return userReport.data;
       } else {}
     } catch (e) {}
   }

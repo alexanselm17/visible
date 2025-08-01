@@ -112,17 +112,32 @@ class Data {
 class Datum {
   String? id;
   String? category;
+  String? description;
+  String? capitalInvested;
+  DateTime? validUntil;
+  String? reward;
+  int? capacity;
+  TargetAudience? targetAudience;
+  List<String>? badge;
   String? name;
-  int? sellingPrice;
+  String? sellingPrice;
   String? campaignId;
   DateTime? createdAt;
   DateTime? updatedAt;
   String? imagePath;
   String? imageUrl;
+  String? videoUrl;
 
   Datum({
     this.id,
     this.category,
+    this.description,
+    this.capitalInvested,
+    this.validUntil,
+    this.reward,
+    this.capacity,
+    this.targetAudience,
+    this.badge,
     this.name,
     this.sellingPrice,
     this.campaignId,
@@ -130,11 +145,25 @@ class Datum {
     this.updatedAt,
     this.imagePath,
     this.imageUrl,
+    this.videoUrl,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         category: json["category"],
+        description: json["description"],
+        capitalInvested: json["capital_invested"],
+        validUntil: json["valid_until"] == null
+            ? null
+            : DateTime.parse(json["valid_until"]),
+        reward: json["reward"],
+        capacity: json["capacity"],
+        targetAudience: json["target_audience"] == null
+            ? null
+            : TargetAudience.fromJson(json["target_audience"]),
+        badge: json["badge"] == null
+            ? []
+            : List<String>.from(json["badge"]!.map((x) => x)),
         name: json["name"],
         sellingPrice: json["selling_price"],
         campaignId: json["campaign_id"],
@@ -146,11 +175,19 @@ class Datum {
             : DateTime.parse(json["updated_at"]),
         imagePath: json["image_path"],
         imageUrl: json["image_url"],
+        videoUrl: json["video_url"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "category": category,
+        "description": description,
+        "capital_invested": capitalInvested,
+        "valid_until": validUntil?.toIso8601String(),
+        "reward": reward,
+        "capacity": capacity,
+        "target_audience": targetAudience?.toJson(),
+        "badge": badge == null ? [] : List<dynamic>.from(badge!.map((x) => x)),
         "name": name,
         "selling_price": sellingPrice,
         "campaign_id": campaignId,
@@ -158,6 +195,27 @@ class Datum {
         "updated_at": updatedAt?.toIso8601String(),
         "image_path": imagePath,
         "image_url": imageUrl,
+        "video_url": videoUrl,
+      };
+}
+
+class TargetAudience {
+  String? gender;
+  String? countyId;
+
+  TargetAudience({
+    this.gender,
+    this.countyId,
+  });
+
+  factory TargetAudience.fromJson(Map<String, dynamic> json) => TargetAudience(
+        gender: json["gender"],
+        countyId: json["county_id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "gender": gender,
+        "county_id": countyId,
       };
 }
 

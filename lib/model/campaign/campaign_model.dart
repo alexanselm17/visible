@@ -40,10 +40,6 @@ class CampaignModel {
 class Datum {
   String? id;
   String? name;
-  String? capitalInvested;
-  DateTime? validUntil;
-  String? reward;
-  int? capacity;
   int? completed;
   int? ongoing;
   int? available;
@@ -53,10 +49,6 @@ class Datum {
   Datum({
     this.id,
     this.name,
-    this.capitalInvested,
-    this.validUntil,
-    this.reward,
-    this.capacity,
     this.completed,
     this.ongoing,
     this.available,
@@ -67,12 +59,6 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         name: json["name"],
-        capitalInvested: json["capital_invested"],
-        validUntil: json["valid_until"] == null
-            ? null
-            : DateTime.parse(json["valid_until"]),
-        reward: json["reward"],
-        capacity: json["capacity"],
         completed: json["completed"],
         ongoing: json["ongoing"],
         available: json["available"],
@@ -85,10 +71,6 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "capital_invested": capitalInvested,
-        "valid_until": validUntil?.toIso8601String(),
-        "reward": reward,
-        "capacity": capacity,
         "completed": completed,
         "ongoing": ongoing,
         "available": available,

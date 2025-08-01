@@ -42,18 +42,10 @@ class CampaignRepository {
 
   Future<Response?> createCampaign({
     required String name,
-    required int capitalInvested,
-    required String validUntil,
-    required int reward,
-    required int capacity,
   }) async {
     try {
       var body = {
         "name": name,
-        "capital_invested": capitalInvested,
-        "valid_until": validUntil,
-        "reward": reward,
-        "capacity": capacity,
       };
 
       Logger().d(body);

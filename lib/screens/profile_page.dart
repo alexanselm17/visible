@@ -8,6 +8,7 @@ import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/report.dart';
 import 'package:visible/shared_preferences/user_pref.dart';
+import 'package:visible/widgets/referal_code.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -306,6 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final email = user.email ?? 'No email provided';
     final phone = user.phone ?? 'No phone provided';
     final from = user.createdAt;
+    final code = user.myCode ?? 'No code provided';
 
     String calculateTimeDifferenceLong(DateTime from) {
       final DateTime now = DateTime.now();
@@ -595,6 +597,15 @@ class _ProfilePageState extends State<ProfilePage> {
         ).animate().fadeIn(duration: 400.ms, delay: 550.ms),
         const SizedBox(height: 30),
 
+        ReferralCodeCard(
+          referralCode: code,
+          title: 'Your Referral Code',
+          subtitle: 'Share with friends to earn rewards',
+          shareMessage:
+              'Join Visible using code $code and get exclusive rewards! 🎁',
+        ).animate().fadeIn(duration: 400.ms, delay: 550.ms),
+        const SizedBox(height: 30),
+
         // My Report Button
         SizedBox(
           width: 150,
@@ -760,13 +771,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     final user = _authenticationController.currentUser.value;
                     final email = user.email;
                     final phone = user.phone;
-                    final nationalId = user.nationalId;
                     _authenticationController.resetPassword(
                         isLoggedIn: true,
                         username: user.username!,
                         email: email!,
                         phone: phone!,
-                        nationalId: nationalId.toString(),
                         password: passwordController.text,
                         passwordConfirmation: confirmPasswordController.text);
                   },
@@ -799,6 +808,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final email = user.email ?? 'No email provided';
     final phone = user.phone ?? 'No phone provided';
     final from = user.createdAt;
+    final code = user.myCode ?? 'No code provided';
 
     String calculateTimeDifferenceLong(DateTime from) {
       final DateTime now = DateTime.now();
@@ -1075,6 +1085,15 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
+        const SizedBox(height: 30),
+
+        ReferralCodeCard(
+          referralCode: code,
+          title: 'Your Referral Code',
+          subtitle: 'Share with friends to earn rewards',
+          shareMessage:
+              'Join Visible using code $code and get exclusive rewards! 🎁',
+        ).animate().fadeIn(duration: 400.ms, delay: 550.ms),
         const SizedBox(height: 30),
 
         // My Performance Report Section

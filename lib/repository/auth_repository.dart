@@ -15,7 +15,6 @@ class AuthRepository {
     required String fullname,
     required String username,
     required String phone,
-    required String nationalId,
     required String email,
     required String occupation,
     required String password,
@@ -23,8 +22,10 @@ class AuthRepository {
     required String location,
     required String gender,
     required String county,
+    required String subCounty,
     required String town,
     required String estate,
+    required String code,
   }) async {
     try {
       var body = {
@@ -32,15 +33,16 @@ class AuthRepository {
         "username": username,
         "phone": phone,
         "email": email,
-        "national_id": nationalId,
         "password": password,
         "occupation": occupation,
         "location": location,
         "password_confirmation": cpassword,
         "county": county,
+        "sub_county": subCounty,
         "town": town,
         "estate": estate,
-        "gender": gender
+        "gender": gender,
+        "code": code,
       };
       Logger().d(body);
       final Response? response =
@@ -81,7 +83,6 @@ class AuthRepository {
     required String username,
     required String email,
     required String phone,
-    required String nationalId,
     required String password,
     required String passwordConfirmation,
   }) async {
@@ -90,7 +91,6 @@ class AuthRepository {
         "email": email,
         "username": username,
         "phone": phone,
-        "national_id": nationalId,
         "password": password,
         "password_confirmation": passwordConfirmation
       };
@@ -233,5 +233,21 @@ class AuthRepository {
     }
 
     return null;
+  }
+
+  Future getUserLocation({
+    required String search,
+  }) async {
+    try {
+      final Response? response = await dioClient.getHTTP(
+        '${ApiEndpoints.baseUrl}/auth/location?name=$search',
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

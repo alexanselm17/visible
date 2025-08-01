@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visible/common/notif_icon.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_dashboard.dart';
 import 'package:visible/screens/profile_page.dart';
-import 'package:visible/screens/user/notification/notification_page.dart';
 import 'package:visible/shared_preferences/user_pref.dart';
 import 'package:visible/widgets/loading_indicator.dart';
 
@@ -201,10 +199,10 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                         style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.bold,
                           height: 1.2,
                         ),
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -231,11 +229,10 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.green,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
                   'APPROVED',
@@ -247,31 +244,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              const SizedBox(width: 12),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _loadDashboardData();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.refresh,
-                        color: Colors.black87,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  buildNotificationIconAlt(),
-                ],
-              ),
+              buildNotificationIconAlt(),
             ],
           ),
         ),
@@ -762,7 +735,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                           width: 80,
                           height: 80,
                           child: CircularProgressIndicator(
-                            value: (campaign.screenshotCount ?? 2) / 5.0,
+                            value: (campaign.screenshotCount ?? 2) / 2.0,
                             strokeWidth: 3,
                             backgroundColor: Colors.white.withOpacity(0.3),
                             valueColor: const AlwaysStoppedAnimation<Color>(
@@ -770,7 +743,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                           ),
                         ),
                         Text(
-                          '${campaign.screenshotCount ?? 2}/5',
+                          '${campaign.screenshotCount ?? 2}/2',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -818,9 +791,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
                 ],
               ),
             ),
-
             const SizedBox(width: 12),
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
@@ -924,7 +895,7 @@ class _UserDashboardPageState extends State<UserDashboardPage> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 earning.advertName!,

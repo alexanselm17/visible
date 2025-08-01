@@ -445,7 +445,7 @@ class _ProductsPageState extends State<ProductsPage> {
                             child: CircularProgressIndicator(
                               value: (double.parse(
                                       product.screenshotCount.toString()) /
-                                  5.0),
+                                  2.0),
                               strokeWidth: 3,
                               backgroundColor: Colors.black.withOpacity(0.3),
                               valueColor: const AlwaysStoppedAnimation<Color>(
@@ -453,7 +453,7 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                           ),
                           Text(
-                            '${product.screenshotCount}/5',
+                            '${product.screenshotCount}/2',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -798,10 +798,10 @@ class _ProductsPageState extends State<ProductsPage> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.green,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
                     'APPROVED',
@@ -813,29 +813,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const SizedBox(width: 12),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.refresh,
-                          color: Colors.black87,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    buildNotificationIconAlt(),
-                  ],
-                ),
+                buildNotificationIconAlt(),
               ],
             ),
           ),
