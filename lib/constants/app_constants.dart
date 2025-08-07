@@ -5,7 +5,6 @@ class ApiEndpoints {
   // "https://lightslategrey-whale-350840.hostingersite.com/api/v1";
   // static const String baseUrl = "http://192.168.8.125:8000/api/v1";
   static const String baseUrl = "https://visibledm.com/api/v1";
-
   static const int receiveTimeout = 10000;
   static const int connectionTimeout = 10000;
   static const String signUpEndpoint = "$baseUrl/auth/signup";
@@ -21,6 +20,5 @@ class ApiEndpoints {
   static const String salesEndpoint = "$baseUrl/sale";
   static const String stockEndpoint = "$baseUrl/stock";
   static const String customerEndpoint = "$baseUrl/customers";
-
   static const String TOKEN_KEY = "token";
 }

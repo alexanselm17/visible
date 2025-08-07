@@ -669,13 +669,13 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
                       // Price and Investment Info
                       Row(
                         children: [
-                          if (product.sellingPrice != null) ...[
+                          if (product.reward != null) ...[
                             Expanded(
                               child: _buildInfoCard(
-                                'Selling Price',
-                                '\$${product.sellingPrice}',
-                                Icons.attach_money,
-                                Colors.green,
+                                'Reward',
+                                product.reward!,
+                                Icons.card_giftcard,
+                                Colors.orange,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -694,20 +694,8 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
 
                       const SizedBox(height: 16),
 
-                      // Reward and Capacity
                       Row(
                         children: [
-                          if (product.reward != null) ...[
-                            Expanded(
-                              child: _buildInfoCard(
-                                'Reward',
-                                product.reward!,
-                                Icons.card_giftcard,
-                                Colors.orange,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
                           if (product.capacity != null)
                             Expanded(
                               child: _buildInfoCard(

@@ -308,6 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final phone = user.phone ?? 'No phone provided';
     final from = user.createdAt;
     final code = user.myCode ?? 'No code provided';
+    final county = user.county!.name ?? 'No county provided';
 
     String calculateTimeDifferenceLong(DateTime from) {
       final DateTime now = DateTime.now();
@@ -482,6 +483,15 @@ class _ProfilePageState extends State<ProfilePage> {
         // Email
         Text(
           email,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
+
+        const SizedBox(height: 8),
+        Text(
+          county,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -809,6 +819,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final phone = user.phone ?? 'No phone provided';
     final from = user.createdAt;
     final code = user.myCode ?? 'No code provided';
+    final county = user.county!.name ?? 'No county provided';
 
     String calculateTimeDifferenceLong(DateTime from) {
       final DateTime now = DateTime.now();
@@ -976,6 +987,15 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 16),
         Text(
           email,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
+
+        const SizedBox(height: 8),
+        Text(
+          county,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
