@@ -25,6 +25,7 @@ class AuthRepository {
     required String town,
     required String estate,
     required String code,
+    required String fcmToken,
   }) async {
     try {
       var body = {
@@ -41,6 +42,7 @@ class AuthRepository {
         "estate": estate,
         "gender": gender,
         "code": code,
+        "fcm_token": fcmToken,
       };
       Logger().d(body);
       final Response? response =

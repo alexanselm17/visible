@@ -87,10 +87,17 @@ class AuthenticationController extends GetxController {
     try {
       isLoading.value = true;
 
+      // Get and store FCM token
+      final fcmToken = await PushNotification().getDeviceToken();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('fcm_token', fcmToken);
+
+      final formattedPhone = "+254${phone.replaceAll(' ', '')}";
+
       final res = await authRepository.userSignUp(
         fullname: fullname,
         username: username,
-        phone: "+254${phone.replaceAll(' ', '')}",
+        phone: formattedPhone,
         password: password,
         cpassword: cpassword,
         email: email,
@@ -101,26 +108,29 @@ class AuthenticationController extends GetxController {
         estate: estate,
         subCounty: subCounty,
         code: code,
+        fcmToken: fcmToken,
       );
+      Logger().i(res!.data);
+      Logger().i(res.statusCode);
 
-      isLoading.value = false;
-      if (res!.statusCode == 200 || res.statusCode == 201) {
-        // final fcmToken = await PushNotification().getDeviceToken();
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('fcm_token', fcmToken);
-        // await updateFcmToken(fcmToken);
-        Get.offUntil(
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-          (route) => false,
-        );
-
-        isLoading.value = true;
+      if ((res.statusCode == 200 || res.statusCode == 201)) {
+        isLoading.value = false;
+        Get.offAll(const LoginPage());
+        CommonUtils.showToast(
+            res.data['message'] ?? 'Sign-up successful! Please log in.');
       } else {
-        return CommonUtils.showErrorToast(res.data['message']);
+        isLoading.value = false;
+        final errorMessage =
+            res.data?['message'] ?? 'Sign-up failed. Please try again.';
+        CommonUtils.showErrorToast(errorMessage);
       }
     } catch (e) {
       isLoading.value = false;
-      CommonUtils.showErrorToast("Sign-up failed. Please try again.");
+
+      print('Sign-up error: $e');
+
+      CommonUtils.showErrorToast(
+          "Sign-up failed. Please check your connection and try again.");
     }
   }
 

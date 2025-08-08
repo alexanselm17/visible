@@ -24,7 +24,6 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
-  bool _hasReferralCode = false;
 
   final _nameController = TextEditingController();
   final _userNameController = TextEditingController();
@@ -821,61 +820,41 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Checkbox(
-              value: _hasReferralCode,
-              onChanged: (value) {
-                setState(() {
-                  _hasReferralCode = value ?? false;
-                  if (!_hasReferralCode) {
-                    _referralCodeController.clear();
-                  }
-                });
-              },
-              checkColor: Colors.black,
-              fillColor: WidgetStateProperty.all(Colors.white),
-              side: const BorderSide(color: Colors.white),
-            ),
-            const Text(
-              'I have a referral code',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+        const Text(
+          'Referral Code',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        if (_hasReferralCode) ...[
-          const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.grey[850]!, Colors.grey[800]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.orange.withOpacity(0.5),
-                width: 1,
-              ),
+        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.grey[850]!, Colors.grey[800]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: TextFormField(
-              controller: _referralCodeController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(16),
-                hintText: 'Enter referral code',
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon:
-                    const Icon(Icons.card_giftcard, color: Colors.orange),
-              ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.orange.withOpacity(0.5),
+              width: 1,
             ),
-          ).animate().fadeIn().slideY(begin: 0.3),
-        ],
+          ),
+          child: TextFormField(
+            controller: _referralCodeController,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
+              hintText: 'Enter referral code',
+              hintStyle: TextStyle(color: Colors.grey[400]),
+              prefixIcon: const Icon(Icons.card_giftcard, color: Colors.orange),
+            ),
+          ),
+        ).animate().fadeIn().slideY(begin: 0.3),
       ],
     ).animate(delay: 1050.ms).fadeIn().slideY(begin: 0.3);
   }
@@ -986,7 +965,8 @@ class _SignUpPageState extends State<SignUpPage> {
             );
             return;
           }
-          if (_hasReferralCode == '' || !_hasReferralCode) {
+
+          if (_referralCodeController.text.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Please input referral code'),
@@ -1001,14 +981,14 @@ class _SignUpPageState extends State<SignUpPage> {
             fullname: _nameController.text,
             username: _userNameController.text,
             phone: _phoneNumberController.text,
-            password: _passwordController.text,
-            cpassword: _confirmPasswordController.text,
+            password: _passwordController.text.trim(),
+            cpassword: _confirmPasswordController.text.trim(),
             email: _emailController.text,
             occupation: _selectedOccupation ?? '',
             county: _selectedCounty?.id ?? '',
             town: _townController.text,
             estate: _estateController.text,
-            code: _hasReferralCode ? _referralCodeController.text : '',
+            code: _referralCodeController.text,
             subCounty: _selectedSubCounty!.id!,
           );
         },
