@@ -70,8 +70,10 @@ class ProductController extends GetxController {
         gender: gender,
         countyId: countyId,
       );
+      Logger().i(response!.statusCode);
+      Logger().i(response.data);
 
-      if (response != null && response.statusCode == 200) {
+      if (response.statusCode == 200) {
         await campaignController.fetchCampaignProducts(
             campaignId: campaignId, isRefresh: true);
 
@@ -79,7 +81,7 @@ class ProductController extends GetxController {
         return CommonUtils.showToast('Product advert uploaded successfully');
       } else {
         return CommonUtils.showErrorToast(
-            response!.data['message'] ?? 'Failed to upload product advert');
+            response.data['message'] ?? 'Failed to upload product advert');
       }
     } catch (e) {
       uploadStatus('Upload failed');

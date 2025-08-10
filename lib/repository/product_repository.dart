@@ -39,7 +39,7 @@ class ProductRepository {
 
         if (thumbnailFile != null) {
           formData.files.add(MapEntry(
-            "thumbnail",
+            "image",
             await MultipartFile.fromFile(thumbnailFile.path,
                 filename: thumbnailFile.path.split('/').last),
           ));

@@ -254,23 +254,6 @@ class _AdminAddProductPageState extends State<AdminAddProductPage> {
             countyId: selectedCountyId ?? '',
           );
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.product == null
-                ? 'Product created successfully!'
-                : 'Product updated successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
       } finally {
         setState(() {
           _isSubmitting = false;
