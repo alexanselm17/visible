@@ -266,123 +266,150 @@ class _ProductsPageState extends State<ProductsPage> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 200,
-              width: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white, width: 2),
-                image: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(product.imageUrl!),
-                        fit: BoxFit.fitWidth,
-                      )
-                    : const DecorationImage(
-                        image: AssetImage('assets/johnnie_walker.png'),
-                        fit: BoxFit.cover,
-                      ),
+        padding: const EdgeInsets.all(8),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Product Image Container
+              Container(
+                height: 200,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white, width: 2),
+                  image:
+                      product.imageUrl != null && product.imageUrl!.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(product.imageUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: AssetImage('assets/johnnie_walker.png'),
+                              fit: BoxFit.cover,
+                            ),
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product Name
-                  Text(
-                    product.name!.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
 
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: product.badge!.asMap().entries.map((entry) {
-                      final int index = entry.key;
-                      final String badge = entry.value;
-                      final Color badgeColor = AppColors
-                          .badgeColors[index % AppColors.badgeColors.length];
+              const SizedBox(width: 16),
 
-                      return _buildBadge(badge, badgeColor);
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 12),
-                  Text(
-                    'Description:',
-                    style: TextStyle(
-                      color: Colors.orange[400],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.description ?? 'No description available',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      height: 1.3,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.monetization_on,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      (product.name ?? 'Product Name').toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        size: 16,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Ksh ${product.reward ?? 50}',
-                        style: const TextStyle(
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    if (product.badge != null && product.badge!.isNotEmpty)
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: product.badge!.asMap().entries.map((entry) {
+                          final int index = entry.key;
+                          final String badge = entry.value;
+                          final Color badgeColor = AppColors.badgeColors[
+                              index % AppColors.badgeColors.length];
+
+                          return _buildBadge(badge, badgeColor);
+                        }).toList(),
+                      ),
+
+                    const SizedBox(height: 12),
+
+                    Text(
+                      'Description:',
+                      style: TextStyle(
+                        color: Colors.orange[400],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      product.description ?? 'No description available',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Price Row with overflow protection
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.monetization_on,
                           color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.timer,
-                        color: Colors.orange,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _getRemainingTime(product.validUntil) == 'Expired'
-                            ? 'Expired'
-                            : 'Expires in ${_getRemainingTime(product.validUntil)}',
-                        style: TextStyle(
-                          color:
-                              _getRemainingTime(product.validUntil) == 'Expired'
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Ksh ${product.reward ?? 50}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Timer Row with overflow protection
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.timer,
+                          color: Colors.orange,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            _getRemainingTime(product.validUntil) == 'Expired'
+                                ? 'Expired'
+                                : 'Expires in ${_getRemainingTime(product.validUntil)}',
+                            style: TextStyle(
+                              color: _getRemainingTime(product.validUntil) ==
+                                      'Expired'
                                   ? Colors.red
                                   : Colors.orange,
-                          fontSize: 12,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -395,125 +422,150 @@ class _ProductsPageState extends State<ProductsPage> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              height: 200,
-              width: 125,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white, width: 2),
-                image: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(product.imageUrl!),
-                        fit: BoxFit.fitWidth,
-                      )
-                    : const DecorationImage(
-                        image: AssetImage('assets/johnnie_walker.png'),
-                        fit: BoxFit.fitWidth,
-                      ),
-              ),
-            ),
-
-            // const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name!.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Progress Circle
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            width: 80,
-                            height: 80,
-                            child: CircularProgressIndicator(
-                              value: (double.parse(
-                                      product.screenshotCount.toString()) /
-                                  2.0),
-                              strokeWidth: 3,
-                              backgroundColor: Colors.black.withOpacity(0.3),
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Colors.white),
+        padding: const EdgeInsets.all(8),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Product Image Container
+              Container(
+                height: 200,
+                width: 125,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white, width: 2),
+                  image:
+                      product.imageUrl != null && product.imageUrl!.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(product.imageUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: AssetImage('assets/johnnie_walker.png'),
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                          Text(
-                            '${product.screenshotCount}/2',
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              // Content Column - Expanded to prevent overflow
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // Product Name - Fixed with proper text handling
+                    Text(
+                      product.name ?? "Product Name",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Progress Circle
+                    Center(
+                      child: SizedBox(
+                        width: 70,
+                        height: 70,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 70,
+                              height: 70,
+                              child: CircularProgressIndicator(
+                                value: (double.parse(
+                                        product.screenshotCount.toString()) /
+                                    2.0),
+                                strokeWidth: 3,
+                                backgroundColor: Colors.black.withOpacity(0.3),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Colors.white),
+                              ),
+                            ),
+                            Text(
+                              '${product.screenshotCount}/2',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Price Row
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.monetization_on,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Ksh ${product.reward ?? 50}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              height: 1.0,
+                              fontWeight: FontWeight.bold,
                             ),
-                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
 
-                // Price and Time Row
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.monetization_on,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Ksh ${product.reward ?? 50}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.timer,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _getRemainingTime(product.validUntil) == 'Expired'
-                          ? 'Expired'
-                          : 'Expires in ${_getRemainingTime(product.validUntil)}',
-                      style: TextStyle(
-                        color:
+                    const SizedBox(height: 8),
+
+                    // Time Row
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.timer,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
                             _getRemainingTime(product.validUntil) == 'Expired'
-                                ? Colors.red
-                                : Colors.orange,
-                        fontSize: 12,
-                      ),
+                                ? 'Expired'
+                                : 'Expires in ${_getRemainingTime(product.validUntil)}',
+                            style: TextStyle(
+                              color: _getRemainingTime(product.validUntil) ==
+                                      'Expired'
+                                  ? Colors.red
+                                  : Colors.orange,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
