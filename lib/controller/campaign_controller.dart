@@ -3,6 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/model/campaign/campaign_model.dart' as campaign;
 import 'package:visible/model/campaign/campaign_product.dart';
+import 'package:visible/model/campaign/fraud.dart';
 import 'package:visible/repository/campaign_repository.dart';
 
 class CampaignController extends GetxController {
@@ -13,6 +14,8 @@ class CampaignController extends GetxController {
 
   RxList<campaign.Datum> campaigns = <campaign.Datum>[].obs;
   List<Datum> productsInCampaign = <Datum>[].obs;
+  final Rx<FraudUserModel?> fraudUserModel = Rx<FraudUserModel?>(null);
+
   var currentPage = 1.obs;
   var isLoadingMore = false.obs;
   var isRefreshing = false.obs;
@@ -132,6 +135,28 @@ class CampaignController extends GetxController {
         return CommonUtils.showToast("Campaign updated successfully!");
       } else {
         CommonUtils.showErrorToast(response!.data["message"]);
+      }
+    } catch (e) {
+      CommonUtils.showErrorToast(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchFraudInCampaign({
+    required String campaignId,
+  }) async {
+    try {
+      isLoading.value = true;
+      final response = await _campaignRepository.fetchFraudInCampaign(
+        campaignId: campaignId,
+      );
+
+      if (response!.statusCode == 200) {
+        fraudUserModel.value = FraudUserModel.fromJson(response.data);
+        Logger().i(response.data);
+      } else {
+        CommonUtils.showErrorToast("Failed to fetch fraud data.");
       }
     } catch (e) {
       CommonUtils.showErrorToast(e.toString());

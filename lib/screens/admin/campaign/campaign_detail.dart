@@ -4,6 +4,8 @@ import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/campaign_controller.dart';
 import 'package:visible/model/campaign/campaign_product.dart';
 import 'package:visible/screens/admin/campaign/add_product.dart';
+import 'package:visible/screens/admin/campaign/fraud_users.dart';
+import 'package:visible/screens/reports/specific_campaign_report.dart';
 
 class AdminCampaignDetailsPage extends StatefulWidget {
   final String campaignId;
@@ -91,6 +93,10 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
     });
   }
 
+  void _generateReport() {
+    Get.to(() => CampaignReportPage(campaignId: widget.campaignId));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,6 +120,20 @@ class _AdminCampaignDetailsPageState extends State<AdminCampaignDetailsPage> {
           ),
         ),
         actions: [
+          IconButton(
+            onPressed: () => Get.to(() => FraudUsers(
+                  campaignId: widget.campaignId,
+                  campaignName: widget.campaignName,
+                )),
+            icon: const Icon(Icons.security),
+            tooltip: 'Fraud',
+          ),
+          // Generate Report Button
+          IconButton(
+            onPressed: _generateReport,
+            icon: const Icon(Icons.assessment),
+            tooltip: 'Generate Report',
+          ),
           IconButton(
             onPressed: _refreshData,
             icon: const Icon(Icons.refresh),

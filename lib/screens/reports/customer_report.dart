@@ -33,7 +33,7 @@ class _CustomerReportState extends State<CustomerReport> {
   InAppWebViewController? webViewController;
 
   String _getReportUrl() {
-    return "https://lightslategrey-whale-350840.hostingersite.com/api/v1/campaign/report/timely_individual_campaign_report?from_date=$fromDate&to_date=$toDate&processed_by=${widget.customerId}";
+    return "https://visibledm.com/api/v1/campaign/report/timely_individual_campaign_report?from_date=$fromDate&to_date=$toDate&processed_by=${widget.customerId}";
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:visible/model/campaign/campaign_model.dart';
 import 'package:visible/screens/admin/campaign/add_product.dart';
 import 'package:visible/screens/admin/campaign/campaign_detail.dart';
 import 'package:visible/screens/admin/campaign/create_campaign.dart';
+import 'package:visible/screens/reports/all_campaigns_report.dart'; // Add this import
 
 class AdminCampaignPage extends StatefulWidget {
   const AdminCampaignPage({super.key});
@@ -93,6 +94,14 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
           ),
         ),
         actions: [
+          // Add Report Button
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined),
+            onPressed: () {
+              Get.to(() => const AllCampaignsReport());
+            },
+            tooltip: 'Generate Report',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadCampaigns,
@@ -147,8 +156,33 @@ class _AdminCampaignPageState extends State<AdminCampaignPage> {
 
                 const SizedBox(height: 16),
 
-                // Summary Stats
-                if (!isLoading && errorMessage == null) _buildSummaryRow(),
+                // Summary Stats and Report Button Row
+                if (!isLoading && errorMessage == null)
+                  Column(
+                    children: [
+                      _buildSummaryRow(),
+                      const SizedBox(height: 12),
+                      // Generate Report Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Get.to(() => const AllCampaignsReport());
+                          },
+                          icon: const Icon(Icons.analytics),
+                          label: const Text('Generate All Campaigns Report'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accentOrange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

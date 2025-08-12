@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:visible/common/toast.dart';
 import 'package:visible/constants/app_constants.dart';
@@ -207,22 +208,55 @@ class AuthRepository {
       );
 
       if (response != null && response.statusCode == 200) {
-        // 🔐 Ask for permission
-        final status = await Permission.storage.request();
-        if (!status.isGranted) {
-          CommonUtils.showErrorToast("Storage permission denied");
-          return null;
+        // ✅ Android permission handling
+        if (Platform.isAndroid) {
+          if (Platform.version.compareTo("11") >= 0) {
+            // Android 11+ → Request All Files Access
+            var manageStatus = await Permission.manageExternalStorage.status;
+            if (!manageStatus.isGranted) {
+              manageStatus = await Permission.manageExternalStorage.request();
+            }
+            if (manageStatus.isPermanentlyDenied) {
+              CommonUtils.showErrorToast(
+                  "Storage permission permanently denied. Enable it from Settings.");
+              await openAppSettings();
+              return null;
+            }
+            if (!manageStatus.isGranted) {
+              CommonUtils.showErrorToast("Storage permission denied");
+              return null;
+            }
+          } else {
+            // Android 10 and below → Normal storage permission
+            var storageStatus = await Permission.storage.status;
+            if (!storageStatus.isGranted) {
+              storageStatus = await Permission.storage.request();
+            }
+            if (storageStatus.isPermanentlyDenied) {
+              CommonUtils.showErrorToast(
+                  "Storage permission permanently denied. Enable it from Settings.");
+              await openAppSettings();
+              return null;
+            }
+            if (!storageStatus.isGranted) {
+              CommonUtils.showErrorToast("Storage permission denied");
+              return null;
+            }
+          }
         }
 
-        // 📂 Path to real Downloads folder (works on most Android devices)
+        // 📂 Save to public Downloads folder
         final downloadsDir = Directory("/storage/emulated/0/Download");
+        if (!downloadsDir.existsSync()) {
+          downloadsDir.createSync(recursive: true);
+        }
         final filePath = "${downloadsDir.path}/payroll.xlsx";
         final file = File(filePath);
 
         // 💾 Save the file
         await file.writeAsBytes(response.data, flush: true);
 
-        CommonUtils.showToast("Payroll downloaded to Downloads folder.");
+        CommonUtils.showToast("Payroll saved to Downloads folder.");
         return file;
       } else {
         CommonUtils.showErrorToast(
@@ -231,7 +265,6 @@ class AuthRepository {
     } catch (e) {
       CommonUtils.showErrorToast("Download error: $e");
     }
-
     return null;
   }
 
@@ -242,6 +275,47 @@ class AuthRepository {
       final Response? response = await dioClient.getHTTP(
         '${ApiEndpoints.baseUrl}/auth/location?name=$search',
       );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future getUserRefarals({
+    required String userId,
+    required int page,
+  }) async {
+    try {
+      final Response? response = await dioClient.getHTTP(
+        '${ApiEndpoints.baseUrl}/user/user_referals/$userId?page=$page',
+      );
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future uploadPaymentExcel({
+    required String filePath,
+  }) async {
+    try {
+      // Prepare the file
+      final fileName = filePath.split('/').last;
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final Response? response = await dioClient.postHTTP(
+        '${ApiEndpoints.baseUrl}/campaign/payment',
+        formData,
+      );
+
       return response;
     } on DioException catch (e) {
       final errorMessage = DioExceptions.fromDioError(e).toString();

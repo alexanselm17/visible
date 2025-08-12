@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/user_controller.dart';
 import 'package:visible/model/users/user_model.dart';
+import 'package:visible/screens/admin/users/userRefarals.dart';
 import 'package:visible/screens/admin/users/users_search_deligate.dart';
 import 'package:visible/screens/reports/customer_report.dart';
 
@@ -494,6 +495,11 @@ class _UsersScreenState extends State<UsersScreen> {
         onTap: () {
           if (isSelectionMode) {
             _toggleUserSelection(user.id!);
+          } else {
+            Get.to(() => UserReferrals(
+                  userId: user.id,
+                  userName: user.fullname!,
+                ));
           }
         },
         onLongPress: () {

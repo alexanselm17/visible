@@ -181,7 +181,7 @@ class _AllCampaignsReportState extends State<AllCampaignsReport> {
           .loadUrl(
         urlRequest: URLRequest(
           url: WebUri(
-              "https://lightslategrey-whale-350840.hostingersite.com/api/v1/campaign/report/timely_campaign_report?from_date=$fromDate&to_date=$toDate"),
+              "https://visibledm.com/api/v1/campaign/report/timely_campaign_report?from_date=$fromDate&to_date=$toDate"),
           headers: {
             'Accept': '*/*',
             'Access-Control-Allow-Origin': '*',
@@ -395,7 +395,7 @@ class _AllCampaignsReportState extends State<AllCampaignsReport> {
                       InAppWebView(
                         initialUrlRequest: URLRequest(
                           url: WebUri(
-                              "https://lightslategrey-whale-350840.hostingersite.com/api/v1/campaign/report/timely_campaign_report?from_date=$fromDate&to_date=$toDate"),
+                              "https://visibledm.com/api/v1/campaign/report/timely_campaign_report?from_date=$fromDate&to_date=$toDate"),
                           headers: {
                             'Accept': '*/*',
                             'Access-Control-Allow-Origin': '*',

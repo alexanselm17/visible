@@ -96,4 +96,20 @@ class CampaignRepository {
       rethrow;
     }
   }
+
+  Future<Response?> fetchFraudInCampaign({required String campaignId}) async {
+    try {
+      final Response? response = await dioClient
+          .getHTTP('${ApiEndpoints.baseUrl}/campaign/fraud_advert/$campaignId');
+      Logger().i(response);
+
+      return response;
+    } on DioException catch (e) {
+      final errorMessage = DioExceptions.fromDioError(e).toString();
+      throw errorMessage;
+    } catch (e) {
+      CommonUtils.showErrorToast(e.toString());
+      rethrow;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:visible/constants/colors.dart';
 import 'package:visible/controller/authentication_controller.dart';
 import 'package:visible/model/users/admin_dashboard.dart';
+import 'package:visible/screens/admin/upload-payment_excel.dart';
 import 'package:visible/screens/admin/users/user_page.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -124,6 +125,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ],
           ),
         ),
+        PopupMenuItem<String>(
+          value: 'Upload Payment Excel',
+          child: Row(
+            children: [
+              const Icon(Icons.upload_file_outlined,
+                  size: 20, color: Colors.black87),
+              const SizedBox(width: 10),
+              Text('Upload Payment Excel',
+                  style: TextStyle(color: Colors.grey[800])),
+            ],
+          ),
+        ),
         const PopupMenuDivider(),
         const PopupMenuItem<String>(
           value: 'logout',
@@ -155,6 +168,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       case 'download_payroll':
         authenticationController.downloadPayRoll();
         break;
+      case 'Upload Payment Excel':
+        Get.to(const UploadPaymentExcelPage());
+        break;
+
       case 'logout':
         authenticationController.logOut();
         break;

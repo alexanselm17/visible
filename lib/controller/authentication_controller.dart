@@ -6,7 +6,9 @@ import 'package:visible/common/toast.dart';
 import 'package:visible/constants/roles_constants.dart';
 import 'package:visible/model/auth/location_search.dart';
 import 'package:visible/model/auth/sign_in_model.dart';
+import 'package:visible/model/users/referal_user.dart';
 import 'package:visible/model/users/report.dart' as report;
+import 'package:visible/model/users/user_model.dart';
 import 'package:visible/repository/auth_repository.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +19,7 @@ import 'package:visible/shared_preferences/user_pref.dart';
 
 import 'package:visible/screens/user/main_screen.dart' as user;
 import 'package:visible/screens/admin/main_screen.dart' as admin;
+import 'package:visible/model/users/user_model.dart' as ref;
 
 class AuthenticationController extends GetxController {
   final AuthRepository authRepository = AuthRepository();
@@ -363,5 +366,78 @@ class AuthenticationController extends GetxController {
         return userReport.data;
       } else {}
     } catch (e) {}
+  }
+
+  RxList<ref.Datum> users = <ref.Datum>[].obs;
+  var currentPage = 1.obs;
+  var lastPage = 1.obs;
+  var hasMoreData = true.obs;
+  var isFetchingMore = false.obs;
+
+  Future<void> getUserReferrals({
+    required String userId,
+    bool isRefresh = false,
+  }) async {
+    try {
+      if (isRefresh) {
+        users.clear();
+        currentPage.value = 1;
+        lastPage.value = 1;
+        hasMoreData.value = true;
+        isFetchingMore.value = false;
+      }
+
+      if (!hasMoreData.value) return;
+
+      if (currentPage.value == 1) {
+        isLoading.value = true;
+      } else {
+        isFetchingMore.value = true;
+      }
+
+      final userResponse = await authRepository.getUserRefarals(
+        userId: userId,
+        page: currentPage.value,
+      );
+      Logger().i("User referrals fetched: ${userResponse!.data}");
+
+      if (userResponse?.statusCode != 200) {
+        CommonUtils.showErrorToast(
+          'Failed to load users: API returned ${userResponse?.statusCode}',
+        );
+        return;
+      }
+
+      final referralData = RefaralUserModel.fromJson(userResponse!.data);
+
+      if (referralData.referrals?.data != null) {
+        final List<ref.Datum> newUsers = referralData.referrals!.data!
+            .map((e) => ref.Datum.fromJson(e.toJson()))
+            .toList();
+
+        // Avoid duplicates
+        final existingIds = users.map((user) => user.id).toSet();
+        final uniqueNewUsers =
+            newUsers.where((user) => !existingIds.contains(user.id)).toList();
+
+        users.addAll(uniqueNewUsers);
+        users.refresh();
+      }
+
+      lastPage.value = referralData.referrals?.lastPage ?? 1;
+      hasMoreData.value = (referralData.referrals!.nextPageUrl != null) &&
+          (currentPage.value < lastPage.value);
+
+      if (hasMoreData.value) {
+        currentPage.value++;
+      }
+    } catch (e, stackTrace) {
+      CommonUtils.showErrorToast('Failed to load users: $e');
+      Logger().e("Error fetching referrals: $e");
+      Logger().e("Stack trace: $stackTrace");
+    } finally {
+      isLoading.value = false;
+      isFetchingMore.value = false;
+    }
   }
 }

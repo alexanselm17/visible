@@ -91,7 +91,7 @@ class _CampaignReportPageState extends State<CampaignReportPage> {
           InAppWebView(
             initialUrlRequest: URLRequest(
               url: WebUri.uri(Uri.parse(
-                  'https://lightslategrey-whale-350840.hostingersite.com/api/v1/campaign/report/campaign_report?campaign_id=${widget.campaignId}')),
+                  'https://visibledm.com/api/v1/campaign/report/campaign_report?campaign_id=${widget.campaignId}')),
               headers: {
                 'Accept': '*/*',
                 'Access-Control-Allow-Origin': '*',
